@@ -26,15 +26,15 @@ npm run dev
 
 Buka `http://localhost:3000`.
 
-Login demo: email `demo@flexrent.local`. Kalau `SMTP_HOST` dibiarkan kosong,
-tautan masuk tidak dikirim ke email tapi dicetak ke terminal dalam format
+Masuk demo: email `demo@flexrent.local`, sandi `Flexrent-Demo-2026!` (nilai itu
+dipasang `npm run db:seed` sebagai hash scrypt; override lewat env
+`DEMO_PASSWORD`, atau ganti kemudian dengan
+`npm run account:password -- demo@flexrent.local "sandi baru"`).
 
-```
-[magic link] demo@flexrent.local
-http://localhost:3000/api/auth/callback/nodemailer?token=...
-```
-
-Salin URL itu ke browser. Halaman `/login/verify` menjelaskan hal yang sama.
+Cara masuk utama adalah **email + sandi**, jadi tidak perlu email yang benar-benar
+terkirim. Tautan sekali pakai (magic link) masih ada sebagai jalan kedua, tetapi
+tombolnya hanya muncul bila `SMTP_HOST` terisi; tanpa SMTP isi email — termasuk
+undangan staf — hanya dicetak ke log.
 Data seed membuat satu tenant `bandung-ride` ("Bandung Ride Rental") dengan 10
 kendaraan (lengkap dengan tarif denda keterlambatan per unit), 5 pelanggan, 10
 pesanan, 3 jadwal perawatan, serta checklist PICKUP/RETURN untuk pesanan
@@ -54,6 +54,7 @@ publiknya sudah aktif di `http://localhost:3000/bandung-ride`.
 | `npm run db:migrate` | buat migrasi baru saat `schema.prisma` berubah |
 | `npm run db:deploy` | terapkan migrasi ke database target |
 | `npm run db:seed` | isi data demo (idempoten, menghapus baris demo lama) |
+| `npm run account:password -- "<email>" "<sandi>"` | pasang/ganti sandi akun yang sudah ada (membaca `.env`) |
 | `npm run db:studio` | Prisma Studio |
 
 ## Variabel environment
@@ -63,10 +64,13 @@ Semua rahasia lewat environment, tidak ada yang di-hardcode di kode.
 - `DATABASE_URL` — endpoint **pooler** Neon (`?sslmode=require&channel_binding=require`,
   dipakai runtime). `DIRECT_URL` — endpoint **direct**, dipakai Prisma supaya
   `CREATE EXTENSION` dan `ALTER TABLE` jalan.
-- `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST` — Auth.js v5. `AUTH_URL` wajib
-  cocok dengan URL yang diakses browser, kalau tidak magic link salah host.
+- `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST` — Auth.js v5. Sesi memakai JWT,
+  dan `AUTH_URL` menentukan host tautan magic link serta nama cookie sesi, jadi
+  harus sama persis dengan origin yang dibuka browser.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — kosong = tombol Google disembunyikan.
-- `SMTP_HOST` dkk — kosong = magic link dicetak ke terminal (mode dev).
+- `SMTP_HOST` dkk — kosong = email tidak dikirim; tombol tautan masuk ikut
+  disembunyikan dan masuk hanya lewat sandi.
+- `DEMO_PASSWORD` — sandi yang dipasang `prisma/seed.ts` untuk `demo@flexrent.local`.
 - `BLOB_READ_WRITE_TOKEN` — kosong = foto kendaraan dan foto checklist serah-terima
   ditulis ke `public/uploads`, KTP/SIM ditulis ke `private/uploads` (dua-duanya
   di-gitignore).
@@ -115,7 +119,8 @@ src/
                                     bookings/, customers/, maintenance/, auth/,
                                     marketing/, public/, payments/, billing/, settings/
   lib/
-    auth.ts                         konfigurasi Auth.js + magic link
+    auth.ts                         konfigurasi Auth.js: credentials + magic link (+ Google)
+    password.ts                     hash & verifikasi scrypt untuk sandi
     email.ts                        transporter SMTP (magic link + undangan staf)
     tenant.ts                       getTenantContext / requireTenant / requireWritable
     tenant-public.ts                resolusi {slug} -> tenant untuk halaman publik
@@ -150,16 +155,25 @@ src/
     queries/                        baca (selalu difilter tenantId)
 vercel.json                         build command Vercel (prisma generate + next build)
 .github/workflows/cron.yml          pemanggil /api/cron/* tiap jam dari GitHub Actions
+scripts/set-user-password.ts        alat CLI di balik npm run account:password
 ```
 
 ## Cara kerja multi-tenant
 
+- **Masuk = email + sandi** (Auth.js `credentials`, hash scrypt di
+  `users.passwordHash`). Sesi JWT 30 hari; `session.user.id` diambil dari
+  `token.sub` lewat callback, dan hak akses tetap dihitung dari `Membership` di
+  setiap permintaan — jadi staf yang dihapus kehilangan akses walau tokennya
+  belum kedaluwarsa. Tautan email (Nodemailer) dan Google tetap terdaftar sebagai
+  jalan kedua; keduanya butuh konfigurasi supaya muncul di formulir.
 - `requireTenant()` (src/lib/tenant.ts) mengembalikan sesi + membership +
   subscription + plan, atau melempar redirect ke `/login` / `/onboarding`.
   Dipakai di setiap halaman dashboard dan di awal setiap server action.
+- Percobaan masuk dibatasi `login` (10 percobaan / 5 menit per email + IP) lewat
+  `ipRateRejection()` yang sama dengan formulir booking.
 - `tenantId` **tidak pernah** dibaca dari input klien. Action mengambilnya dari
   konteks, lalu `where: { id, tenantId }` — milik tenant lain tidak tersentuh.
-- `context.canManage` (OWNER/STAFF) menentukan hak ubah, `context.isReadOnly`
+- `context.canManage` (OWNER/ADMIN) menentukan hak ubah, `context.isReadOnly`
   (PAST_DUE/CANCELED) membuat seluruh form dikunci tapi tetap bisa dibaca.
 - `plan.maxVehicles` ditegakkan di action, bukan hanya di UI: menambah kendaraan
   ke-11 di paket Starter ditolak dengan pesan yang menjelaskan batas paket.
@@ -577,23 +591,36 @@ staf + undangan email.
 - Syarat sewa disimpan sebagai teks multi-baris; `termsList()` memecahnya jadi
   butir dan tetap memakai syarat bawaan Flexrent kalau kosong.
 - **Undangan staf tidak membuat kata sandi.** `inviteStaffAction()` membuat
-  `User` (email saja) bila belum ada, lalu men-upsert `Membership` dengan
-  `invitedEmail` dan peran `ADMIN`/`STAFF`. Email undangan hanya berisi tautan
-  `/login`; staf masuk lewat magic link ke email yang sama, dan karena
-  `getUserByEmail` dipakai lebih dulu, akun hasil undangan tidak dibuat dua kali.
+  `User` (email saja, `passwordHash` kosong) bila belum ada, lalu men-upsert
+  `Membership` dengan `invitedEmail` dan peran `ADMIN`/`STAFF`. Email undangan
+  hanya berisi tautan `/login`, jadi tanpa SMTP staf itu belum bisa masuk:
+  pemilik rental membuatkan sandinya lewat
+  `npm run account:password -- email@staf.id "sandi"`, lalu menyampaikan sandi itu
+  di luar aplikasi. Karena `getUserByEmail` dipakai lebih dulu, akun hasil
+  undangan tidak dibuat dua kali.
   Batas `maxStaff` paket dijaga sebelum menambah kursi; tanpa `SMTP_HOST` pesan
   hanya dicetak ke log dan UI menandainya sebagai "belum terkirim".
   Staf non-admin melihat halaman pengaturan dalam mode baca-saja.
 
 ## Tes end-to-end (Playwright)
 
-`npm run test:e2e` menjalankan sembilan tes di `e2e/` pada satu worker Chromium.
+`npm run test:e2e` menjalankan lima belas tes di `e2e/` pada satu worker Chromium.
 Yang perlu diketahui kalau mengubahnya:
 
+- **`login-flow.spec.ts` memakai sandi seed.** Nilainya harus sama dengan
+  `DEMO_PASSWORD ?? "Flexrent-Demo-2026!"` di `prisma/seed.ts`; kalau sandbox
+  memakai sandi lain, jalankan `E2E_DEMO_PASSWORD="sandi" npm run test:e2e`.
+  Tes hanya mengirim 3–4 percobaan sehingga masih di bawah batas `login`
+  (10/5 menit) — jangan ditambahkan percobaan sandi salah berulang-ulang.
 - **Tidak ada ID yang dihafal.** Tenant diambil dari `/sitemap.xml`, lalu kendaraan
   pertama dari katalog bertanggal diklik seperti pengunjung biasa. Ganti seed, tes
   tetap jalan; kalau sitemap kosong, tes gagal dengan pesan "jalankan
   `npm run db:seed`".
+- **Link "Pesan" wajib `exact: true`.** Footer tenant punya tautan "Cek status
+  pesanan" yang datang lebih dulu di DOM, jadi pencarian longgar akan mengklik
+  rute `/booking` dan suite mati menunggu halaman wizard. Di dev kesalahan ini
+  tidak kelihatan — ulangi suite terhadap build produksi:
+  `npx next start -p 3100` lalu `E2E_BASE_URL=http://localhost:3100 npm run test:e2e`.
 - **Jendela tanggal diacak 30–180 hari ke depan.** Pesanan buatan tes terakhir masih
   `PENDING` dan memblokir kendaraannya, jadi tanggal acak mencegah bentrok saat
   suite dijalankan dua kali berturut-turut.
@@ -628,6 +655,9 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
    Migrasi `20261122103000_add_rate_limit_bucket` wajib ikut terpasang. Tanpa tabelnya
    `consumeRate` memilih fail-open: booking tetap diterima, tapi pembatasan laju mati
    tanpa suara — yang tersisa hanya `console.error("[rate-limit] …")` di log.
+   Migrasi `20261122180000_add_user_password_hash` juga wajib: kolom
+   `users.passwordHash` dibaca setiap percobaan masuk, jadi tanpa kolom itu
+   `/login` gagal duluan.
 2. **Build command membangkitkan client.** `vercel.json` menyetel
    `"buildCommand": "prisma generate && next build"`. Isian manual di
    Settings → Build & Deployment → Build Command mengalahkan file itu, dan deploy lalu
@@ -641,7 +671,7 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
    | `NEXT_PUBLIC_APP_URL` + `AUTH_URL` | origin produksi, keduanya | canonical, `og:url`, sitemap, tautan status di WhatsApp, `finish_url` Midtrans, dan magic link ikut nilai ini |
    | `AUTH_SECRET` | `npx auth secret` | tiket form anti-bot dan tanda tangan tautan dokumen ikut mati |
    | `CRON_SECRET` | nilai baru | keempat rute cron menjawab `401`: booking `PENDING` tidak pernah `EXPIRED` dan pencacah laju tidak pernah dibersihkan |
-   | `SMTP_HOST` dkk | kredensial nyata | tanpa SMTP tautan login hanya tercetak di log server, yang tidak bisa dibaca di Vercel |
+   | `SMTP_HOST` dkk | kredensial nyata | masuk tetap jalan (email + sandi); yang hilang cuma tombol tautan masuk dan email undangan staf — isinya hanya tercetak di log server yang tidak bisa dibaca di Vercel |
    | `BLOB_READ_WRITE_TOKEN` | token Vercel Blob | unggahan ditulis ke filesystem sementara dan hilang begitu instance dingin — termasuk KTP/SIM pelanggan |
    | `MIDTRANS_IS_SANDBOX` + `MIDTRANS_SERVER_KEY` | `"false"` + key produksi | webhook masih menunjuk sandbox; daftarkan ulang `https://{origin}/api/webhooks/midtrans` |
    | `WHATSAPP_PROVIDER` + `FONNTE_API_KEY` | `"fonnte"` | `"stub"` hanya menulis `NotificationLog`; pengingat H-1 dan keterlambatan tidak pernah sampai |
@@ -726,6 +756,17 @@ Sisa dari Fase 4 (kecil, dan sengaja tidak dipaksakan supaya fase tidak melebar)
   berjalan butuh order_id sendiri (skema nonce sudah mendukung).
 - **Notifikasi belum punya halaman admin.** `NotificationLog` bisa dibaca lewat
   Prisma Studio; belum ada tab riwayat pesan per pesanan/klien.
+- **Belum ada "lupa sandi".** Masuk sudah email + sandi dan pendaftaran langsung
+  membuat sandi, tapi tidak ada alur reset mandiri: sandi akun yang sudah ada hanya
+  bisa dipasang lewat `npm run account:password` (butuh akses ke basis data).
+  Tautan reset sejati tetap menuntut SMTP yang benar-benar terkirim.
+- **Pendaftaran lewat sandi belum membuktikan kepemilikan email.** Selama SMTP
+  mati, `registerWithPasswordAction` menyimpan akun tanpa `emailVerified`, jadi
+  siapa pun bisa mengklaim email orang lain sebagai akun miliknya sendiri —
+  yang terpengaruh hanya tenant buatannya. Risiko naik kalau Google OAuth
+  diaktifkan: Auth.js menautkan akun Google ke baris `User` beremail sama, sehingga
+  klaim lebih dulu bisa menumpang identitas. Aktifkan SMTP + verifikasi email,
+  atau biarkan `GOOGLE_CLIENT_ID` kosong, sebelum pendaftaran dibuka untuk publik.
 - Midtrans hanya memakai Snap Redirect (`redirect_url`), jadi `MIDTRANS_CLIENT_KEY`
   tidak dibaca kode. Embedded JS/popup perlu client key di sisi klien.
 - Cron bergantung pada GitHub Actions (`.github/workflows/cron.yml`). GitHub

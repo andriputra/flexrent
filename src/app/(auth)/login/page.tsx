@@ -1,15 +1,17 @@
 import { redirect } from "next/navigation"
 import { LoginForm } from "@/components/auth/login-form"
 import { auth } from "@/lib/auth"
+import { isEmailConfigured } from "@/lib/email"
 
 export const metadata = {
   title: "Masuk",
-  description: "Masuk ke dashboard rental Anda dengan tautan rahasia yang dikirim ke email.",
+  description: "Masuk ke dashboard rental Anda dengan email dan sandi.",
 }
 
 const ERROR_TEXT: Record<string, string> = {
   Verification: "Tautan masuk tidak valid atau sudah kedaluwarsa. Kirim tautan baru.",
-  google: "Masuk dengan Google belum selesai. Coba lagi atau gunakan tautan email.",
+  CredentialsSignin: "Email atau sandi tidak cocok. Coba lagi.",
+  google: "Masuk dengan Google belum selesai. Coba lagi atau pakai sandi.",
   Default: "Terjadi kesalahan saat masuk. Coba lagi sebentar.",
 }
 
@@ -29,6 +31,7 @@ export default async function LoginPage({
     <LoginForm
       mode={mode}
       googleEnabled={googleEnabled}
+      emailConfigured={isEmailConfigured()}
       error={params.error ? (ERROR_TEXT[params.error] ?? ERROR_TEXT.Default) : undefined}
     />
   )

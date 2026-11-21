@@ -4,13 +4,18 @@ import { useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Mail } from "lucide-react"
+import { LogIn, Mail, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { signInWithEmailAction, signInWithGoogleAction } from "@/server/actions/auth"
+import {
+  registerWithPasswordAction,
+  signInWithEmailAction,
+  signInWithGoogleAction,
+  signInWithPasswordAction,
+} from "@/server/actions/auth"
 
 const GOOGLE_LOGO = (
   <svg aria-hidden viewBox="0 0 24 24" className="size-4">
@@ -30,33 +35,74 @@ const GOOGLE_LOGO = (
   </svg>
 )
 
+const EMAIL_PATTERN = /^\S+@\S+\.\S+$/
+
 export function LoginForm({
   mode,
   googleEnabled,
+  emailConfigured,
   error,
 }: {
   mode: "login" | "register"
   googleEnabled: boolean
+  emailConfigured: boolean
   error?: string
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [formError, setFormError] = useState<string | null>(error ?? null)
 
   const isRegister = mode === "register"
-  const redirectTo = isRegister ? "/onboarding" : "/dashboard"
 
-  function submitEmail(event: React.FormEvent) {
+  function submitPassword(event: React.FormEvent) {
     event.preventDefault()
     setFormError(null)
     const value = email.trim()
-    if (!/^\S+@\S+\.\S+$/.test(value)) {
+    if (!EMAIL_PATTERN.test(value)) {
+      setFormError("Masukkan email yang valid, contoh rental@kita.id")
+      return
+    }
+    if (isRegister) {
+      if (name.trim().length < 2) {
+        setFormError("Nama minimal 2 karakter.")
+        return
+      }
+      if (password.length < 8) {
+        setFormError("Sandi minimal 8 karakter.")
+        return
+      }
+    } else if (!password) {
+      setFormError("Isi sandi Anda.")
+      return
+    }
+
+    startTransition(async () => {
+      const result = isRegister
+        ? await registerWithPasswordAction(name, value, password)
+        : await signInWithPasswordAction(value, password)
+      if (!result.ok) {
+        setFormError(result.error)
+        toast.error(result.error)
+        return
+      }
+      toast.success(isRegister ? "Akun berhasil dibuat." : "Anda masuk.")
+      router.push(result.data)
+    })
+  }
+
+  function submitEmailLink(event: React.FormEvent) {
+    event.preventDefault()
+    setFormError(null)
+    const value = email.trim()
+    if (!EMAIL_PATTERN.test(value)) {
       setFormError("Masukkan email yang valid, contoh rental@kita.id")
       return
     }
     startTransition(async () => {
-      const result = await signInWithEmailAction(value, redirectTo)
+      const result = await signInWithEmailAction(value, isRegister ? "/onboarding" : "/dashboard")
       if (!result.ok) {
         setFormError(result.error)
         toast.error(result.error)
@@ -72,8 +118,8 @@ export function LoginForm({
         <CardTitle className="text-xl">{isRegister ? "Buat akun rental Anda" : "Masuk ke Flexrent"}</CardTitle>
         <CardDescription>
           {isRegister
-            ? "Tanpa kartu kredit. Kami kirim tautan masuk ke email Anda, lalu Anda isi data rental."
-            : "Kami kirim tautan masuk ke email — tidak perlu mengingat sandi."}
+            ? "Pakai email dan sandi Anda sendiri. Tanpa kartu kredit, masa uji 14 hari berjalan otomatis."
+            : "Masuk dengan email dan sandi yang Anda buat saat mendaftar."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -88,7 +134,7 @@ export function LoginForm({
 
         {googleEnabled ? (
           <>
-            <form action={signInWithGoogleAction.bind(null, redirectTo)}>
+            <form action={signInWithGoogleAction.bind(null, isRegister ? "/onboarding" : "/dashboard")}>
               <Button type="submit" variant="outline" className="w-full" disabled={pending}>
                 {GOOGLE_LOGO}
                 Lanjut dengan Google
@@ -103,7 +149,23 @@ export function LoginForm({
           </>
         ) : null}
 
-        <form onSubmit={submitEmail} className="space-y-3">
+        <form onSubmit={submitPassword} className="space-y-3">
+          {isRegister ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Nama Anda</Label>
+              <Input
+                id="name"
+                name="name"
+                autoComplete="name"
+                placeholder="Andi"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                disabled={pending}
+                required
+              />
+            </div>
+          ) : null}
+
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -118,19 +180,44 @@ export function LoginForm({
               required
             />
           </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Sandi</Label>
+            <Input
+              id="password"
+              type="password"
+              name="password"
+              autoComplete={isRegister ? "new-password" : "current-password"}
+              placeholder={isRegister ? "Minimal 8 karakter" : "Sandi akun Anda"}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={pending}
+              required
+            />
+          </div>
+
           <Button
             type="submit"
             className="w-full bg-accent text-accent-foreground hover:bg-accent-hover"
             disabled={pending}
           >
-            <Mail aria-hidden />
-            {pending
-              ? "Mengirim…"
-              : isRegister
-                ? "Kirim tautan pendaftaran"
-                : "Kirim tautan masuk"}
+            {isRegister ? <User aria-hidden /> : <LogIn aria-hidden />}
+            {pending ? "Memproses…" : isRegister ? "Buat akun" : "Masuk"}
           </Button>
         </form>
+
+        {emailConfigured ? (
+          <form onSubmit={submitEmailLink} className="space-y-2">
+            <Separator />
+            <p className="text-xs text-muted-foreground">
+              Lupa sandi atau belum membuatnya? Kami kirim tautan masuk sekali pakai ke email ini.
+            </p>
+            <Button type="submit" variant="outline" className="w-full" disabled={pending}>
+              <Mail aria-hidden />
+              {pending ? "Mengirim…" : "Kirim tautan masuk"}
+            </Button>
+          </form>
+        ) : null}
 
         <p className="text-center text-sm text-muted-foreground">
           {isRegister ? "Sudah punya akun rental?" : "Belum punya rental?"}{" "}

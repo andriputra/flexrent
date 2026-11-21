@@ -1,4 +1,5 @@
 import { PrismaClient, type PlanCode } from "@prisma/client"
+import { hashPassword } from "../src/lib/password"
 
 const prisma = new PrismaClient()
 
@@ -153,10 +154,18 @@ async function main() {
   }
 
   const ownerEmail = "demo@flexrent.local"
+  // Sandi demo bisa diganti lewat env DEMO_PASSWORD supaya tidak ada kredensial
+  // bawaan yang sama di semua instalasi.
+  const demoPassword = process.env.DEMO_PASSWORD ?? "Flexrent-Demo-2026!"
   const owner = await prisma.user.upsert({
     where: { email: ownerEmail },
-    update: { name: "Pemilik Demo", emailVerified: new Date() },
-    create: { email: ownerEmail, name: "Pemilik Demo", emailVerified: new Date() },
+    update: { name: "Pemilik Demo", emailVerified: new Date(), passwordHash: await hashPassword(demoPassword) },
+    create: {
+      email: ownerEmail,
+      name: "Pemilik Demo",
+      emailVerified: new Date(),
+      passwordHash: await hashPassword(demoPassword),
+    },
   })
 
   const starter = await prisma.plan.findUniqueOrThrow({ where: { code: "STARTER" } })
@@ -412,7 +421,8 @@ async function main() {
   console.log(
     `Selesai: ${vehicles.length} kendaraan, ${customers.length} pelanggan, ${BOOKINGS.length} pesanan.`
   )
-  console.log(`Masuk sebagai ${ownerEmail} lewat tautan email (lihat terminal).`)
+  console.log(`Masuk sebagai ${ownerEmail} dengan sandi ${demoPassword}`)
+  console.log("Ganti sandi demo lewat env DEMO_PASSWORD sebelum menjalankan seed ini.")
 }
 
 main()

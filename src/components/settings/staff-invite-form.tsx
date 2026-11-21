@@ -112,7 +112,9 @@ export function StaffInviteForm({
 
       {!emailConfigured ? (
         <p className="text-xs text-muted-foreground">
-          SMTP belum dipasang, jadi undangan hanya tercatat di dashboard dan isinya dicetak ke log server.
+          SMTP belum dipasang, jadi undangannya tidak terkirim dan hanya tercatat di dashboard. Staf tetap bisa
+          masuk memakai email ini begitu sandinya dibuat:{" "}
+          <code className="rounded bg-muted px-1 py-0.5">{`npm run account:password -- email@staf.id SANDI_BARU`}</code>
         </p>
       ) : null}
     </form>

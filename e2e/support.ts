@@ -29,7 +29,9 @@ export async function tenantSlugFromSitemap(request: APIRequestContext): Promise
 /** Katalog bertanggal → detail kendaraan → wizard langkah 1. */
 export async function openWizard(page: Page, slug: string, ambil: string, kembali: string) {
   await page.goto(`/${slug}?ambil=${ambil}&kembali=${kembali}`)
-  await page.getByRole("link", { name: "Pesan" }).first().click()
+  // `exact: true` wajib: footer tenant punya tautan "Cek status pesanan" yang
+  // datang lebih dulu di DOM dan tetap cocok dengan pencarian "Pesan" yang longgar.
+  await page.getByRole("link", { name: "Pesan", exact: true }).first().click()
   await page.getByRole("link", { name: "Lanjut isi data penyewaan" }).click()
   // Rute wizard bisa dikompilasi saat sentuhan pertama, jadi jangan pakai timeout default.
   await expect(page).toHaveURL(/\/pesan\//, { timeout: 90_000 })

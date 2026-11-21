@@ -1,20 +1,13 @@
 import NextAuth, { type NextAuthConfig } from "next-auth"
+import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import Nodemailer from "next-auth/providers/nodemailer"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db"
+import { verifyPassword } from "@/lib/password"
 import { emailFrom, getEmailTransporter, smtpServer } from "@/lib/email"
 
-// Saat memproses tautan masuk, Auth.js menghapus sesi lama yang tertinggal di
-// cookie. PrismaAdapter memakai session.delete() yang gagal kalau barisnya memang
-// tidak ada (P2025). Error itu akan muncul sebagai "Configuration" di /login, jadi
-// deleteSession dibuat idempoten di sini.
-const adapter: NextAuthConfig["adapter"] = {
-  ...PrismaAdapter(prisma),
-  deleteSession: async (sessionToken: string) => {
-    await prisma.session.deleteMany({ where: { sessionToken } })
-  },
-}
+const adapter = PrismaAdapter(prisma)
 
 const providers: NextAuthConfig["providers"] = []
 
@@ -26,6 +19,31 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     })
   )
 }
+
+// Hash dummy dipakai saat email tidak dikenal supaya biayanya sama dengan
+// sandi salah — respons tidak membocorkan email mana yang sudah punya akun.
+// Panjangnya mengikuti keluaran hashPassword: salt 16 byte, kunci 64 byte.
+const PLACEHOLDER_HASH = ["scrypt", 16384, 8, 1, "0".repeat(32), "0".repeat(128)].join("$")
+
+// Email + sandi. Ini cara masuk utama karena tautan email butuh SMTP.
+providers.push(
+  Credentials({
+    name: "password",
+    credentials: {
+      email: { label: "Email", type: "email" },
+      password: { label: "Sandi", type: "password" },
+    },
+    async authorize(credentials) {
+      const email = String(credentials?.email ?? "").trim().toLowerCase()
+      const password = String(credentials?.password ?? "")
+      if (!email || !password) return null
+      const user = await prisma.user.findUnique({ where: { email } })
+      const cocok = await verifyPassword(password, user?.passwordHash ?? PLACEHOLDER_HASH)
+      if (!cocok || !user) return null
+      return { id: user.id, email: user.email, name: user.name, image: user.image }
+    },
+  })
+)
 
 // Magic link. Tanpa SMTP_HOST tautan hanya dicetak ke terminal (mode dev),
 // sehingga alur tetap bisa diuji tanpa akun email.
@@ -55,7 +73,18 @@ providers.push(
 
 export const authConfig: NextAuthConfig = {
   adapter,
-  session: { strategy: "database" },
+  // Sesi JWT: provider credentials tidak didukung pada sesi database. Hak akses
+  // tetap diperiksa ke basis data setiap permintaan (lihat lib/tenant.ts), jadi
+  // staf yang dihapus kehilangan akses meski tokennya belum kedaluwarsa.
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
+  callbacks: {
+    session({ session, token }) {
+      // Kode mengandalkan session.user.id untuk mencari membership, jadi id
+      // dipindahkan dari substrat token ke sesi.
+      if (session.user && token.sub) session.user.id = token.sub
+      return session
+    },
+  },
   providers,
   pages: {
     signIn: "/login",
