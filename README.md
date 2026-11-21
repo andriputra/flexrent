@@ -148,7 +148,8 @@ src/
   server/
     actions/                        tulis (FormData masuk, ActionResult keluar)
     queries/                        baca (selalu difilter tenantId)
-vercel.json                         jadwal cron untuk /api/cron/*
+vercel.json                         build command Vercel (prisma generate + next build)
+.github/workflows/cron.yml          pemanggil /api/cron/* tiap jam dari GitHub Actions
 ```
 
 ## Cara kerja multi-tenant
@@ -359,10 +360,14 @@ opsional reference/notes. Yang perlu diketahui:
 
 ### Cron dan pengingat WhatsApp
 
-`vercel.json` menyimpan empat jadwal: `/api/cron/booking-expired` tiap jam (`5 * * * *`),
-`/api/cron/booking-reminders` dua kali sehari (`0 1 * * *` dan `0 9 * * *`, UTC
-= 08:00 dan 16:00 WIB), dan `/api/cron/subscription` sekali sehari (`0 2 * * *` =
-09:00 WIB) untuk tagihan langganan. Booking `PENDING` lahir dengan `expiresAt` = +2 jam
+Jadwal cron dipegang `.github/workflows/cron.yml` (satu tick tiap jam, `0 * * * *` UTC
+= WIB + 7): `/api/cron/booking-expired` menutup `PENDING` yang lewat `expiresAt` sekaligus
+membersihkan pencacah laju, `/api/cron/booking-reminders` mengirim pengingat H-1 / hampir
+selesai / keterlambatan, dan `/api/cron/subscription` mengurus tagihan langganan.
+`vercel.json` sengaja tidak punya blok `crons` lagi — plan Hobby menolak ekspresi yang
+jalan lebih dari sekali sehari dan validasinya membuat build gagal. Ketiga rute idempoten
+(pengingat punya kunci dedupe, tagihan dicek per periode), jadi tick yang terlewat atau
+dobel tidak menghasilkan pesan ganda. Booking `PENDING` lahir dengan `expiresAt` = +2 jam
 (`PENDING_TTL_MS` di `src/server/actions/booking.ts`), dan cron pertama yang
 memindahkan baris itu ke `EXPIRED` sekaligus me-refresh halaman publik tenant.
 Jalankan manual:
@@ -501,8 +506,9 @@ ACTIVE ──invoice lewat dueAt──▶ PAST_DUE (dashboard baca-saja, halaman
 cancelAtPeriodEnd ──cron saat periode habis──▶ CANCELLED
 ```
 
-- **Tagihan lahir dari cron, bukan dari halaman.** `/api/cron/subscription` (02:00
-  WIB / `0 2 * * *` di `vercel.json`) membuat invoice periode berikutnya untuk
+- **Tagihan lahir dari cron, bukan dari halaman.** `/api/cron/subscription` — dipanggil
+  tiap jam oleh `.github/workflows/cron.yml`, jadi invoice terbit paling lambat satu jam
+  setelah periode habis — membuat invoice periode berikutnya untuk
   subscription yang `currentPeriodEnd <= sekarang`, menghormati
   `cancelAtPeriodEnd`, lalu menandai invoice yang lewat `dueAt` sebagai `PAST_DUE`.
   Nomor invoice `INV-YYMM-####` bernomor urut per bulan kalender; `ensureNextInvoice`
@@ -639,10 +645,19 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
    | `BLOB_READ_WRITE_TOKEN` | token Vercel Blob | unggahan ditulis ke filesystem sementara dan hilang begitu instance dingin — termasuk KTP/SIM pelanggan |
    | `MIDTRANS_IS_SANDBOX` + `MIDTRANS_SERVER_KEY` | `"false"` + key produksi | webhook masih menunjuk sandbox; daftarkan ulang `https://{origin}/api/webhooks/midtrans` |
    | `WHATSAPP_PROVIDER` + `FONNTE_API_KEY` | `"fonnte"` | `"stub"` hanya menulis `NotificationLog`; pengingat H-1 dan keterlambatan tidak pernah sampai |
-4. **Cron dan plan.** Jadwal di `vercel.json` ada empat; `5 * * * *` (expiry + prune)
-   dan dua pengingat harian butuh Vercel Cron dengan frekuensi per jam — plan Hobby
-   membatasi cron ke harian. Di host lain, penggantinya scheduler apa pun yang mengirim
-   `Authorization: Bearer ${CRON_SECRET}` ke rute yang sama.
+4. **Cron tidak lagi dimiliki Vercel.** `vercel.json` hanya menyimpan `buildCommand`;
+   jadwal ada di `.github/workflows/cron.yml` dan butuh dua isian di GitHub —
+   secret `CRON_SECRET` (nilai yang sama dengan yang dipakai di Vercel) dan variable
+   `APP_URL` (origin produksi). Verifikasi setelah keduanya diisi:
+
+   ```bash
+   gh workflow run cron.yml && gh run watch --exit-status
+   ```
+
+   Kalau project Vercel mengaktifkan Deployment Protection (Vercel Authentication /
+   Only Vercel Trusted Network), panggilan dari Actions kena `401` dan perlu header
+   `x-vercel-protection-bypass` — matikan proteksinya atau tambahkan secret
+   `BYPASS_PROTECTION` lalu kirim lewat header itu.
 5. **Smoke test setelah publish.**
 
    ```bash
@@ -712,8 +727,10 @@ Sisa dari Fase 4 (kecil, dan sengaja tidak dipaksakan supaya fase tidak melebar)
   Prisma Studio; belum ada tab riwayat pesan per pesanan/klien.
 - Midtrans hanya memakai Snap Redirect (`redirect_url`), jadi `MIDTRANS_CLIENT_KEY`
   tidak dibaca kode. Embedded JS/popup perlu client key di sisi klien.
-- Cron mengandalkan Vercel Cron (`vercel.json`). Di host lain, ganti dengan
-  scheduler yang mengirim `Authorization: Bearer ${CRON_SECRET}` ke tiga rute itu.
+- Cron bergantung pada GitHub Actions (`.github/workflows/cron.yml`). GitHub
+  menghentikan schedule pada repo yang 60 hari tanpa commit, dan tick bisa molor beberapa
+  menit di jam sibuk — belum ada alarm kalau sebuah tick gagal. Scheduler lain tetap bisa
+  dipakai selama mengirim `Authorization: Bearer ${CRON_SECRET}` ke tiga rute itu.
 - Pembayaran otomatis mengonfirmasi booking, tapi belum mengirim invoice/resi
   (PDF) dan belum ada penagihan deposit berulang.
 

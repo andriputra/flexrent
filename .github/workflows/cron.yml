@@ -1,0 +1,48 @@
+name: Cron operasional
+
+# Vercel plan Hobby menolak cron yang jalan lebih dari sekali sehari, jadi jadwal tidak
+# lagi tinggal di vercel.json: Actions memanggil tiga rute /api/cron/* sebagai HTTP biasa
+# dengan header Authorization yang sudah diperiksa isCronAuthorized().
+# Catatan: GitHub mematikan schedule pada repo yang 60 hari tidak ada commit, dan cron di
+# sini memakai UTC (WIB = UTC + 7).
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: cron-operasional
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      APP_URL: ${{ vars.APP_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Gerbang konfigurasi
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "Repository secret CRON_SECRET belum diisi (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          if [ -z "$APP_URL" ]; then
+            echo "Repository variable APP_URL belum diisi, misalnya https://flexrent-git-main-agusandriputras-projects.vercel.app"
+            exit 1
+          fi
+
+      - name: Panggil rute cron
+        run: |
+          gagal=0
+          for path in booking-expired booking-reminders subscription; do
+            code=$(curl -s -o /tmp/body.json -w '%{http_code}' -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/$path")
+            body=$(tr -d '\n' < /tmp/body.json | head -c 300)
+            echo "$path → $code $body"
+            if [ "$code" != "200" ]; then gagal=1; fi
+          done
+          exit $gagal
