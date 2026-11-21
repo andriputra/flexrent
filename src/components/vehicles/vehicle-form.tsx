@@ -43,6 +43,7 @@ export type VehicleFormValues = {
   priceWeekly: string
   priceMonthly: string
   deposit: string
+  lateFeeDaily: string
   odometer: string
   status: "AVAILABLE" | "RENTED" | "MAINTENANCE" | "INACTIVE"
   description: string
@@ -66,6 +67,7 @@ const DEFAULT_VALUES: VehicleFormValues = {
   priceWeekly: "",
   priceMonthly: "",
   deposit: "",
+  lateFeeDaily: "",
   odometer: "",
   status: "AVAILABLE",
   description: "",
@@ -146,6 +148,7 @@ export function VehicleForm({
   const priceWeekly = watch("priceWeekly")
   const priceMonthly = watch("priceMonthly")
   const deposit = watch("deposit")
+  const lateFeeDaily = watch("lateFeeDaily")
 
   const isMotor = type === "MOTOR"
 
@@ -434,7 +437,8 @@ export function VehicleForm({
           <CardTitle className="text-base">Tarif & deposit</CardTitle>
           <CardDescription>
             Sistem menghitung kombinasi termurah (harian / mingguan / bulanan) otomatis saat pelanggan
-            memesan. Kosongkan tarif mingguan atau bulanan bila tidak dipakai.
+            memesan. Kosongkan tarif mingguan atau bulanan bila tidak dipakai. Denda telat dipakai saat
+            pengembalian lewat dari jadwal dan bisa diubah staf sebelum disimpan.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -495,6 +499,21 @@ export function VehicleForm({
               error={errors.deposit?.message}
             >
               <Input id="deposit" inputMode="numeric" placeholder="200000" readOnly={readOnly} {...register("deposit")} />
+            </Field>
+
+            <Field
+              htmlFor="lateFeeDaily"
+              label="Denda telat per hari"
+              hint={moneyHint(lateFeeDaily) ?? "Kosongkan bila tidak didenda otomatis"}
+              error={errors.lateFeeDaily?.message}
+            >
+              <Input
+                id="lateFeeDaily"
+                inputMode="numeric"
+                placeholder="50000"
+                readOnly={readOnly}
+                {...register("lateFeeDaily")}
+              />
             </Field>
           </div>
 

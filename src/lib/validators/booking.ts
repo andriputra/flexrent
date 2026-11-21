@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { isStatusAction } from "@/lib/bookings/status"
 import { fromWib, rentalDays, toDayKey } from "@/lib/datetime"
 import { normalizePhone } from "@/lib/format"
 import { boolField, dayField, optionalText, timeField } from "./common"
@@ -80,6 +81,22 @@ export const bookingLookupInput = z.object({
 })
 
 export type BookingLookup = z.infer<typeof bookingLookupInput>
+
+/** Aksi status staf. Nama aksinya divalidasi, bukan status tujuannya. */
+export const bookingStatusInput = z.object({
+  code: z
+    .string()
+    .transform((value) => value.trim().toUpperCase())
+    .refine((value) => value.length >= 7 && value.length <= 20, "Kode booking tidak valid"),
+  action: z.string().refine(isStatusAction, "Aksi tidak dikenal"),
+  reason: optionalText("Alasan pembatalan", 200),
+})
+
+export const bookingStatusFieldLabels: Record<string, string> = {
+  code: "Kode booking",
+  action: "Aksi",
+  reason: "Alasan",
+}
 
 export const bookingFieldLabels: Record<string, string> = {
   vehicleId: "Kendaraan",

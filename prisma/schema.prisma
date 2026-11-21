@@ -400,6 +400,8 @@ model Vehicle {
   priceWeekly  Int?
   priceMonthly Int?
   deposit      Int          @default(0)
+  // Denda per hari saat kendaraan kembali lewat dari endsAt. Kosong = tidak didenda otomatis.
+  lateFeeDaily Int?
   status       VehicleStatus @default(AVAILABLE)
   odometer     Int?
   description  String?

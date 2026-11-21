@@ -84,6 +84,7 @@ describe("sanity tarif pada vehicleInput", () => {
     priceWeekly: "",
     priceMonthly: "",
     deposit: "1500000",
+    lateFeeDaily: "",
     odometer: "112400",
     status: "AVAILABLE",
     description: "",

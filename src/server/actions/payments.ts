@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import type { BookingPaymentStatus } from "@prisma/client"
 import { formatDateId } from "@/lib/datetime"
 import { formatRupiah } from "@/lib/format"
+import { textOf } from "@/lib/form"
 import { notifyBooking } from "@/lib/notifications"
 import { recomputeBooking } from "@/lib/payments/apply"
 import { getPaymentProvider } from "@/lib/payments/midtrans"
@@ -16,12 +17,6 @@ import { getPublicTenant } from "@/lib/tenant-public"
 import { bookingLookupInput } from "@/lib/validators/booking"
 import { manualPaymentInput, paymentFieldLabels } from "@/lib/validators/payment"
 import { findPublicBooking } from "@/server/queries/public"
-
-/** Payload formulir selalu string; field yang tidak ada dianggap kosong. */
-function textOf(formData: FormData, key: string): string {
-  const value = formData.get(key)
-  return typeof value === "string" ? value.trim() : ""
-}
 
 export type ManualPaymentResult = {
   code: string

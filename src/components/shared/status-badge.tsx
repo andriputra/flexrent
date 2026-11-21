@@ -1,6 +1,13 @@
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import type { BookingPaymentStatus, BookingStatus, PaymentStatus, VehicleStatus, VehicleType } from "@prisma/client"
+import type {
+  BookingPaymentStatus,
+  BookingStatus,
+  DepositStatus,
+  PaymentStatus,
+  VehicleStatus,
+  VehicleType,
+} from "@prisma/client"
 
 const VEHICLE_STATUS: Record<VehicleStatus, { label: string; className: string }> = {
   AVAILABLE: { label: "Tersedia", className: "bg-success/12 text-success" },
@@ -101,6 +108,22 @@ export function PaymentStatusBadge({ status, className }: { status: PaymentStatu
   const config = TRANSACTION_STATUS[status]
   return (
     <Badge variant="secondary" className={cn("border-transparent", config.className, className)}>
+      {config.label}
+    </Badge>
+  )
+}
+
+const DEPOSIT_STATUS: Record<DepositStatus, { label: string; className: string }> = {
+  HELD: { label: "Deposit dipegang", className: "bg-warning/15 text-warning" },
+  PARTIAL_REFUNDED: { label: "Deposit sebagian kembali", className: "bg-info/12 text-info" },
+  REFUNDED: { label: "Deposit dikembalikan", className: "bg-success/12 text-success" },
+  FORFEITED: { label: "Deposit hangus", className: "bg-danger/12 text-danger" },
+}
+
+export function DepositStatusBadge({ status, className }: { status: DepositStatus; className?: string }) {
+  const config = DEPOSIT_STATUS[status]
+  return (
+    <Badge variant="outline" className={cn(config.className, className)}>
       {config.label}
     </Badge>
   )

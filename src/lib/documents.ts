@@ -1,4 +1,11 @@
 import { createHmac, timingSafeEqual } from "node:crypto"
+import type { DocumentType } from "@prisma/client"
+
+export const DOCUMENT_LABEL: Record<DocumentType, string> = {
+  KTP: "KTP",
+  SIM: "SIM",
+  OTHER: "Dokumen lain",
+}
 
 /**
  * Tautan dokumen (KTP/SIM) berumur pendek. Route /api/dokumen/[id] tetap menuntut

@@ -4,10 +4,11 @@ SaaS penyewaan motor & mobil untuk rental lokal. Setiap rental (tenant) punya
 halaman admin sendiri dan satu halaman publik `/{slug}` untuk menerima pesanan.
 
 Fase yang sudah jalan di repo ini: **Fase 1 (fondasi)**, **Fase 2 (armada &
-perawatan)**, **Fase 3 (halaman publik & booking)**, dan **Fase 4 (pembayaran
-Midtrans + pencatatan manual, notifikasi WhatsApp, cron)**. Tagihan & deposit
-otomatis, laporan, dan undangan staf ada di fase berikutnya — lihat bagian
-**Belum dikerjakan**.
+perawatan)**, **Fase 3 (halaman publik & booking)**, **Fase 4 (pembayaran Midtrans
++ pencatatan manual, notifikasi WhatsApp, cron)**, dan **Fase 5 (operasional
+harian: status pesanan, kalender armada, checklist serah-terima, denda & deposit,
+halaman pelanggan)**. Laporan, pengaturan tenant, dan undangan staf ada di fase
+berikutnya — lihat bagian **Belum dikerjakan**.
 
 ## Menjalankan
 
@@ -33,8 +34,10 @@ http://localhost:3000/api/auth/callback/nodemailer?token=...
 
 Salin URL itu ke browser. Halaman `/login/verify` menjelaskan hal yang sama.
 Data seed membuat satu tenant `bandung-ride` ("Bandung Ride Rental") dengan 10
-kendaraan, 5 pelanggan, 10 pesanan, dan 3 jadwal perawatan. Halaman publiknya
-sudah aktif di `http://localhost:3000/bandung-ride`.
+kendaraan (lengkap dengan tarif denda keterlambatan per unit), 5 pelanggan, 10
+pesanan, 3 jadwal perawatan, serta checklist PICKUP/RETURN untuk pesanan
+`ONGOING` dan `COMPLETED` supaya halaman detail Fase 5 langsung terisi. Halaman
+publiknya sudah aktif di `http://localhost:3000/bandung-ride`.
 
 ## Skrip
 
@@ -44,7 +47,7 @@ sudah aktif di `http://localhost:3000/bandung-ride`.
 | `npm run build` / `npm start` | build & jalankan produksi |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run test` | Vitest (harga, jadwal, tanggal, rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp) |
+| `npm run test` | Vitest (harga, jadwal, tanggal, rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp, mesin status pesanan, checklist handover, denda & deposit) |
 | `npm run db:migrate` | buat migrasi baru saat `schema.prisma` berubah |
 | `npm run db:deploy` | terapkan migrasi ke database target |
 | `npm run db:seed` | isi data demo (idempoten, menghapus baris demo lama) |
@@ -61,8 +64,9 @@ Semua rahasia lewat environment, tidak ada yang di-hardcode di kode.
   cocok dengan URL yang diakses browser, kalau tidak magic link salah host.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — kosong = tombol Google disembunyikan.
 - `SMTP_HOST` dkk — kosong = magic link dicetak ke terminal (mode dev).
-- `BLOB_READ_WRITE_TOKEN` — kosong = foto kendaraan ditulis ke `public/uploads`,
-  KTP/SIM ditulis ke `private/uploads` (dua-duanya di-gitignore).
+- `BLOB_READ_WRITE_TOKEN` — kosong = foto kendaraan dan foto checklist serah-terima
+  ditulis ke `public/uploads`, KTP/SIM ditulis ke `private/uploads` (dua-duanya
+  di-gitignore).
 - `DOCUMENT_SECRET` — kunci HMAC untuk tautan berumur 5 menit yang membuka
   KTP/SIM di `/api/dokumen/{id}`. Kosong = memakai `AUTH_SECRET`; ganti nilainya
   kalau `AUTH_SECRET` berubah supaya tautan lama ikut mati.
@@ -95,14 +99,17 @@ src/
   app/[slug]/                         halaman publik tenant (lihat di bawah)
   app/(marketing)/                  landing + /harga
   app/(auth)/                       /login, /login/verify, /onboarding
-  app/(dashboard)/dashboard/        ringkasan, armada, perawatan, pembayaran
+  app/(dashboard)/dashboard/        ringkasan, armada, booking (+ kalender armada &
+                                    detail pesanan), pelanggan (+ detail), perawatan,
+                                    pembayaran
   app/api/auth/[...nextauth]/       route handler Auth.js
   app/api/dokumen/[id]/             baca KTP/SIM lewat tautan bertanda tangan
   app/api/webhooks/midtrans/        callback pembayaran (verifikasi + idempoten)
   app/api/cron/booking-expired/     expire PENDING lewat batas waktu
   app/api/cron/booking-reminders/   pengingat H-1, hampir selesai, terlambat
   components/                       ui/ (primitif), shared/, dashboard/, vehicles/,
-                                    maintenance/, auth/, marketing/, public/, payments/
+                                    bookings/, customers/, maintenance/, auth/,
+                                    marketing/, public/, payments/
   lib/
     auth.ts                         konfigurasi Auth.js + magic link
     tenant.ts                       getTenantContext / requireTenant / requireWritable
@@ -111,7 +118,10 @@ src/
     pricing.ts                      harga termurah harian/mingguan/bulanan
     quote.ts                        total sewa + sopir + deposit dari tarif DB
     booking-code.ts                 kode BR-YYMM-####
+    bookings/status.ts              mesin status: aksi mana yang boleh dari status sekarang
+    handover.ts                     posisi foto checklist, level bahan bakar, selisih odometer
     documents.ts                    tanda tangan HMAC tautan dokumen
+    form.ts                         pembaca field FormData untuk semua action
     terms.ts                        syarat sewa tenant + fallback
     schedule.ts                     konversi durasi <-> tanggal, bentrok slot
     datetime.ts                     semua perhitungan tanggal pakai WIB
@@ -119,7 +129,8 @@ src/
     storage.ts                      Vercel Blob dengan fallback lokal
     cron.ts                         penjaga Authorization: Bearer untuk /api/cron/*
     payments/                       provider.ts (interface) + midtrans.ts (Snap v2)
-                                    + reconcile.ts (due/paid/status) + apply.ts
+                                    + reconcile.ts (due/paid/status) + fees.ts
+                                    (denda & rencana pengembalian deposit) + apply.ts
                                     (webhook & manual lewat satu jalur)
     notifications/                  provider.ts (interface) + fonnte.ts + templates.ts
                                     + send.ts (dedupe lewat NotificationLog)
@@ -330,6 +341,101 @@ mencetaknya ke log.
   internasional, jadi `toInternationalPhone()` mengubahnya saat kirim. Nomor yang
   tidak valid membuat pesan di-*skip* (baris log `SKIPPED`), bukan error.
 
+## Operasional harian: booking & pelanggan
+
+| Rute | Isi |
+| --- | --- |
+| `/dashboard/bookings` | daftar pesanan (filter status + kendaraan + kata kunci, paginasi) — atau `?tampilan=kalender&mulai=YYYY-MM-DD` untuk timeline armada 14 hari |
+| `/dashboard/bookings/{code}` | detail: tagihan & pembayaran, checklist kondisi sebelum/sesudah, dokumen pelanggan, panel aksi + form checklist |
+| `/dashboard/customers` | daftar pelanggan + jumlah pesanan + nilai sewa + badge verifikasi, filter blacklist/verifikasi |
+| `/dashboard/customers/{id}` | riwayat sewa (50 terakhir), dokumen identitas + tombol verifikasi, panel ringkasan, aksi blacklist |
+| `/api/dokumen/{id}` | dipakai tombol "Buka" di detail pesanan & pelanggan |
+
+### Mesin status pesanan
+
+`src/lib/bookings/status.ts` satu-satunya tempat transisi ditandai:
+`PENDING → CONFIRMED` (Konfirmasi), `CONFIRMED → ONGOING` (Mulai sewa),
+`ONGOING → COMPLETED` (Selesai), `PENDING|CONFIRMED → CANCELLED` (Batalkan).
+UI hanya menampilkan aksi yang diizinkan matriks itu, tapi
+`changeBookingStatusAction` memvalidasi ulang di server — jadi tab lama atau dua
+staf tidak bisa memaksa lompatan status. Efek sampingnya ikut ditangani di sana:
+Konfirmasi mematikan `expiresAt` (cron tidak lagi kedaluwarsakan pesanan yang
+sudah di-ACC), Batalkan menyimpan `cancelledAt` + `cancelReason`, dan Mulai/Selesai
+memindahkan `Vehicle.status` (`RENTED` ↔ `AVAILABLE`; saat selesai kendaraan tetap
+`MAINTENANCE` kalau sedang dijadwalkan).
+
+Dua keputusan yang perlu diketahui:
+
+- **`COMPLETED` tidak bisa lewat tombol biasa.** Menu "Selesai" membuka form
+  pengembalian (`recordBookingClosingAction`) supaya denda dan deposit selalu ikut
+  tercatat; `changeBookingStatusAction` menolak `action=COMPLETE` dengan pesan yang
+  menjelaskan.
+- **Sewa yang sedang berjalan tidak bisa dibatalkan.** Setelah `ONGOING`, satu-satunya
+  jalan keluar adalah menyelesaikan lewat form pengembalian (uang dan kendaraan sudah
+  berpindah). Ini asumsi sederhana yang dipilih supaya tidak ada status "dibatalkan
+  tapi sudah dipakai".
+
+### Denda keterlambatan, kerusakan, dan deposit
+
+Form pengembalian menghitung nilainya dari baris `Payment`, bukan dari kolom:
+
+- `lateFee` terisi otomatis dari `Vehicle.lateFeeDaily × lateDays(...)`, dan
+  `lateDays` mengikuti kalender WIB (`endsAt` → tanggal kembali; balik sehari lewat
+  jatuh tempo = 1 hari). `lateFeeDaily` per kendaraan disunting di halaman detail
+  armada; kendaraan tanpa tarif denda = saran 0.
+- `damageFee` diisi manual, berdasar catatan kerusakan di checklist pengembalian.
+- Pengembalian deposit dibatasi `depositHeld − depositReturned` (deposit `SETTLED`
+  dikurangi deposit `REFUNDED`); lebih dari itu ditolak dengan "Maksimal Rp …".
+  Bila dipilih "Pakai Rp …", nilainya datang dari `depositRefundPlan()`: sisa sewa
+  yang belum dibayar + denda baru dipotong dulu dari deposit, sisanya yang kembali ke
+  pelanggan. `depositStatus` (`HELD`/`PARTIAL_REFUNDED`/`REFUNDED`/`FORFEITED`)
+  diturunkan dari hasil itu lewat `depositStatusAfterRefund()`.
+- Setiap pengembalian tercatat sebagai `Payment` `kind=DEPOSIT status=REFUNDED`
+  dengan `recordedById`, jadi uang keluar bisa diaudit; penutup transaksi tetap
+  memanggil `recomputeBooking()` sehingga status pelunasan tidak ditulis manual.
+
+### Checklist serah-terima & pengembalian
+
+Satu form (`HandoverChecklist`) untuk dua arah, `PICKUP`/`RETURN`, di panel kanan
+detail pesanan. `saveHandoverAction` menolak checklist yang tidak pada tempatnya
+(`typeRejection`): pengembalian butuh PICKUP dulu. Isinya: odometer, level bahan
+bakar, catatan kondisi, catatan kerusakan, dan foto per posisi (`FRONT`, `BACK`,
+`LEFT`, `RIGHT`, `DASHBOARD` + maksimum 8 file termasuk foto tambahan). Odometer
+pengembalian tidak boleh lebih kecil dari odometer pengambilan, dan `Vehicle.odometer`
+hanya naik mengikuti angka terbesar. Foto disimpan lewat `uploadImage()` ke folder
+`handovers/{slug}`; bila transaksi gagal, file yang baru diunggah dihapus lagi.
+
+`HandoverCompare` menampilkan PICKUP dan RETURN berdampingan plus selisihnya: jarak
+tempuh (`odometerDelta`), berkurangnya bahan bakar dalam perempat tangki
+(`fuelDropQuarters`/`fuelDropLabel`), dan posisi foto yang belum terisi
+(`missingPhotoPositions`). Di daftar pesanan, kolom Checklist menandai mana yang sudah
+ada. Karena tiap submit membuat baris `Handover` baru (bukan menimpa), koreksi
+sengaja bisa diulang dan riwayatnya tersimpan; perbandingan memakai entri terakhir
+tiap jenis.
+
+### Pelanggan, verifikasi dokumen, blacklist
+
+- `isBlacklisted` + `blacklistReason` disimpan di `Customer`. Penegakannya sudah ada
+  sejak Fase 3 (`findBlockedCustomer` di `createBookingAction`, lewat nomor WhatsApp),
+  jadi halaman ini hanya tempat mengaktifkannya; melepas blacklist mengosongkan
+  alasannya.
+- Verifikasi dokumen = `Document.isVerified` + `verifiedAt`, diubah lewat
+  `setDocumentVerifiedAction`. Badge "Terverifikasi" di daftar hanya menghitung
+  dokumen yang sudah disetujui staf. KTP/SIM dibuka lewat `documentViewLink()` —
+  tautan HMAC 5 menit yang **tetap menuntut sesi staf tenant pemilik** (lihat
+  "Halaman publik & booking").
+- Riwayat sewa per pelanggan dihitung dari `Booking` (yang `CANCELLED`/`EXPIRED` ikut
+  tampil dengan badge-nya), dan ringkasan daftar memakai satu `groupBy` per halaman,
+  bukan query per baris. "Nilai pesanan" tetap **nilai pesanan**, tetapi "Sisa bayar"
+  dan "Deposit tertahan" di halaman profil memakai `bookingMoney()` yang sama dengan
+  detail booking, jadi angkanya berasal dari baris `Payment`, bukan dari kolom.
+- `totalAmount` selalu termasuk deposit — sama seperti penawaran di halaman publik —
+  sehingga `rentDueOf()` (= `totalAmount − depositAmount + denda`) cocok. Seed demo
+  menulis angka itu beserta baris `Payment` (`RENTAL`/`DEPOSIT`), jadi data contoh
+  tidak lagi terlihat "lunas" padahal tidak ada penerimaan tercatat.
+- Tenant `PAST_DUE`/`CANCELLED` melihat semuanya dalam keadaan baca-saja: tombol aksi
+  mati dan action menolak lewat `requireWritable()`.
+
 ## Desain
 
 Navy `#0B1F3A` + amber `#F59E0B`, Plus Jakarta Sans, radius kartu 16px / input &
@@ -346,6 +452,10 @@ Aturan UI yang sudah diterapkan dan silakan diikuti saat menambah halaman:
   animasi menghormati `prefers-reduced-motion`.
 - Sidebar bisa diciutkan (tersimpan di localStorage), di mobile diganti bottom
   nav dengan tombol "Lainnya".
+- Kalender armada digambar sebagai satu CSS grid per kendaraan
+  (`190px repeat(hari, minmax(52px,1fr))`) dengan kolom label sticky; sel latar
+  berwarna dan bar segmen sama-sama diletakkan di `gridRow: 1`, jadi pesanan yang
+  bertumpuk tampil menumpuk alih-alih berpindah baris.
 - Uang dan tanggal dalam format Indonesia (`Rp 1.500.000`, `Sen, 21 Nov 2026`),
   seluruh perhitungan tanggal memakai WIB lewat `src/lib/datetime.ts`.
 
@@ -355,16 +465,17 @@ Sisa dari Fase 3 yang baru tertutup sebagian:
 
 - Biaya antar-jemput selalu disimpan `0` sampai pengaturan tenant (area + tarif
   antar) dibuat.
-- Unggah KTP/SIM masih opsional, dan tautan bertanda tangan
-  (`documentViewLink`) belum dipanggil dari mana-mana: tombol "buka dokumen"
-  baru dipasang saat panel detail pesanan di admin dibuat (Fase 5). Rutenya
-  sudah diuji manual — tanda tangan valid = 200, kedaluwarsa/diubah = 403.
+- Unggah KTP/SIM masih opsional di wizard publik, jadi verifikasi dokumen hanya
+  berarti "yang diunggah sudah disetujui staf". Tombol "Buka" dokumen sekarang sudah
+  dipasang (detail pesanan & pelanggan); rutenya diuji manual — tanda tangan valid +
+  sesi staf = 200, kedaluwarsa/diubah = 403, tanpa sesi = 401.
 
 Sisa dari Fase 4 (kecil, dan sengaja tidak dipaksakan supaya fase tidak melebar):
 
-- **Refund belum jadi transaksi.** Status `REFUNDED` ada di enum dan badge, tapi
-  webhook Midtrans memperlakukan `refund` sebagai `PENDING` dan admin hanya bisa
-  mencatat pembayaran masuk. Perlu satu aksi "kembalikan pembayaran" + alasan.
+- **Refund pembayaran sewa belum jadi transaksi.** Status `REFUNDED` ada di enum dan
+  badge, dan sejak Fase 5 dipakai untuk **pengembalian deposit** lewat form
+  pengembalian. Tapi webhook Midtrans masih memperlakukan `refund` sebagai `PENDING`,
+  dan belum ada aksi "kembalikan pembayaran sewa" (kind `RENTAL`) + alasan.
 - **Denda lewat Midtrans belum bisa.** `lateFee`/`damageFee` sudah ikut
   menghitung sisa bayar dan ditolak kalau melebihi, tapi checkout publik selalu
   memakai `transaction.id` = kode booking; denda yang muncul setelah pesanan
@@ -378,9 +489,28 @@ Sisa dari Fase 4 (kecil, dan sengaja tidak dipaksakan supaya fase tidak melebar)
 - Pembayaran otomatis mengonfirmasi booking, tapi belum mengirim invoice/resi
   (PDF) dan belum ada penagihan deposit berulang.
 
+Sisa dari Fase 5 (sengaja tidak dipaksakan supaya fase tidak melebar):
+
+- **Deposit yang dipotong tidak menghasilkan bukti potong.** Form pengembalian
+  menyimpan `damageFee`/`lateFee` dan `depositStatus`, tapi potongan yang tidak
+  kembali ke pelanggan tidak ditulis sebagai baris uang keluar — hanya `depositRefunded`
+  dan `Payment` `REFUNDED` untuk bagian yang dikembalikan.
+- **Denda tidak menagih sendiri.** Setelah `COMPLETED`, sisa + denda tampil di halaman
+  pembayaran dan bisa dicatat manual, tapi pelanggan tidak bisa membayar denda lewat
+  Midtrans (butuh order_id khusus, lihat Fase 4) dan tidak ada pengingat denda.
+- **Kalender armada hanya 14 hari** dan mulai dari hari ini (bisa digeser
+  `±14` lewat `?mulai=`); belum ada zoom minggu/bulan dan belum bisa drag untuk
+  memindahkan pesanan.
+- **Checklist tidak mengunci angka akhir.** Odometer & foto bisa diulang berapa pun
+  kali; versi terbaru yang dibandingkan, dan tidak ada audit "siapa mengubah apa".
+- **Verifikasi dokumen belum mengalir ke halaman publik.** Status terverifikasi hanya
+  tampak di admin; pelanggan yang dokumennya ditolak tidak diberi tahu (butuh template
+  WhatsApp + alasan penolakan).
+
 Di luar itu:
 
-- Menu pelanggan, laporan, pengaturan tenant, dan undangan staf.
-- E2E alur pemesanan di CI (sampai Fase 4 verifikasi dilakukan manual lewat
+- Laporan, pengaturan tenant, dan undangan staf.
+- E2E alur pemesanan di CI (sampai Fase 5 verifikasi dilakukan manual lewat
   browser + curl); unit test pricing/quote/booking-code/schedule/datetime,
-  rekonsiliasi pembayaran, tanda tangan Midtrans, dan template WhatsApp sudah ada.
+  rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp, mesin status,
+  handover, dan denda/deposit sudah ada.

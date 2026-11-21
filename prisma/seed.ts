@@ -212,6 +212,10 @@ async function main() {
 
   const vehicles = []
   for (const item of [...MOTOR, ...MOBIL]) {
+    // Tarif denda keterlambatan per kendaraan. Satu motor sengaja dibiarkan kosong
+    // supaya form pengembalian menampilkan saran Rp 0 dan angkanya diisi manual.
+    let lateFeeDaily: number | null = "seats" in item ? 250_000 : 50_000
+    if (item.plate === "D 2019 LZ") lateFeeDaily = null
     vehicles.push(
       await prisma.vehicle.create({
         data: {
@@ -233,6 +237,7 @@ async function main() {
           priceMonthly: item.priceMonthly,
           deposit: item.deposit,
           odometer: item.odometer,
+          lateFeeDaily,
           status: "AVAILABLE",
           description:
             "Kondisi prima, helm dua, dan tool kit lengkap. Servis rutin tercatat di jadwal perawatan.",
@@ -272,14 +277,16 @@ async function main() {
     const rentalAmount = days * vehicle.priceDaily
     const withDriver = vehicle.type === "MOBIL" && booking.customer % 2 === 0
     const driverFee = withDriver ? days * vehicle.driverFee : 0
-    const paid =
-      booking.payment === "PAID"
-        ? rentalAmount + driverFee + vehicle.deposit
-        : booking.payment === "PARTIAL"
-          ? Math.round((rentalAmount + driverFee) * 0.5)
-          : 0
+    // Sama seperti penawaran di halaman publik: deposit ikut dihitung dalam totalAmount.
+    const totalAmount = rentalAmount + driverFee + vehicle.deposit
+    const rentDue = rentalAmount + driverFee
+    const rentPaid =
+      booking.payment === "PAID" ? rentDue : booking.payment === "PARTIAL" ? Math.round(rentDue * 0.5) : 0
+    // Deposit baru dianggap dipegang kalau uangnya benar-benar masuk.
+    const depositTaken = booking.payment === "PAID" ? vehicle.deposit : 0
+    const method = booking.payment === "PAID" ? "BANK_TRANSFER" : "CASH"
 
-    await prisma.booking.create({
+    const created = await prisma.booking.create({
       data: {
         tenantId: tenant.id,
         code: code(counter++),
@@ -300,12 +307,95 @@ async function main() {
         driverFee,
         rentalAmount,
         depositAmount: vehicle.deposit,
-        totalAmount: rentalAmount + driverFee,
-        paidAmount: paid,
+        totalAmount,
+        paidAmount: rentPaid,
         depositStatus: booking.status === "COMPLETED" ? "REFUNDED" : "HELD",
-        notes: booking.status === "CANCELLED" ? "Pelanggan membatalkan karena perubahan jadwal." : null,
+        cancelledAt: booking.status === "CANCELLED" ? new Date(startsAt.getTime() - DAY) : null,
+        cancelReason:
+          booking.status === "CANCELLED" ? "Pelanggan membatalkan karena perubahan jadwal." : null,
       },
     })
+
+    // Uang masuk ditulis sebagai baris pembayaran, bukan hanya kolom, supaya halaman
+    // pembayaran, detail booking, dan ringkasan pelanggan memakai angka yang sama.
+    if (rentPaid > 0) {
+      await prisma.payment.create({
+        data: {
+          tenantId: tenant.id,
+          bookingId: created.id,
+          kind: "RENTAL",
+          method,
+          status: "SETTLED",
+          amount: rentPaid,
+          paidAt: startsAt,
+          recordedById: owner.id,
+          notes: booking.payment === "PARTIAL" ? "Uang muka sewa" : "Pembayaran sewa lunas",
+        },
+      })
+    }
+    if (depositTaken > 0) {
+      await prisma.payment.create({
+        data: {
+          tenantId: tenant.id,
+          bookingId: created.id,
+          kind: "DEPOSIT",
+          method,
+          status: "SETTLED",
+          amount: depositTaken,
+          paidAt: startsAt,
+          recordedById: owner.id,
+          notes: "Deposit diterima saat serah-terima",
+        },
+      })
+    }
+    if (depositTaken > 0 && booking.status === "COMPLETED") {
+      await prisma.payment.create({
+        data: {
+          tenantId: tenant.id,
+          bookingId: created.id,
+          kind: "DEPOSIT",
+          method,
+          status: "REFUNDED",
+          amount: depositTaken,
+          paidAt: new Date(endsAt.getTime() + 2 * 60 * 60 * 1000),
+          recordedById: owner.id,
+          notes: "Deposit dikembalikan saat kendaraan kembali",
+        },
+      })
+    }
+
+    // Checklist kondisi untuk pesanan yang sudah diambil, supaya halaman detail
+    // langsung punya data sebelum/sesudah. Waktu pencatatan sengaja didekatkan ke
+    // jadwal agar demo tidak menampilkan keterlambatan palsu.
+    if (booking.status === "ONGOING" || booking.status === "COMPLETED") {
+      await prisma.handover.create({
+        data: {
+          bookingId: created.id,
+          tenantId: tenant.id,
+          type: "PICKUP",
+          odometer: vehicle.odometer,
+          fuelLevel: "FULL",
+          conditionNotes: "Kondisi prima, helm dua, bahan bakar penuh.",
+          recordedById: owner.id,
+          createdAt: startsAt,
+        },
+      })
+    }
+    if (booking.status === "COMPLETED") {
+      await prisma.handover.create({
+        data: {
+          bookingId: created.id,
+          tenantId: tenant.id,
+          type: "RETURN",
+          odometer: (vehicle.odometer ?? 0) + days * 45,
+          fuelLevel: "HALF",
+          conditionNotes: "Dibersihkan sebelum kembali, mesin normal.",
+          damageNotes: booking.vehicle === 6 ? "Baret halus di pintu kiri, tidak dikenakan biaya." : null,
+          recordedById: owner.id,
+          createdAt: new Date(endsAt.getTime() + 2 * 60 * 60 * 1000),
+        },
+      })
+    }
 
     // Status kendaraan mengikuti pesanan yang sedang berjalan agar dashboard langsung masuk akal.
     if (booking.status === "ONGOING") {

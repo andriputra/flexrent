@@ -87,6 +87,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                 priceWeekly: vehicle.priceWeekly ? String(vehicle.priceWeekly) : "",
                 priceMonthly: vehicle.priceMonthly ? String(vehicle.priceMonthly) : "",
                 deposit: vehicle.deposit ? String(vehicle.deposit) : "",
+                lateFeeDaily: vehicle.lateFeeDaily ? String(vehicle.lateFeeDaily) : "",
                 odometer: vehicle.odometer ? String(vehicle.odometer) : "",
                 status: vehicle.status,
                 description: vehicle.description ?? "",

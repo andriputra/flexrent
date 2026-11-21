@@ -109,7 +109,13 @@ export async function getPayableBookingOptions(tenantId: string) {
   return rows
     .map((booking) => {
       const outstanding = Math.max(0, rentDueOf(booking) - sumOf(booking.id, "RENTAL"))
-      const depositOutstanding = Math.max(0, booking.depositAmount - sumOf(booking.id, "DEPOSIT"))
+      // Deposit hanya ditagih selama sewanya belum ditutup. Setelah COMPLETED,
+      // siklus deposit selesai (dikembalikan atau dipotong denda) walaupun uang
+      // depositnya tidak pernah tercatat masuk.
+      const depositOutstanding =
+        booking.status === "COMPLETED"
+          ? 0
+          : Math.max(0, booking.depositAmount - sumOf(booking.id, "DEPOSIT"))
       return {
         code: booking.code,
         label: `${booking.code} · ${booking.customerName} · sisa ${formatRupiah(outstanding || depositOutstanding)}`,
