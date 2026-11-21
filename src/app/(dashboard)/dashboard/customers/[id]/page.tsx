@@ -91,6 +91,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 blacklistReason: customer.blacklistReason,
               }}
               readOnly={context.isReadOnly}
+              canManage={context.canManage}
             />
           </>
         }

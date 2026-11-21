@@ -152,6 +152,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                             blacklistReason: customer.blacklistReason,
                           }}
                           readOnly={context.isReadOnly}
+                          canManage={context.canManage}
                         />
                       </TableCell>
                     </TableRow>
@@ -186,6 +187,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                             blacklistReason: customer.blacklistReason,
                           }}
                           readOnly={context.isReadOnly}
+                          canManage={context.canManage}
                         />
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

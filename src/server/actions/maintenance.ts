@@ -46,7 +46,7 @@ export async function saveMaintenanceAction(formData: FormData): Promise<ActionR
     const startsAt = fromWib(startDay, startTime)
     const endsAt = fromWib(endDay, endTime)
 
-    const bookingConflict = await findConflictingBookings(vehicleId, startsAt, endsAt)
+    const bookingConflict = await findConflictingBookings(context.tenant.id, vehicleId, startsAt, endsAt)
     if (bookingConflict) {
       return fail(
         `${vehicle.plate} sedang dipesan pada rentang itu (booking ${bookingConflict.code}). Jadwal perawatan ditolak.`,
@@ -54,7 +54,12 @@ export async function saveMaintenanceAction(formData: FormData): Promise<ActionR
       )
     }
 
-    const maintenanceConflict = await findConflictingMaintenance(vehicleId, startsAt, endsAt)
+    const maintenanceConflict = await findConflictingMaintenance(
+      context.tenant.id,
+      vehicleId,
+      startsAt,
+      endsAt
+    )
     if (maintenanceConflict) {
       return fail("Sudah ada jadwal perawatan yang tumpang tindih pada tanggal tersebut.", {
         code: "CONFLICT",

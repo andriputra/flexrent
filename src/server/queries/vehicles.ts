@@ -129,9 +129,15 @@ export async function getVehicleBusyIntervals(
 }
 
 /** Bentrok untuk satu kendaraan, ditanyakan ke DB (sumber kebenaran sama dengan constraint). */
-export function findConflictingBookings(vehicleId: string, startsAt: Date, endsAt: Date) {
+export function findConflictingBookings(
+  tenantId: string,
+  vehicleId: string,
+  startsAt: Date,
+  endsAt: Date
+) {
   return prisma.booking.findFirst({
     where: {
+      tenantId,
       vehicleId,
       status: { in: [...ACTIVE_BOOKING_STATUSES] },
       startsAt: { lt: endsAt },
@@ -188,9 +194,10 @@ export async function getVehicleCalendar(
   ].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
 }
 
-export function findConflictingMaintenance(vehicleId: string, startsAt: Date, endsAt: Date) {
+export function findConflictingMaintenance(tenantId: string, vehicleId: string, startsAt: Date, endsAt: Date) {
   return prisma.maintenancePlan.findFirst({
     where: {
+      tenantId,
       vehicleId,
       isDone: false,
       startsAt: { lt: endsAt },

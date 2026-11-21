@@ -111,7 +111,10 @@ export async function changeBookingStatusAction(
 
       const vehicleStatus = vehicleStatusAfterAction(action)
       if (vehicleStatus) {
-        await tx.vehicle.updateMany({ where: { id: booking.vehicleId }, data: { status: vehicleStatus } })
+        await tx.vehicle.updateMany({
+          where: { id: booking.vehicleId, tenantId: context.tenant.id },
+          data: { status: vehicleStatus },
+        })
       }
 
       return recomputeBooking(tx, booking.id)
@@ -242,7 +245,7 @@ export async function recordBookingClosingAction(formData: FormData): Promise<Ac
 
       // Kendaraan kembali tersedia kecuali sedang dijadwalkan perawatan.
       await tx.vehicle.updateMany({
-        where: { id: booking.vehicleId, status: "RENTED" },
+        where: { id: booking.vehicleId, tenantId: context.tenant.id, status: "RENTED" },
         data: { status: "AVAILABLE" },
       })
 

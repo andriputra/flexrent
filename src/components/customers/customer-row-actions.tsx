@@ -17,11 +17,16 @@ import { BlacklistDialog } from "@/components/customers/blacklist-dialog"
 export function BlacklistButton({
   customer,
   readOnly = false,
+  canManage = true,
 }: {
   customer: { id: string; name: string; isBlacklisted: boolean; blacklistReason: string | null }
   readOnly?: boolean
+  canManage?: boolean
 }) {
   const [open, setOpen] = useState(false)
+
+  // Aksi daftar hitam ditolak server untuk STAFF, jadi kendali tidak ditampilkan.
+  if (!canManage) return null
 
   return (
     <>
@@ -50,13 +55,25 @@ export function BlacklistButton({
 export function CustomerRowActions({
   customer,
   readOnly = false,
+  canManage = true,
 }: {
   customer: { id: string; name: string; isBlacklisted: boolean; blacklistReason: string | null }
   readOnly?: boolean
+  canManage?: boolean
 }) {
   const [open, setOpen] = useState(false)
 
   if (readOnly) return null
+
+  if (!canManage) {
+    return (
+      <Button asChild size="icon-xs" variant="ghost" aria-label={`Buka profil ${customer.name}`}>
+        <Link href={`/dashboard/customers/${customer.id}`}>
+          <Eye />
+        </Link>
+      </Button>
+    )
+  }
 
   return (
     <>

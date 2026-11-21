@@ -286,7 +286,7 @@ export async function deleteVehicleAction(formData: FormData): Promise<ActionRes
     if (!vehicle) return fail("Kendaraan tidak ditemukan.", { code: "NOT_FOUND" })
 
     const activeBookings = await prisma.booking.count({
-      where: { vehicleId: id, status: { in: [...ACTIVE_BOOKING_STATUSES] } },
+      where: { tenantId: context.tenant.id, vehicleId: id, status: { in: [...ACTIVE_BOOKING_STATUSES] } },
     })
     if (activeBookings > 0) {
       return fail(

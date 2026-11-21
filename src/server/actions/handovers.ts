@@ -77,7 +77,7 @@ export async function saveHandoverAction(formData: FormData): Promise<ActionResu
 
     if (input.type === "RETURN" && input.odometer !== null) {
       const pickup = await prisma.handover.findFirst({
-        where: { bookingId: booking.id, type: "PICKUP" },
+        where: { tenantId: context.tenant.id, bookingId: booking.id, type: "PICKUP" },
         orderBy: { createdAt: "desc" },
         select: { odometer: true },
       })
@@ -135,7 +135,10 @@ export async function saveHandoverAction(formData: FormData): Promise<ActionResu
         if (input.odometer !== null) {
           const current = booking.vehicle.odometer ?? 0
           if (input.odometer > current) {
-            await tx.vehicle.update({ where: { id: booking.vehicleId }, data: { odometer: input.odometer } })
+            await tx.vehicle.update({
+              where: { id: booking.vehicleId, tenantId: context.tenant.id },
+              data: { odometer: input.odometer },
+            })
           }
         }
 
