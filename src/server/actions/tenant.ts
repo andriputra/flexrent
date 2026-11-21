@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
-import { prisma } from "@/lib/db"
+import { prisma, TX_OPTIONS } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { ACTIVE_TENANT_COOKIE } from "@/lib/tenant"
 import { slugify } from "@/lib/slug"
@@ -84,7 +84,7 @@ export async function createTenantAction(
     })
 
     return created
-  })
+  }, TX_OPTIONS)
 
   const store = await cookies()
   store.set(ACTIVE_TENANT_COOKIE, tenant.id, {

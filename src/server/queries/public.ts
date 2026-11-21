@@ -158,3 +158,12 @@ export function findBlockedCustomer(tenantId: string, phone: string) {
     select: { id: true },
   })
 }
+
+/** Dipakai untuk menyembunyikan tombol bayar deposit yang sudah lunas. */
+export async function isDepositPaid(tenantId: string, bookingId: string): Promise<boolean> {
+  const paid = await prisma.payment.findFirst({
+    where: { tenantId, bookingId, kind: "DEPOSIT", status: "SETTLED" },
+    select: { id: true },
+  })
+  return Boolean(paid)
+}

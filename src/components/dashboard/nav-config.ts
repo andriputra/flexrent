@@ -1,4 +1,4 @@
-import { Bike, LayoutDashboard, Wrench } from "lucide-react"
+import { Bike, LayoutDashboard, Wallet, Wrench } from "lucide-react"
 
 export type NavItem = {
   href: string
@@ -11,6 +11,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/vehicles", label: "Kendaraan", icon: Bike },
   { href: "/dashboard/maintenance", label: "Perawatan", icon: Wrench },
+  { href: "/dashboard/payments", label: "Pembayaran", icon: Wallet },
 ]
 
 /** Item aktif dicocokkan dengan awalan path agar sub-halaman ikut menyalakan menu. */

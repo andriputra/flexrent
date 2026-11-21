@@ -180,6 +180,24 @@ enum FuelLevel {
   @@map("FuelLevel")
 }
 
+enum NotificationKind {
+  BOOKING_CREATED
+  PAYMENT_SETTLED
+  PICKUP_REMINDER
+  RETURN_REMINDER
+  LATE_NOTICE
+
+  @@map("NotificationKind")
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+  SKIPPED
+
+  @@map("NotificationStatus")
+}
+
 // MARK: - Auth (Auth.js v5 / @auth/prisma-adapter)
 
 model Account {
@@ -271,6 +289,7 @@ model Tenant {
   payments            Payment[]
   maintenancePlans    MaintenancePlan[]
   webhookEvents       WebhookEvent[]
+  notifications       NotificationLog[]
 
   @@map("tenants")
 }
@@ -541,6 +560,7 @@ model Booking {
   payments   Payment[]
   handovers  Handover[]
   documents  Document[]
+  notifications NotificationLog[]
 
   @@index([tenantId, status, startsAt])
   @@index([tenantId, endsAt])
@@ -630,4 +650,26 @@ model WebhookEvent {
 
   @@unique([provider, eventId])
   @@map("webhook_events")
+}
+
+// Jejak notifikasi WhatsApp. dedupeKey (mis. "BR-2611-0001:2026-11-22") membuat cron
+// reminder H-1 hanya terkirim sekali meski cron berjalan dua kali sehari.
+model NotificationLog {
+  id        String             @id @default(cuid())
+  tenantId  String
+  bookingId String?
+  kind      NotificationKind
+  to        String
+  dedupeKey String
+  status    NotificationStatus @default(SENT)
+  provider  String             @default("stub")
+  detail    String?
+  createdAt DateTime           @default(now())
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, kind, dedupeKey])
+  @@index([tenantId, createdAt])
+  @@map("notification_logs")
 }

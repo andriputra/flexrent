@@ -18,7 +18,8 @@ import { cn } from "@/lib/utils"
 export function DashboardBottomNav({ publicUrl }: { publicUrl: string }) {
   const pathname = usePathname()
   const items = NAV_ITEMS.slice(0, 3)
-  const moreActive = items.every((item) => !isActiveItem(pathname, item))
+  const moreItems = NAV_ITEMS.slice(3)
+  const moreActive = moreItems.some((item) => isActiveItem(pathname, item)) || items.every((item) => !isActiveItem(pathname, item))
 
   return (
     <nav
@@ -59,6 +60,17 @@ export function DashboardBottomNav({ publicUrl }: { publicUrl: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="top" className="w-56">
               <DropdownMenuLabel>Lainnya</DropdownMenuLabel>
+              {moreItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link href={item.href}>
+                      <Icon aria-hidden />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                )
+              })}
               <DropdownMenuItem asChild>
                 <a href={publicUrl} target="_blank" rel="noreferrer">
                   Halaman publik

@@ -9,7 +9,8 @@ import { StorageError, deletePrivateFiles, uploadPrivateFile, type StoredPrivate
 import { fieldErrorsFromZod, fail, ok, safeAction, type ActionResult } from "@/lib/result"
 import type { Quote } from "@/lib/quote"
 import { bookingDraftInput, bookingFieldLabels, type BookingDraft } from "@/lib/validators/booking"
-import { prisma } from "@/lib/db"
+import { notifyBooking } from "@/lib/notifications"
+import { prisma, TX_OPTIONS } from "@/lib/db"
 import { findBlockedCustomer } from "@/server/queries/public"
 
 const PENDING_TTL_MS = 2 * 60 * 60_000
@@ -249,6 +250,27 @@ export async function createBookingAction(
           })
         }
         return booking
+      }, TX_OPTIONS)
+
+      // Pelanggan dikabari setelah baris booking aman; notifikasi tidak boleh
+      // membatalkan pesanan yang sudah terbentuk.
+      await notifyBooking({
+        tenantId: tenant.id,
+        tenant: { name: tenant.name, slug: tenant.slug, phone: tenant.phone },
+        bookingId: created.id,
+        kind: "BOOKING_CREATED",
+        booking: {
+          code: created.code,
+          status: "PENDING",
+          customerName: draft.name,
+          customerPhone: draft.phone,
+          startsAt,
+          endsAt,
+          totalAmount: quote.totalAmount,
+          paidAmount: 0,
+          lateFee: 0,
+          vehicle: { brand: vehicle.brand, model: vehicle.model },
+        },
       })
 
       return ok({ code: created.code, phone: draft.phone })

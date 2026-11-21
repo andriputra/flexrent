@@ -4,14 +4,17 @@ import { notFound } from "next/navigation"
 import { MessageCircle, SearchX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BookingLookupForm } from "@/components/public/booking-lookup-form"
+import { BookingPayButton } from "@/components/public/booking-pay-button"
 import { Stepper } from "@/components/shared/stepper"
 import { BookingPaymentBadge, BookingStatusBadge } from "@/components/shared/status-badge"
 import { formatDateId } from "@/lib/datetime"
 import { formatRupiah } from "@/lib/format"
+import { getPaymentProvider } from "@/lib/payments/midtrans"
+import { rentDueOf } from "@/lib/payments/reconcile"
 import { getPublicTenant, whatsappLink } from "@/lib/tenant-public"
 import { normalizePhone } from "@/lib/format"
 import { bookingLookupInput } from "@/lib/validators/booking"
-import { findPublicBooking } from "@/server/queries/public"
+import { findPublicBooking, isDepositPaid } from "@/server/queries/public"
 
 const TIMELINE = [
   { title: "Pesanan dibuat", description: "Menunggu konfirmasi staf" },
@@ -51,6 +54,7 @@ export default async function PublicBookingStatusPage({
 
   const raw = await searchParams
   const phone = typeof raw.phone === "string" ? raw.phone : ""
+  const justPaid = raw.paid === "1"
   const parsed = bookingLookupInput.safeParse({ code: rawCode, phone })
 
   if (!parsed.success) {
@@ -120,6 +124,10 @@ export default async function PublicBookingStatusPage({
   ]
 
   const closed = booking.status === "CANCELLED" || booking.status === "EXPIRED"
+  const outstanding = Math.max(0, rentDueOf(booking) - booking.paidAmount)
+  const canPay = Boolean(getPaymentProvider()) && !closed && outstanding > 0
+  const depositUnpaid = booking.depositAmount > 0 && !(await isDepositPaid(tenant.id, booking.id))
+  const awaitingVerification = justPaid && booking.paymentStatus !== "PAID"
 
   return (
     <div className="page-container space-y-6 py-6 sm:space-y-8 sm:py-8">
@@ -149,6 +157,13 @@ export default async function PublicBookingStatusPage({
           Pesanan menunggu konfirmasi staf
           {booking.expiresAt ? ` sampai ${formatDateId(booking.expiresAt, "d MMMM yyyy · HH:mm")}` : ""}. Hubungi
           WhatsApp di bawah supaya kami segera memeriksa stok kendaraannya.
+        </p>
+      ) : null}
+
+      {awaitingVerification ? (
+        <p className="rounded-xl bg-info/10 p-3 text-sm">
+          Pembayaran Anda sudah diterima dan sedang diverifikasi. Status berubah otomatis dalam beberapa menit — tidak
+          perlu membayar dua kali.
         </p>
       ) : null}
 
@@ -188,15 +203,49 @@ export default async function PublicBookingStatusPage({
                   <span className="tabular-nums">{formatRupiah(booking.paidAmount)}</span>
                 </li>
               ) : null}
+              {outstanding > 0 && !closed ? (
+                <li className="flex justify-between gap-3 font-medium">
+                  <span>Sisa bayar</span>
+                  <span className="tabular-nums">{formatRupiah(outstanding)}</span>
+                </li>
+              ) : null}
             </ul>
             <p className="mt-3 text-xs text-muted-foreground">
-              Pembayaran tunai atau transfer ke rental. Pembayaran online lewat Midtrans menyusul — nomor WhatsApp
-              Anda akan dihubungi untuk konfirmasi tagihan.
+              {canPay
+                ? "Bayar lewat tautan aman Midtrans di panel samping, atau tunai/transfer ke rental. Deposit dihitung terpisah dan dikembalikan saat kendaraan kembali."
+                : "Pembayaran tunai atau transfer ke rental. Nomor WhatsApp Anda akan dihubungi untuk konfirmasi tagihan."}
             </p>
           </section>
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-20">
+          {canPay ? (
+            <div className="rounded-2xl border bg-card p-4 shadow-card sm:p-5">
+              <p className="text-sm text-muted-foreground">Sisa bayar</p>
+              <p className="mb-3 text-2xl font-semibold tabular-nums">{formatRupiah(outstanding)}</p>
+              <BookingPayButton
+                slug={tenant.slug}
+                code={booking.code}
+                phone={booking.customerPhone}
+                kind="RENTAL"
+                label={`Bayar ${formatRupiah(outstanding)}`}
+                hint="Anda diarahkan ke halaman pembayaran Midtrans yang aman."
+              />
+              {depositUnpaid ? (
+                <div className="mt-2">
+                  <BookingPayButton
+                    slug={tenant.slug}
+                    code={booking.code}
+                    phone={booking.customerPhone}
+                    kind="DEPOSIT"
+                    variant="outline"
+                    label={`Bayar deposit ${formatRupiah(booking.depositAmount)}`}
+                    hint="Deposit dikembalikan saat kendaraan kembali dalam kondisi baik."
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <div className="rounded-2xl border bg-card p-4 shadow-card sm:p-5">
             <p className="mb-3 text-sm text-muted-foreground">Perlu bantuan atau ada perubahan jadwal?</p>
             <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent-hover">
