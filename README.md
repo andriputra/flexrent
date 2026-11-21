@@ -251,6 +251,11 @@ Yang perlu diketahui kalau mengubah bagian ini:
   tersisa ada di `/{slug}/booking/{code}` (rute itu tidak punya gerbang 404).
   Saat menambah halaman publik, jangan menaruh `notFound()` di dalam komponen
   yang dibungkus `<Suspense>`.
+- **Penjaga tampilan:** `src/app/not-found.tsx` (404 di luar rute tenant — rute
+  tenant punya `/{slug}/not-found.tsx` sendiri), `src/app/error.tsx` (gagal render
+  dengan tombol "Coba lagi"), dan `src/app/global-error.tsx` untuk kegagalan root
+  layout; yang terakhir ini sengaja memakai gaya inline karena tidak boleh
+  bergantung pada layout yang sedang rusak.
 - Langganan `PAST_DUE` / `CANCELLED` membuat `acceptingBookings` false: banner
   "sedang tidak menerima pesanan" muncul, kalkulator berhenti, dan
   `createBookingAction` menolak submit dengan pesan yang sama — halaman tetap
