@@ -40,6 +40,9 @@ yarn-error.log*
 # foto kendaraan yang diunggah saat dev tanpa BLOB_READ_WRITE_TOKEN
 /public/uploads
 
+# KTP/SIM yang diunggah saat dev tanpa BLOB_READ_WRITE_TOKEN (di luar folder public)
+/private
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

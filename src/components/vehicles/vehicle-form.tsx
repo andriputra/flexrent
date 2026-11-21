@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, useTransition } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
@@ -224,7 +225,7 @@ export function VehicleForm({
           <div className="space-y-1 text-sm">
             <p className="font-medium">{limitWarning}</p>
             <Button asChild variant="outline" size="sm">
-              <a href="/harga">Lihat pilihan paket</a>
+              <Link href="/harga">Lihat pilihan paket</Link>
             </Button>
           </div>
         </div>

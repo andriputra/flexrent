@@ -3,9 +3,10 @@
 SaaS penyewaan motor & mobil untuk rental lokal. Setiap rental (tenant) punya
 halaman admin sendiri dan satu halaman publik `/{slug}` untuk menerima pesanan.
 
-Fase yang sudah jalan di repo ini: **Fase 1 (fondasi)** dan **Fase 2 (armada &
-perawatan)**. Halaman publik pemesanan, Midtrans, WhatsApp, cron, dan tagihan ada
-di fase berikutnya — lihat bagian **Belum dikerjakan**.
+Fase yang sudah jalan di repo ini: **Fase 1 (fondasi)**, **Fase 2 (armada &
+perawatan)**, dan **Fase 3 (halaman publik & booking)**. Midtrans, notifikasi
+WhatsApp, cron, dan tagihan ada di fase berikutnya — lihat bagian **Belum
+dikerjakan**.
 
 ## Menjalankan
 
@@ -31,9 +32,8 @@ http://localhost:3000/api/auth/callback/nodemailer?token=...
 
 Salin URL itu ke browser. Halaman `/login/verify` menjelaskan hal yang sama.
 Data seed membuat satu tenant `bandung-ride` ("Bandung Ride Rental") dengan 10
-kendaraan, 5 pelanggan, 10 pesanan, dan 3 jadwal perawatan. Halaman publik
-`/bandung-ride` baru dibuat di Fase 3, jadi untuk melihat armadanya masuk ke
-dashboard.
+kendaraan, 5 pelanggan, 10 pesanan, dan 3 jadwal perawatan. Halaman publiknya
+sudah aktif di `http://localhost:3000/bandung-ride`.
 
 ## Skrip
 
@@ -60,7 +60,11 @@ Semua rahasia lewat environment, tidak ada yang di-hardcode di kode.
   cocok dengan URL yang diakses browser, kalau tidak magic link salah host.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — kosong = tombol Google disembunyikan.
 - `SMTP_HOST` dkk — kosong = magic link dicetak ke terminal (mode dev).
-- `BLOB_READ_WRITE_TOKEN` — kosong = foto kendaraan ditulis ke `public/uploads`.
+- `BLOB_READ_WRITE_TOKEN` — kosong = foto kendaraan ditulis ke `public/uploads`,
+  KTP/SIM ditulis ke `private/uploads` (dua-duanya di-gitignore).
+- `DOCUMENT_SECRET` — kunci HMAC untuk tautan berumur 5 menit yang membuka
+  KTP/SIM di `/api/dokumen/{id}`. Kosong = memakai `AUTH_SECRET`; ganti nilainya
+  kalau `AUTH_SECRET` berubah supaya tautan lama ikut mati.
 - `MIDTRANS_*`, `WHATSAPP_*`, `FONNTE_*`, `CRON_SECRET` — cadangan untuk fase
   berikutnya; sudah dideklarasikan supaya deploy tidak perlu mengubah kode.
 
@@ -73,17 +77,24 @@ prisma/
   migrations/20261121093956_.../    constraint anti-double-booking (btree_gist)
   seed.ts                           data demo
 src/
+  app/[slug]/                         halaman publik tenant (lihat di bawah)
   app/(marketing)/                  landing + /harga
   app/(auth)/                       /login, /login/verify, /onboarding
   app/(dashboard)/dashboard/        ringkasan, armada, perawatan
   app/api/auth/[...nextauth]/       route handler Auth.js
+  app/api/dokumen/[id]/             baca KTP/SIM lewat tautan bertanda tangan
   components/                       ui/ (primitif), shared/, dashboard/, vehicles/,
-                                    maintenance/, auth/, marketing/
+                                    maintenance/, auth/, marketing/, public/
   lib/
     auth.ts                         konfigurasi Auth.js + magic link
     tenant.ts                       getTenantContext / requireTenant / requireWritable
+    tenant-public.ts                resolusi {slug} -> tenant untuk halaman publik
     db.ts                           Prisma client singleton
     pricing.ts                      harga termurah harian/mingguan/bulanan
+    quote.ts                        total sewa + sopir + deposit dari tarif DB
+    booking-code.ts                 kode BR-YYMM-####
+    documents.ts                    tanda tangan HMAC tautan dokumen
+    terms.ts                        syarat sewa tenant + fallback
     schedule.ts                     konversi durasi <-> tanggal, bentrok slot
     datetime.ts                     semua perhitungan tanggal pakai WIB
     result.ts                       kontrak ActionResult untuk server action
@@ -125,6 +136,50 @@ Dua lapis:
 Rentang perawatan dicek terpisah (`maintenance_plans_period_is_valid` + query
 bentrok) karena tabel perawatan tidak ikut constraint booking.
 
+## Halaman publik & booking
+
+| Rute | Isi |
+| --- | --- |
+| `/{slug}` | katalog + pencarian tanggal, filter tipe/transmisi/harga; kendaraan yang sudah terisi pada rentang tanggal disembunyikan dan jumlah yang terisi ditampilkan sebagai catatan |
+| `/{slug}/kendaraan/{id}` | galeri 4:3, spesifikasi, kalender ketersediaan 3 bulan, kalkulator harga, syarat sewa, panel aksi menempel |
+| `/{slug}/pesan/{id}` | wizard 4 langkah: tanggal → data diri + KTP/SIM → pembayaran → konfirmasi |
+| `/{slug}/booking` | cek status pesanan dengan kode + nomor WhatsApp |
+| `/{slug}/booking/{code}?phone=08…` | status, timeline, jadwal, total, dan tombol WhatsApp |
+| `/api/dokumen/{id}` | hanya dibuka dengan tautan bertanda tangan yang belum kedaluwarsa |
+
+Yang perlu diketahui kalau mengubah bagian ini:
+
+- **Harga tidak dihitung di browser.** `useVehicleQuote` menanyakan
+  `quoteVehicleAction` (debounce 250 ms) dan action itu memakai `quoteRental`
+  dengan tarif dari database, jadi angka di halaman = angka yang ditulis ke
+  booking.
+- **Booking ditulis dalam satu transaksi**: cek bentrok, cek jadwal perawatan,
+  cek pelanggan yang di-blacklist (`findBlockedCustomer` lewat nomor
+  WhatsApp), upsert pelanggan (`tenantId + phone`), simpan dokumen, baru
+  `booking.create`. Kode `BR-YYMM-####` diambil dari nomor urut bulan berjalan
+  dan diulang sampai unik; kalau transaksi gagal, file yang baru diunggah ikut
+  dihapus lagi.
+- **KTP/SIM privat.** Filenya tidak pernah muncul di `public/`; hanya rute
+  `/api/dokumen/[id]` yang membacanya, dan rute itu menuntut sesi staf dari
+  tenant pemilik dokumen **plus** tanda tangan HMAC (`?e=`, `?s=`) yang umur
+  defaultnya 5 menit (`DOCUMENT_SECRET` / `AUTH_SECRET`, `timingSafeEqual`).
+- **Halaman publik memakai query tanpa nama pelanggan**
+  (`getPublicCalendarIntervals`), jadi kalender tidak membocorkan kode booking
+  atau nama penyewa.
+- **Skeleton dipasang sebagai `<Suspense>` inline, bukan `loading.tsx`.**
+  `loading.tsx` di segmen induk ternyata ikut membungkus rute anak, sehingga
+  `notFound()` (mis. ID kendaraan salah ketik) terkirim sebagai HTTP 200.
+  Sekarang gerbang `notFound()` selalu di atas boundary: katalog membungkus
+  hasil filter dengan `CatalogSkeleton`, detail kendaraan membungkus kalender
+  dengan `VehicleAvailabilitySkeleton`, dan satu-satunya `loading.tsx` yang
+  tersisa ada di `/{slug}/booking/{code}` (rute itu tidak punya gerbang 404).
+  Saat menambah halaman publik, jangan menaruh `notFound()` di dalam komponen
+  yang dibungkus `<Suspense>`.
+- Langganan `PAST_DUE` / `CANCELLED` membuat `acceptingBookings` false: banner
+  "sedang tidak menerima pesanan" muncul, kalkulator berhenti, dan
+  `createBookingAction` menolak submit dengan pesan yang sama — halaman tetap
+  bisa dibaca.
+
 ## Desain
 
 Navy `#0B1F3A` + amber `#F59E0B`, Plus Jakarta Sans, radius kartu 16px / input &
@@ -146,8 +201,23 @@ Aturan UI yang sudah diterapkan dan silakan diikuti saat menambah halaman:
 
 ## Belum dikerjakan
 
-- Halaman publik `/{slug}`: katalog, form pemesanan, checkout.
-- Midtrans di belakang `PaymentProvider`, deposit, invoice, status bayar.
+Sisa dari Fase 3 (sengaja ditinggal supaya tidak menabrak fase berikutnya):
+
+- Langkah 3 wizard baru menampilkan instruksi transfer/manual; belum ada
+  pembayaran online Midtrans di belakang `PaymentProvider`, belum ada invoice
+  dan rekonsiliasi status bayar.
+- Biaya antar-jemput selalu disimpan `0` sampai pengaturan tenant (area + tarif
+  antar) dibuat.
+- Unggah KTP/SIM masih opsional, dan tautan bertanda tangan
+  (`documentViewLink`) belum dipanggil dari mana-mana: tombol "buka dokumen"
+  baru dipasang saat panel detail pesanan di admin dibuat (Fase 5). Rutenya
+  sudah diuji manual — tanda tangan valid = 200, kedaluwarsa/diubah = 403.
+- `expiresAt` (2 jam) sudah ditulis ke booking, tapi belum ada cron yang
+  memindahkan `PENDING` → `EXPIRED`.
+
+Di luar itu:
+
 - Notifikasi WhatsApp, cron pengingat & penagihan (`CRON_SECRET`).
 - Menu pelanggan, laporan, pengaturan tenant, dan undangan staf.
-- Uji end-to-end alur pemesanan; unit test pricing/schedule sudah ada.
+- E2E alur pemesanan di CI (sampai Fase 3 verifikasi dilakukan manual lewat
+  browser); unit test pricing/quote/booking-code/schedule sudah ada.

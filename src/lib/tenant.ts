@@ -29,6 +29,15 @@ function effectiveStatus(subscription: Subscription | null) {
 }
 
 /**
+ * Langganan belum bisa dipakai menulis: dashboard jadi read-only dan halaman publik
+ * berhenti menerima pesanan. Tanpa langganan (tenant baru daftar) tetap boleh menulis.
+ */
+export function isSubscriptionBlocked(subscription: Subscription | null): boolean {
+  const status = effectiveStatus(subscription)
+  return status === "PAST_DUE" || status === "CANCELLED"
+}
+
+/**
  * Membaca sesi lalu mengembalikan tenant aktif + role.
  * Tenant dipilih dari cookie pilihan, jatuh ke membership pertama.
  * Nilai tenantId dari klien tidak pernah dipakai.

@@ -11,7 +11,8 @@ export type CalendarInterval = {
   startsAt: Date
   endsAt: Date
   kind: "BOOKING" | "MAINTENANCE"
-  label: string
+  /** dikosongkan di halaman publik supaya data pelanggan tidak bocor */
+  label?: string
 }
 
 const WEEKDAY_HEADERS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"]
