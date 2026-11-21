@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ResendLinkButton } from "@/components/auth/resend-link-button"
 
-export const metadata = { title: "Cek email Anda — Flexrent" }
+export const metadata = { title: "Cek email Anda" }
 
 export default async function VerifyRequestPage({
   searchParams,

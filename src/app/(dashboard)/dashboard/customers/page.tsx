@@ -19,7 +19,7 @@ import { formatRupiah } from "@/lib/format"
 import { requireTenant } from "@/lib/tenant"
 import { listCustomers } from "@/server/queries/customers"
 
-export const metadata = { title: "Pelanggan — Flexrent" }
+export const metadata = { title: "Pelanggan" }
 
 type SearchParams = { cari?: string; status?: string; verifikasi?: string; page?: string }
 

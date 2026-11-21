@@ -27,7 +27,7 @@ import { requireTenant } from "@/lib/tenant"
 import { getCustomerDetail, getCustomerHistory } from "@/server/queries/customers"
 import { bookingMoney } from "@/server/queries/bookings"
 
-export const metadata = { title: "Profil pelanggan — Flexrent" }
+export const metadata = { title: "Profil pelanggan" }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (

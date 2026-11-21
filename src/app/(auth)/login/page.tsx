@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/auth/login-form"
 import { auth } from "@/lib/auth"
 
 export const metadata = {
-  title: "Masuk — Flexrent",
+  title: "Masuk",
   description: "Masuk ke dashboard rental Anda dengan tautan rahasia yang dikirim ke email.",
 }
 

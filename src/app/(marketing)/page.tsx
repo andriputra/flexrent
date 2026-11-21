@@ -17,7 +17,7 @@ import { getPublicPlans } from "@/server/queries/plans"
 import { formatRupiah, formatRupiahShort } from "@/lib/format"
 
 export const metadata = {
-  title: "Flexrent — Kelola rental motor & mobil dalam satu tempat",
+  title: "Kelola rental motor & mobil dalam satu tempat",
 }
 
 const FEATURES = [

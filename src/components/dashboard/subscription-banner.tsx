@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { AlertTriangle, PartyPopper } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { diffInCalendarDays, toDayKey } from "@/lib/datetime"
+import { daysToRenewal } from "@/lib/billing"
+import { formatDateId } from "@/lib/datetime"
 import type { TenantContext } from "@/lib/tenant"
 
 /** Banner trial & read-only (langganan PAST_DUE/CANCELLED). */
@@ -35,7 +36,7 @@ export function SubscriptionBanner({ context }: { context: TenantContext }) {
   }
 
   if (subscription?.status === "TRIALING" && subscription.trialEndsAt) {
-    const daysLeft = Math.max(0, diffInCalendarDays(new Date(), subscription.trialEndsAt) + 1)
+    const daysLeft = Math.max(0, daysToRenewal(subscription.trialEndsAt))
     return (
       <div
         role="status"
@@ -45,7 +46,8 @@ export function SubscriptionBanner({ context }: { context: TenantContext }) {
           <PartyPopper aria-hidden className="mt-0.5 size-5 shrink-0 text-accent" />
           <div className="space-y-0.5">
             <p className="text-sm font-medium">
-              Masa trial {context.plan?.name ?? "Starter"} berakhir {toDayKey(subscription.trialEndsAt)}
+              Masa trial {context.plan?.name ?? "Starter"} berakhir{" "}
+              {formatDateId(subscription.trialEndsAt, "d MMMM yyyy")}
             </p>
             <p className="text-sm text-muted-foreground">
               Sisa {daysLeft} hari. Setelah trial selesai, langganan diteruskan otomatis ke paket ini.

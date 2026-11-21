@@ -7,7 +7,7 @@ import { VehicleForm } from "@/components/vehicles/vehicle-form"
 import { requireTenant } from "@/lib/tenant"
 import { countVehicles } from "@/server/queries/vehicles"
 
-export const metadata = { title: "Kendaraan baru — Flexrent" }
+export const metadata = { title: "Kendaraan baru" }
 
 export default async function NewVehiclePage() {
   const context = await requireTenant()

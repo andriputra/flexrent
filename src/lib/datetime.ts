@@ -116,4 +116,19 @@ export function startOfMonthWib(date: Date): Date {
   return fromWib(`${p.year}-${String(p.month).padStart(2, "0")}-01`, "00:00")
 }
 
+/**
+ * Rentang satu bulan kalender WIB sebagai [awal bulan, awal bulan berikutnya),
+ * supaya laporan bisa memakai filter `lt` alih-alih menambahkan 30/31 hari.
+ */
+export function monthRangeWib(date: Date): { start: Date; end: Date; label: string } {
+  const p = parts(date)
+  const year = p.month === 12 ? p.year + 1 : p.year
+  const month = p.month === 12 ? 1 : p.month + 1
+  return {
+    start: startOfMonthWib(date),
+    end: fromWib(`${year}-${String(month).padStart(2, "0")}-01`, "00:00"),
+    label: `${MONTHS_LONG[p.month - 1]} ${p.year}`,
+  }
+}
+
 export { MONTHS_LONG as monthsLong, WEEKDAYS_SHORT as weekdaysShort }

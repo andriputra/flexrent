@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { BookingStatus } from "@prisma/client"
-import { buildNotificationMessage, dedupeKeyFor, statusUrl, type NotifyBooking, type NotifyTenant } from "./templates"
+import {
+  buildNotificationMessage,
+  dedupeKeyFor,
+  statusUrl,
+  subscriptionDedupeKey,
+  subscriptionReminderMessage,
+  type NotifyBooking,
+  type NotifyTenant,
+} from "./templates"
 
 const tenant: NotifyTenant = { name: "Bandung Ride Rental", slug: "bandung-ride", phone: "0812-3456-7890" }
 
@@ -96,5 +104,41 @@ describe("dedupeKeyFor", () => {
 describe("statusUrl", () => {
   it("memakai nomor ternormalisasi supaya halaman status langsung cocok", () => {
     expect(statusUrl({ tenant, booking })).toContain("phone=08991234567")
+  })
+})
+
+describe("pengingat langganan", () => {
+  const base = {
+    planName: "Pro",
+    amount: 250_000,
+    periodEnd: new Date("2026-11-28T23:59:59+07:00"),
+    daysLeft: 7,
+  }
+
+  it("H-7 menyebut sisa hari, paket, dan nominal tagihan", () => {
+    const message = subscriptionReminderMessage(tenant, base)
+    expect(message).toContain("7 hari lagi")
+    expect(message).toContain("Paket Pro")
+    expect(message).toContain("Rp 250.000")
+    expect(message).toContain("Bandung Ride Rental")
+    expect(message).not.toMatch(/yyyy|MMMM|NaN/)
+  })
+
+  it("hari-H pakai kata hari ini, besok tetap pakai kata besok", () => {
+    expect(subscriptionReminderMessage(tenant, { ...base, daysLeft: 0 })).toContain("berakhir hari ini")
+    expect(subscriptionReminderMessage(tenant, { ...base, daysLeft: 1 })).toContain("berakhir besok")
+  })
+
+  it("lewat jatuh tempo menyebut jumlah hari dan pembatasan akses", () => {
+    const message = subscriptionReminderMessage(tenant, { ...base, daysLeft: -3 })
+    expect(message).toContain("sudah lewat 3 hari")
+    expect(message).toContain("hanya bisa dibaca")
+  })
+
+  it("satu tagihan hanya mengirim sekali per tonggak", () => {
+    expect(subscriptionDedupeKey("INV-2611-0002", { ...base, daysLeft: 7 })).toBe("INV-2611-0002:renewal:H-7")
+    expect(subscriptionDedupeKey("INV-2611-0002", { ...base, daysLeft: 1 })).toBe("INV-2611-0002:renewal:H-1")
+    expect(subscriptionDedupeKey("INV-2611-0002", { ...base, daysLeft: -1 })).toBe("INV-2611-0002:renewal:past-due")
+    expect(subscriptionDedupeKey(null, { ...base, daysLeft: 3 })).toBe("2026-11-28:renewal:H-3")
   })
 })

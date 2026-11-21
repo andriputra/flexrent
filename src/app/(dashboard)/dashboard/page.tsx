@@ -3,6 +3,7 @@ import { Armchair, Bike, CalendarClock, Percent, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState, PageHeader, StatCard } from "@/components/shared/layout-parts"
+import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { VehicleTypeBadge } from "@/components/shared/status-badge"
 import { formatDateId } from "@/lib/datetime"
 import { formatPercent, formatRupiah } from "@/lib/format"
@@ -50,12 +51,29 @@ export default async function DashboardPage() {
           icon={<Percent aria-hidden />}
         />
         <StatCard
-          label="Nilai booking bulan ini"
+          label="Pendapatan bulan ini"
           value={formatRupiah(summary.monthRevenue)}
-          hint={`${summary.monthBookingCount} booking dikonfirmasi/selesai`}
+          hint={`Kas masuk ${summary.monthLabel} dari pembayaran tercatat`}
           icon={<Wallet aria-hidden />}
         />
       </div>
+
+      <Card className="shadow-card">
+        <CardHeader className="gap-1">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="text-base">Pendapatan 30 hari</CardTitle>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/dashboard/reports">Laporan per kendaraan</Link>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Nominal yang benar-benar dibayar pelanggan (sewa dan denda), bukan nilai pesanan.
+          </p>
+        </CardHeader>
+        <CardContent className="px-3 pb-4">
+          <RevenueChart points={summary.revenueSeries} />
+        </CardContent>
+      </Card>
 
       {summary.vehicleTotal === 0 ? (
         <EmptyState

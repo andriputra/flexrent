@@ -2,38 +2,18 @@ import NextAuth, { type NextAuthConfig } from "next-auth"
 import Google from "next-auth/providers/google"
 import Nodemailer from "next-auth/providers/nodemailer"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import nodemailer from "nodemailer"
 import { prisma } from "@/lib/db"
+import { emailFrom, getEmailTransporter, smtpServer } from "@/lib/email"
 
 // Saat memproses tautan masuk, Auth.js menghapus sesi lama yang tertinggal di
 // cookie. PrismaAdapter memakai session.delete() yang gagal kalau barisnya memang
-// tidak ada (P2025) dan error itu tampil sebagai "Configuration" di /login, jadi
-// di sini deleteSession dibuat idempoten.
+// tidak ada (P2025). Error itu akan muncul sebagai "Configuration" di /login, jadi
+// deleteSession dibuat idempoten di sini.
 const adapter: NextAuthConfig["adapter"] = {
   ...PrismaAdapter(prisma),
   deleteSession: async (sessionToken: string) => {
     await prisma.session.deleteMany({ where: { sessionToken } })
   },
-}
-
-const smtpHost = process.env.SMTP_HOST
-const smtpPort = Number(process.env.SMTP_PORT ?? 587)
-const emailFrom = process.env.EMAIL_FROM ?? "Flexrent <noreply@localhost>"
-
-const smtpServer = {
-  host: smtpHost ?? "localhost",
-  port: smtpPort,
-  secure: smtpPort === 465,
-  auth: process.env.SMTP_USER
-    ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
-    : undefined,
-}
-
-let transporter: nodemailer.Transporter | null = null
-function getTransporter() {
-  if (!smtpHost) return null
-  transporter ??= nodemailer.createTransport(smtpServer)
-  return transporter
 }
 
 const providers: NextAuthConfig["providers"] = []
@@ -57,7 +37,7 @@ providers.push(
     // memakai transporter sendiri; jadi smtpServer hanya perlu ada.
     server: smtpServer,
     async sendVerificationRequest({ identifier, url, provider }) {
-      const transport = getTransporter()
+      const transport = getEmailTransporter()
       if (!transport) {
         console.log(`\n[magic link] ${identifier}\n${url}\n`)
         return

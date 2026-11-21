@@ -4,10 +4,7 @@ import { AlertTriangle, Bike, Clock, MapPin, MessageCircle, Phone } from "lucide
 import { Button } from "@/components/ui/button"
 import { WhatsAppFloat } from "@/components/public/whatsapp-float"
 import { getPublicTenant, whatsappLink } from "@/lib/tenant-public"
-
-function dayLabel(day: string): string {
-  return day.charAt(0).toUpperCase() + day.slice(1)
-}
+import { dayLabel } from "@/lib/opening-hours"
 
 export default async function TenantPublicLayout({
   children,

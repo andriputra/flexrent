@@ -20,7 +20,7 @@ import { formatRupiah } from "@/lib/format"
 import { requireTenant } from "@/lib/tenant"
 import { getPayableBookingOptions, listPayments } from "@/server/queries/payments"
 
-export const metadata = { title: "Pembayaran — Flexrent" }
+export const metadata = { title: "Pembayaran" }
 
 type SearchParams = { status?: string; metode?: string; cari?: string; page?: string }
 

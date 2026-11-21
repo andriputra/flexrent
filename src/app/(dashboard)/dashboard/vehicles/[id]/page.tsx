@@ -13,7 +13,7 @@ import { requireTenant } from "@/lib/tenant"
 import { addDays, formatDateTimeId } from "@/lib/datetime"
 import { getVehicle, getVehicleCalendar } from "@/server/queries/vehicles"
 
-export const metadata = { title: "Detail kendaraan — Flexrent" }
+export const metadata = { title: "Detail kendaraan" }
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const context = await requireTenant()

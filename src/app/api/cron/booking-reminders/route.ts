@@ -1,10 +1,9 @@
 import type { NextRequest } from "next/server"
-import type { NotificationKind } from "@prisma/client"
 import { Prisma } from "@prisma/client"
 import { addDays, fromWib, toDayKey } from "@/lib/datetime"
 import { prisma } from "@/lib/db"
 import { isCronAuthorized, unauthorizedCron } from "@/lib/cron"
-import { notifyBooking } from "@/lib/notifications"
+import { notifyBooking, type BookingNotificationKind } from "@/lib/notifications"
 
 export const runtime = "nodejs"
 
@@ -26,7 +25,7 @@ const reminderSelect = {
 type Scan = { scanned: number; sent: number; skipped: number }
 
 /** Satu jenis pengingat; kunci dedupe membuat cron yang jalan dua kali aman. */
-async function remind(kind: NotificationKind, where: Prisma.BookingWhereInput): Promise<Scan> {
+async function remind(kind: BookingNotificationKind, where: Prisma.BookingWhereInput): Promise<Scan> {
   const rows = await prisma.booking.findMany({
     where,
     select: reminderSelect,

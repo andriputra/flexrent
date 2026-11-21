@@ -1,8 +1,7 @@
 import { cache } from "react"
 import { prisma } from "@/lib/db"
+import { parseOpeningHours, type OpeningHour } from "@/lib/opening-hours"
 import { isSubscriptionBlocked } from "@/lib/tenant"
-
-export type OpeningHour = { day: string; open: string; close: string; closed?: boolean }
 
 export type PublicTenant = {
   id: string
@@ -18,18 +17,6 @@ export type PublicTenant = {
   openingHours: OpeningHour[]
   acceptingBookings: boolean
   closedMessage: string | null
-}
-
-function parseOpeningHours(value: unknown): OpeningHour[] {
-  if (!Array.isArray(value)) return []
-  return value.filter(
-    (row): row is OpeningHour =>
-      typeof row === "object" &&
-      row !== null &&
-      typeof (row as OpeningHour).day === "string" &&
-      typeof (row as OpeningHour).open === "string" &&
-      typeof (row as OpeningHour).close === "string"
-  )
 }
 
 /**

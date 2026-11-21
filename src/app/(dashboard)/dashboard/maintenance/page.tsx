@@ -19,7 +19,7 @@ import { requireTenant } from "@/lib/tenant"
 import { formatDateTimeId } from "@/lib/datetime"
 import { listMaintenancePlans, getVehicleOptions } from "@/server/queries/maintenance"
 
-export const metadata = { title: "Perawatan — Flexrent" }
+export const metadata = { title: "Perawatan" }
 
 type SearchParams = { vehicle?: string; selesai?: string; page?: string }
 

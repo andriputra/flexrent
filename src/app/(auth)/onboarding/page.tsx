@@ -5,7 +5,7 @@ import { OnboardingForm } from "@/components/auth/onboarding-form"
 import { auth } from "@/lib/auth"
 import { getTenantContext } from "@/lib/tenant"
 
-export const metadata = { title: "Buat rental Anda — Flexrent" }
+export const metadata = { title: "Buat rental Anda" }
 
 const LANGKAH = [
   { icon: Bike, label: "Data rental", aktif: true },

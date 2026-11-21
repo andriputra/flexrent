@@ -16,7 +16,7 @@ import { formatRupiah } from "@/lib/format"
 import { getPublicPlans } from "@/server/queries/plans"
 
 export const metadata = {
-  title: "Harga paket Flexrent",
+  title: "Harga paket",
   description:
     "Harga langganan Flexrent per bulan untuk usaha rental motor dan mobil: paket Starter, Pro, dan Business.",
 }

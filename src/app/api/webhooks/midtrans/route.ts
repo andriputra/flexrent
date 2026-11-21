@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/db"
 import { notifyBooking } from "@/lib/notifications"
-import { applyPaymentEvent } from "@/lib/payments/apply"
+import { applyInvoicePaymentEvent, applyPaymentEvent, isInvoiceOrder } from "@/lib/payments/apply"
 import { getPaymentProvider } from "@/lib/payments/midtrans"
 
 export const runtime = "nodejs"
@@ -51,33 +51,38 @@ export async function POST(request: NextRequest) {
     retried = true
   }
 
-  const applied = await applyPaymentEvent(event)
+  // order_id "-I" menagih tagihan langganan, sisanya menagih booking.
+  const invoiceMode = isInvoiceOrder(event.orderId)
+  const booking = invoiceMode ? null : await applyPaymentEvent(event)
+  const invoice = invoiceMode ? await applyInvoicePaymentEvent(event) : null
 
   await prisma.webhookEvent.update({
     where: { id: stored.id },
-    data: { processedAt: new Date(), tenantId: applied?.tenantId ?? null },
+    data: { processedAt: new Date(), tenantId: invoice?.tenantId ?? booking?.tenantId ?? null },
   })
 
-  if (applied) {
-    revalidatePath(`/${applied.tenant.slug}/booking/${applied.code}`)
+  if (invoice) revalidatePath("/dashboard/billing")
+
+  if (booking) {
+    revalidatePath(`/${booking.tenant.slug}/booking/${booking.code}`)
     revalidatePath("/dashboard/bookings")
-    if (applied.becamePaid) {
+    if (booking.becamePaid) {
       await notifyBooking({
-        tenantId: applied.tenant.id,
-        tenant: applied.tenant,
-        bookingId: applied.bookingId,
+        tenantId: booking.tenant.id,
+        tenant: booking.tenant,
+        bookingId: booking.bookingId,
         kind: "PAYMENT_SETTLED",
         booking: {
-          code: applied.code,
-          status: applied.status,
-          customerName: applied.customerName,
-          customerPhone: applied.customerPhone,
-          startsAt: applied.startsAt,
-          endsAt: applied.endsAt,
-          totalAmount: applied.totalAmount,
-          paidAmount: applied.paidAmount,
-          lateFee: applied.lateFee,
-          vehicle: applied.vehicle,
+          code: booking.code,
+          status: booking.status,
+          customerName: booking.customerName,
+          customerPhone: booking.customerPhone,
+          startsAt: booking.startsAt,
+          endsAt: booking.endsAt,
+          totalAmount: booking.totalAmount,
+          paidAmount: booking.paidAmount,
+          lateFee: booking.lateFee,
+          vehicle: booking.vehicle,
         },
       })
     }

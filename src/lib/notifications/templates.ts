@@ -87,8 +87,14 @@ const LATE_NOTICE = ({ tenant, booking }: NotifyInput) => {
 ${fine} Segera hubungi ${tenant.name} untuk pengembalian atau perpanjangan: ${statusUrl({ tenant, booking })}`
 }
 
-/** Template pesan Bahasa Indonesia, satu fungsi per jenis notifikasi. */
-export const templates: Record<NotificationKind, (input: NotifyInput) => string> = {
+/**
+ * Notifikasi yang menempel pada satu booking. `SUBSCRIPTION_REMINDER` tidak ikut
+ * di sini karena suratnya ditujukan ke rental, bukan ke pelanggannya.
+ */
+export type BookingNotificationKind = Exclude<NotificationKind, "SUBSCRIPTION_REMINDER">
+
+/** Template pesan Bahasa Indonesia, satu fungsi per jenis notifikasi booking. */
+export const templates: Record<BookingNotificationKind, (input: NotifyInput) => string> = {
   BOOKING_CREATED,
   PAYMENT_SETTLED,
   PICKUP_REMINDER,
@@ -96,7 +102,7 @@ export const templates: Record<NotificationKind, (input: NotifyInput) => string>
   LATE_NOTICE,
 }
 
-export function buildNotificationMessage(kind: NotificationKind, input: NotifyInput): string {
+export function buildNotificationMessage(kind: BookingNotificationKind, input: NotifyInput): string {
   return templates[kind](input)
 }
 
@@ -104,7 +110,7 @@ export function buildNotificationMessage(kind: NotificationKind, input: NotifyIn
  * Kunci anti ulang. Pengingat harian menyertakan tanggal supaya tetap terkirim
  * sekali per hari, konfirmasi pesanan/pembayaran cukup sekali seumur booking.
  */
-export function dedupeKeyFor(kind: NotificationKind, booking: NotifyBooking, today = new Date()): string {
+export function dedupeKeyFor(kind: BookingNotificationKind, booking: NotifyBooking, today = new Date()): string {
   switch (kind) {
     case "BOOKING_CREATED":
       return `${booking.code}:created`
@@ -117,4 +123,38 @@ export function dedupeKeyFor(kind: NotificationKind, booking: NotifyBooking, tod
     case "LATE_NOTICE":
       return `${booking.code}:late:${toDayKey(today)}`
   }
+}
+
+export type NotifySubscription = {
+  planName: string
+  amount: number
+  periodEnd: Date
+  /** Sisa hari sampai periode habis; negatif berarti tagihan sudah lewat jatuh tempo. */
+  daysLeft: number
+}
+
+/** Pengingat perpanjangan dan surat telat bayar, ditujukan ke nomor WhatsApp rental. */
+export function subscriptionReminderMessage(tenant: NotifyTenant, subscription: NotifySubscription): string {
+  const due = formatDateId(subscription.periodEnd, "EEEE, d MMMM yyyy")
+  const tagihan = `Paket ${subscription.planName}, tagihan ${formatRupiah(subscription.amount)}`
+  if (subscription.daysLeft < 0) {
+    return `Halo ${tenant.name}, masa pakai langganan Flexrent sudah lewat ${Math.abs(subscription.daysLeft)} hari (${due}).
+
+${tagihan} belum kami terima. Dashboard Anda sementara hanya bisa dibaca dan halaman publik berhenti menerima pesanan baru.
+Lunasi lewat menu Langganan untuk membuka kembali aksesnya.`
+  }
+  const when = subscription.daysLeft === 0 ? "hari ini" : subscription.daysLeft === 1 ? "besok" : `${subscription.daysLeft} hari lagi`
+  return `Halo ${tenant.name}, langganan Flexrent Anda berakhir ${when} (${due}).
+
+${tagihan} akan ditagihkan setelah periode berjalan habis.
+Lunasi lebih awal lewat menu Langganan supaya layanan tidak terhenti.`
+}
+
+/** Sekali terkirim per tagihan per tonggak (H-7/H-3/H-1), plus sekali saat lewat tempo. */
+export function subscriptionDedupeKey(
+  invoiceNumber: string | null,
+  subscription: NotifySubscription
+): string {
+  const milestone = subscription.daysLeft < 0 ? "past-due" : `H-${subscription.daysLeft}`
+  return `${invoiceNumber ?? toDayKey(subscription.periodEnd)}:renewal:${milestone}`
 }

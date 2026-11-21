@@ -4,7 +4,9 @@ import type {
   BookingPaymentStatus,
   BookingStatus,
   DepositStatus,
+  InvoiceStatus,
   PaymentStatus,
+  SubscriptionStatus,
   VehicleStatus,
   VehicleType,
 } from "@prisma/client"
@@ -122,6 +124,38 @@ const DEPOSIT_STATUS: Record<DepositStatus, { label: string; className: string }
 
 export function DepositStatusBadge({ status, className }: { status: DepositStatus; className?: string }) {
   const config = DEPOSIT_STATUS[status]
+  return (
+    <Badge variant="outline" className={cn(config.className, className)}>
+      {config.label}
+    </Badge>
+  )
+}
+
+const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; className: string }> = {
+  TRIALING: { label: "Masa coba", className: "bg-info/12 text-info" },
+  ACTIVE: { label: "Aktif", className: "bg-success/12 text-success" },
+  PAST_DUE: { label: "Tagihan tertunda", className: "bg-danger/12 text-danger" },
+  CANCELLED: { label: "Berhenti", className: "bg-muted text-muted-foreground" },
+}
+
+export function SubscriptionStatusBadge({ status, className }: { status: SubscriptionStatus; className?: string }) {
+  const config = SUBSCRIPTION_STATUS[status]
+  return (
+    <Badge variant="secondary" className={cn("border-transparent", config.className, className)}>
+      {config.label}
+    </Badge>
+  )
+}
+
+const INVOICE_STATUS: Record<InvoiceStatus, { label: string; className: string }> = {
+  DRAFT: { label: "Draf", className: "bg-muted text-muted-foreground" },
+  OPEN: { label: "Belum lunas", className: "bg-warning/15 text-warning" },
+  PAID: { label: "Lunas", className: "bg-success/12 text-success" },
+  CANCELLED: { label: "Dibatalkan", className: "bg-muted text-muted-foreground" },
+}
+
+export function InvoiceStatusBadge({ status, className }: { status: InvoiceStatus; className?: string }) {
+  const config = INVOICE_STATUS[status]
   return (
     <Badge variant="outline" className={cn(config.className, className)}>
       {config.label}

@@ -3,7 +3,7 @@
  * bawah ini, jadi Midtrans bisa ditukar Xendit tanpa menyentuh server action.
  */
 
-export type PaymentKindKey = "RENTAL" | "DEPOSIT"
+export type PaymentKindKey = "RENTAL" | "DEPOSIT" | "SUBSCRIPTION"
 
 export type CheckoutRequest = {
   orderId: string
@@ -42,17 +42,18 @@ export interface PaymentProvider {
 
 export class PaymentProviderError extends Error {}
 
-const KIND_SUFFIX: Record<PaymentKindKey, string> = { RENTAL: "R", DEPOSIT: "D" }
-const SUFFIX_KIND = { R: "RENTAL", D: "DEPOSIT" } as const
+const KIND_SUFFIX: Record<PaymentKindKey, string> = { RENTAL: "R", DEPOSIT: "D", SUBSCRIPTION: "I" }
+const SUFFIX_KIND = { R: "RENTAL", D: "DEPOSIT", I: "SUBSCRIPTION" } as const
 
-const ORDER_ID_PATTERN = /^(.+)-(R|D)(?:-(\d{4,14}))?$/
+const ORDER_ID_PATTERN = /^(.+)-(R|D|I)(?:-(\d{4,14}))?$/
 
 /**
- * order_id Midtrans harus unik. `attempt` dipakai saat pelanggan menekan bayar
- * lagi supaya transaksi baru tidak menabrak order_id lama yang sudah kedaluwarsa.
+ * order_id Midtrans harus unik. Untuk tagihan sewa `subject` adalah kode booking,
+ * untuk tagihan langganan itu nomor invoice. `attempt` dipakai saat pelanggan
+ * menekan bayar lagi supaya transaksi baru tidak menabrak order_id lama.
  */
-export function orderIdFor(bookingCode: string, kind: PaymentKindKey, attempt?: string): string {
-  const base = `${bookingCode}-${KIND_SUFFIX[kind]}`
+export function orderIdFor(subject: string, kind: PaymentKindKey, attempt?: string): string {
+  const base = `${subject}-${KIND_SUFFIX[kind]}`
   return attempt ? `${base}-${attempt}` : base
 }
 

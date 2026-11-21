@@ -38,7 +38,7 @@ import { DOCUMENT_LABEL, documentViewLink } from "@/lib/documents"
 import { requireTenant } from "@/lib/tenant"
 import { bookingMoney, getBookingDetail, type BookingDetail } from "@/server/queries/bookings"
 
-export const metadata = { title: "Detail booking — Flexrent" }
+export const metadata = { title: "Detail booking" }
 
 const KIND_LABEL: Record<PaymentKind, string> = {
   RENTAL: "Sewa & denda",

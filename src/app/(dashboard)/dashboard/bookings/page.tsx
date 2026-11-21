@@ -22,7 +22,7 @@ import { rentDueOf } from "@/lib/payments/reconcile"
 import { requireTenant } from "@/lib/tenant"
 import { getBookingVehicleOptions, getFleetTimeline, listBookings } from "@/server/queries/bookings"
 
-export const metadata = { title: "Booking — Flexrent" }
+export const metadata = { title: "Booking" }
 
 type SearchParams = {
   status?: string

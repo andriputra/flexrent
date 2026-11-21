@@ -5,10 +5,12 @@ halaman admin sendiri dan satu halaman publik `/{slug}` untuk menerima pesanan.
 
 Fase yang sudah jalan di repo ini: **Fase 1 (fondasi)**, **Fase 2 (armada &
 perawatan)**, **Fase 3 (halaman publik & booking)**, **Fase 4 (pembayaran Midtrans
-+ pencatatan manual, notifikasi WhatsApp, cron)**, dan **Fase 5 (operasional
++ pencatatan manual, notifikasi WhatsApp, cron)**, **Fase 5 (operasional
 harian: status pesanan, kalender armada, checklist serah-terima, denda & deposit,
-halaman pelanggan)**. Laporan, pengaturan tenant, dan undangan staf ada di fase
-berikutnya — lihat bagian **Belum dikerjakan**.
+halaman pelanggan)**, dan **Fase 6 (langganan SaaS: tagihan & cron, dashboard
+ringkasan + grafik, laporan pendapatan per kendaraan + CSV, pengaturan tenant &
+staf)**. Undangan staf lewat email sudah ada; penjadwalan biaya antar-jemput dan
+halaman riwayat notifikasi masih terbuka — lihat bagian **Belum dikerjakan**.
 
 ## Menjalankan
 
@@ -101,17 +103,19 @@ src/
   app/(auth)/                       /login, /login/verify, /onboarding
   app/(dashboard)/dashboard/        ringkasan, armada, booking (+ kalender armada &
                                     detail pesanan), pelanggan (+ detail), perawatan,
-                                    pembayaran
+                                    pembayaran, laporan, langganan, pengaturan
   app/api/auth/[...nextauth]/       route handler Auth.js
   app/api/dokumen/[id]/             baca KTP/SIM lewat tautan bertanda tangan
   app/api/webhooks/midtrans/        callback pembayaran (verifikasi + idempoten)
   app/api/cron/booking-expired/     expire PENDING lewat batas waktu
   app/api/cron/booking-reminders/   pengingat H-1, hampir selesai, terlambat
+  app/api/cron/subscription/        tagihan periode baru, PAST_DUE, pengingat perpanjangan
   components/                       ui/ (primitif), shared/, dashboard/, vehicles/,
                                     bookings/, customers/, maintenance/, auth/,
-                                    marketing/, public/, payments/
+                                    marketing/, public/, payments/, billing/, settings/
   lib/
     auth.ts                         konfigurasi Auth.js + magic link
+    email.ts                        transporter SMTP (magic link + undangan staf)
     tenant.ts                       getTenantContext / requireTenant / requireWritable
     tenant-public.ts                resolusi {slug} -> tenant untuk halaman publik
     db.ts                           Prisma client singleton
@@ -123,8 +127,13 @@ src/
     documents.ts                    tanda tangan HMAC tautan dokumen
     form.ts                         pembaca field FormData untuk semua action
     terms.ts                        syarat sewa tenant + fallback
+    opening-hours.ts                bentuk JSON jam operasional + label hari
     schedule.ts                     konversi durasi <-> tanggal, bentrok slot
     datetime.ts                     semua perhitungan tanggal pakai WIB
+    billing.ts                      siklus langganan: periode berikutnya, jatuh tempo
+    invoices.ts                     tagihan periode baru + total yang sudah masuk
+    csv.ts                          penulis CSV (BOM + kutip) untuk ekspor
+    reports.ts                      perhitungan laporan pendapatan per kendaraan
     result.ts                       kontrak ActionResult untuk server action
     storage.ts                      Vercel Blob dengan fallback lokal
     cron.ts                         penjaga Authorization: Bearer untuk /api/cron/*
@@ -311,15 +320,17 @@ opsional reference/notes. Yang perlu diketahui:
 
 ### Cron dan pengingat WhatsApp
 
-`vercel.json` menyimpan tiga jadwal: `/api/cron/booking-expired` tiap jam (`5 * * * *`)
-dan `/api/cron/booking-reminders` dua kali sehari (`0 1 * * *` dan `0 9 * * *`, UTC
-= 08:00 dan 16:00 WIB). Booking `PENDING` lahir dengan `expiresAt` = +2 jam
+`vercel.json` menyimpan empat jadwal: `/api/cron/booking-expired` tiap jam (`5 * * * *`),
+`/api/cron/booking-reminders` dua kali sehari (`0 1 * * *` dan `0 9 * * *`, UTC
+= 08:00 dan 16:00 WIB), dan `/api/cron/subscription` sekali sehari (`0 2 * * *` =
+09:00 WIB) untuk tagihan langganan. Booking `PENDING` lahir dengan `expiresAt` = +2 jam
 (`PENDING_TTL_MS` di `src/server/actions/booking.ts`), dan cron pertama yang
 memindahkan baris itu ke `EXPIRED` sekaligus me-refresh halaman publik tenant.
 Jalankan manual:
 
 ```bash
 curl -s -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/booking-reminders
+curl -s -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/subscription
 ```
 
 Lima pesan dalam Bahasa Indonesia (`src/lib/notifications/templates.ts`): pesanan
@@ -327,7 +338,9 @@ dibuat, pembayaran lunas, pengingat H-1 pengambilan, pengingat sewa hampir
 berakhir, dan notifikasi keterlambatan. Nomor booking, tanggal WIB, dan rupiah
 selalu disebut supaya jelas pesanan mana (nomor pengirim WhatsApp bersifat umum).
 Pesan dikirim lewat interface `WhatsAppNotifier`; tanpa Fonnte, `stubNotifier`
-mencetaknya ke log.
+mencetaknya ke log. Ditambah satu surat langganan
+(`subscriptionReminderMessage()`): pengingat perpanjangan H-7/H-3/H-1 dan
+"tagihan sudah lewat jatuh tempo" untuk pemilik rental.
 
 - **Satu pesan per hal, dijamin database.** `NotificationLog
   @@unique([tenantId, kind, dedupeKey])` menahan duplikat, dengan `dedupeKey`
@@ -436,6 +449,97 @@ tiap jenis.
 - Tenant `PAST_DUE`/`CANCELLED` melihat semuanya dalam keadaan baca-saja: tombol aksi
   mati dan action menolak lewat `requireWritable()`.
 
+## Langganan, laporan, dan pengaturan
+
+### Siklus langganan (Fase 6)
+
+Satu siklus bulanan, semuanya dihitung dari tanggal WIB:
+
+```
+TRIALING (14 hari) ──cron──▶ invoice periode 1 OPEN ──bayar──▶ ACTIVE
+ACTIVE ──invoice lewat dueAt──▶ PAST_DUE (dashboard baca-saja, halaman publik
+                               berhenti menerima pesanan) ──bayar──▶ ACTIVE
+cancelAtPeriodEnd ──cron saat periode habis──▶ CANCELLED
+```
+
+- **Tagihan lahir dari cron, bukan dari halaman.** `/api/cron/subscription` (02:00
+  WIB / `0 2 * * *` di `vercel.json`) membuat invoice periode berikutnya untuk
+  subscription yang `currentPeriodEnd <= sekarang`, menghormati
+  `cancelAtPeriodEnd`, lalu menandai invoice yang lewat `dueAt` sebagai `PAST_DUE`.
+  Nomor invoice `INV-YYMM-####` bernomor urut per bulan kalender; `ensureNextInvoice`
+  memakai ulang tagihan yang sudah ada, jadi cron yang jalan dua kali tidak
+  menagih dua kali.
+- **Masa uji tidak menagih.** `trialEndsAt` dipakai sebagai `currentPeriodEnd`
+  pertama, jadi invoice pertama baru terbit saat trial habis. `requireTenant()` juga
+  memperlakukan trial yang sudah lewat sebagai `PAST_DUE` supaya akses tidak bisa
+  bocor sebelum cron sempat jalan.
+- **Lunas = jumlah baris `Payment`.** `invoicePaidTotal()` menjumlahkan
+  `Payment{kind:"SUBSCRIPTION", status:"SETTLED"}`. Tidak ada kolom "sisa bayar"
+  yang bisa berbeda sendiri; `settleInvoice()` yang menulis `paidAt`/`status=PAID`
+  dan memajukan `currentPeriodEnd` hanya kalau tagihan yang dibayar memang menutup
+  periode setelahnya (bayar sebagian tidak memajukan periode).
+- **Bayar lewat Midtrans atau dicatat manual.** Snap memakai `order_id`
+  `INV-…-I` (suffix `-I` = tagihan langganan, lihat `lib/payments/provider.ts`);
+  webhook yang sama membedakan mode dari suffix dan memanggil
+  `applyInvoicePaymentEvent()`. Pencatatan transfer/tunai memakai
+  `recordInvoicePaymentAction()` dan melewati `settleInvoice()` yang sama.
+  Aksi pembayaran **sengaja tidak** dicegat `requireWritable()` — justru lewat
+  halaman inilah tenant yang terkunci membuka aksesnya kembali.
+- **Ganti paket berlaku periode berikutnya.** `changePlanAction()` menolak paket yang
+  lebih kecil dari pemakaian (jumlah kendaraan / staf aktif) dengan kode
+  `PLAN_LIMIT`, dan tidak mengubah tagihan yang sudah terbit.
+- **Pengingat perpanjangan** (H-7, H-3, H-1, dan surat "lewat jatuh tempo") dikirim
+  ke nomor WhatsApp pemilik lewat `notifySubscription()`; dedupe
+  `INV-…:renewal:H-7` menjamin satu pesan per tonggak.
+
+### Dashboard ringkasan
+
+`getDashboardSummary()` membaca semuanya dalam satu `Promise.all`. "Pendapatan bulan
+ini" dan grafik 30 hari memakai baris `Payment` `SETTLED` (`kind: "RENTAL"`), sehingga
+kas yang tampil adalah uang yang benar-benar masuk — bukan nilai pesanan. Okupansi
+30 hari dihitung dari irisan `startsAt`/`endsAt` booking aktif dengan jendela 30 hari
+dibagi `jumlah kendaraan × 30`. Grafik memakai Recharts (`components/dashboard/
+revenue-chart.tsx`) dengan warna token `--chart-2`.
+
+### Laporan per kendaraan + CSV
+
+`/dashboard/reports` (filter rentang tanggal + preset bulan ini / 30 hari / 7 hari)
+menampilkan bookings, hari sewa, dan kas masuk per kendaraan, dan
+`/dashboard/reports/export` menyajikan tabel yang sama sebagai
+`pendapatan-YYYY-MM-DD-YYYY-MM-DD.csv` (BOM UTF-8, CRLF, angka polos tanpa pemisah
+ribuan). Kolomnya teks biasa supaya bisa langsung dihitung ulang di spreadsheet.
+
+Dua hal yang sengaja dibedakan dan diberi label di halaman: **jumlah booking/hari
+sewa** dihitung dari masa sewa yang menyentuh rentang, sedangkan **uang** dihitung
+dari tanggal pembayaran. Sewa yang dibayar di bulan November tapi berjalan di
+Desember karena itu muncul di laporan November dan tidak di Desember.
+
+### Pengaturan tenant & staf
+
+`/dashboard/settings`: profil (nama, slug publik, kota, WhatsApp, email, alamat,
+tagline), logo, jam operasional 7 hari, syarat sewa (dengan pratinjau), dan daftar
+staf + undangan email.
+
+- Mengganti slug lebih dulu dicek ke `tenants.slug` milik tenant lain; kalau sudah
+  dipakai, formulir menolak dengan pesan jelas (nama alamat baru tidak diam-diam
+  diberi akhiran `-2` seperti saat onboarding). Setelah tersimpan, halaman publik
+  alamat lama dan baru sama-sama di-revalidate.
+- Logo memakai `uploadImage()` (`logos/{slug}`) — Vercel Blob kalau token diisi,
+  `public/uploads` kalau tidak. Logo lama dihapus setelah yang baru tersimpan.
+- Jam operasional disimpan apa adanya sebagai JSON di `Tenant.openingHours` dan
+  dibaca halaman publik lewat `parseOpeningHours()`; selama belum diisi, footer
+  publik tetap menampilkan pesan "jam pengambilan disepakati lewat WhatsApp".
+- Syarat sewa disimpan sebagai teks multi-baris; `termsList()` memecahnya jadi
+  butir dan tetap memakai syarat bawaan Flexrent kalau kosong.
+- **Undangan staf tidak membuat kata sandi.** `inviteStaffAction()` membuat
+  `User` (email saja) bila belum ada, lalu men-upsert `Membership` dengan
+  `invitedEmail` dan peran `ADMIN`/`STAFF`. Email undangan hanya berisi tautan
+  `/login`; staf masuk lewat magic link ke email yang sama, dan karena
+  `getUserByEmail` dipakai lebih dulu, akun hasil undangan tidak dibuat dua kali.
+  Batas `maxStaff` paket dijaga sebelum menambah kursi; tanpa `SMTP_HOST` pesan
+  hanya dicetak ke log dan UI menandainya sebagai "belum terkirim".
+  Staf non-admin melihat halaman pengaturan dalam mode baca-saja.
+
 ## Desain
 
 Navy `#0B1F3A` + amber `#F59E0B`, Plus Jakarta Sans, radius kartu 16px / input &
@@ -485,7 +589,7 @@ Sisa dari Fase 4 (kecil, dan sengaja tidak dipaksakan supaya fase tidak melebar)
 - Midtrans hanya memakai Snap Redirect (`redirect_url`), jadi `MIDTRANS_CLIENT_KEY`
   tidak dibaca kode. Embedded JS/popup perlu client key di sisi klien.
 - Cron mengandalkan Vercel Cron (`vercel.json`). Di host lain, ganti dengan
-  scheduler yang mengirim `Authorization: Bearer ${CRON_SECRET}` ke dua rute itu.
+  scheduler yang mengirim `Authorization: Bearer ${CRON_SECRET}` ke tiga rute itu.
 - Pembayaran otomatis mengonfirmasi booking, tapi belum mengirim invoice/resi
   (PDF) dan belum ada penagihan deposit berulang.
 
@@ -507,10 +611,25 @@ Sisa dari Fase 5 (sengaja tidak dipaksakan supaya fase tidak melebar):
   tampak di admin; pelanggan yang dokumennya ditolak tidak diberi tahu (butuh template
   WhatsApp + alasan penolakan).
 
+Sisa dari Fase 6 (sengaja tidak dipaksakan supaya fase tidak melebar):
+
+- **Keluar / ubah peran staf belum ada.** Pengaturan bisa mengundang dan melihat
+  daftar, tapi belum ada tombol "cabut akses" atau naik/turun peran ADMIN ↔ STAFF;
+  satu-satunya jalan mencabut akses saat ini lewat Prisma Studio.
+- **Tagihan langganan belum bisa diunduh.** Invoice tampil di halaman Langganan dan
+  bisa dilunasi, tapi belum ada PDF/resi; laporan bulanan pun hanya CSV.
+- **Belum ada siklus tahunan.** `Plan.priceMonthly` satu-satunya harga dan cron
+  membuat tagihan per periode bulanan; paket tahunan butuh kolom harga sendiri.
+- **Tarif antar-jemput masih di luar pengaturan.** Profil rental menyimpan nama,
+  slug, kota, kontak, logo, jam, dan syarat sewa — biaya antar-jemput (lihat sisa
+  Fase 3) belum punya field, jadi checkout publik tetap memakai `0`.
+- **Riwayat notifikasi belum berhalaman.** Surat pengingat langganan yang terkirim
+  tercatat di `NotificationLog` (bisa dibaca lewat Prisma Studio) tapi belum tampil
+  di admin.
+
 Di luar itu:
 
-- Laporan, pengaturan tenant, dan undangan staf.
-- E2E alur pemesanan di CI (sampai Fase 5 verifikasi dilakukan manual lewat
+- E2E alur pemesanan di CI (sampai Fase 6 verifikasi dilakukan manual lewat
   browser + curl); unit test pricing/quote/booking-code/schedule/datetime,
   rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp, mesin status,
-  handover, dan denda/deposit sudah ada.
+  handover, denda/deposit, tagihan & siklus langganan, laporan/CSV sudah ada.
