@@ -1,5 +1,7 @@
 import Link from "next/link"
+import type { CSSProperties } from "react"
 import { Check, Minus } from "lucide-react"
+import { cn } from "cn"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -46,9 +48,9 @@ export default async function PricingPage() {
     <>
       <section className="page-container space-y-6 py-14">
         <div className="max-w-2xl space-y-3">
-          <Badge variant="secondary" className="border-transparent bg-accent/15 text-accent-foreground">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
             14 hari pertama gratis
-          </Badge>
+          </span>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Harga yang mengikuti besar armada
           </h1>
@@ -59,13 +61,14 @@ export default async function PricingPage() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          {plans.map((plan) => {
+          {plans.map((plan, index) => {
             const featured = plan.code === favorite?.code
             const perDay = plan.priceMonthly / 30
             return (
               <Card
                 key={plan.code}
-                className={featured ? "border-accent shadow-pop" : "shadow-card"}
+                style={{ "--i": index } as CSSProperties}
+                className={cn("reveal h-full", featured ? "border-accent shadow-pop" : "shadow-card")}
               >
                 <CardHeader className="gap-2 pb-4">
                   <div className="flex items-center justify-between gap-2">
@@ -139,7 +142,7 @@ export default async function PricingPage() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border bg-card shadow-card">
+          <div className="reveal overflow-x-auto rounded-xl border bg-card shadow-card">
             <Table className="min-w-[560px]">
               <TableHeader>
                 <TableRow>

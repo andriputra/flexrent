@@ -53,6 +53,9 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-card: 0 1px 2px rgb(11 31 58 / 0.06), 0 8px 24px rgb(11 31 58 / 0.06);
   --shadow-pop: 0 1px 2px rgb(11 31 58 / 0.06), 0 12px 32px rgb(11 31 58 / 0.12);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-muted: var(--ink-muted);
 }
 
 :root {
@@ -95,6 +98,10 @@
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: #1e3a5c;
   --sidebar-ring: #f59e0b;
+  /* Permukaan gelap untuk halaman publik; teksnya tetap terang di kedua tema. */
+  --ink: #0b1f3a;
+  --ink-foreground: #eaf2ff;
+  --ink-muted: #9fb3d1;
 }
 
 .dark {
@@ -130,6 +137,9 @@
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: #1e3a5c;
   --sidebar-ring: #f59e0b;
+  --ink: #0c1a2c;
+  --ink-foreground: #e8eefb;
+  --ink-muted: #93a6c4;
 }
 
 @layer base {
@@ -174,11 +184,228 @@
   }
 }
 
+/* ————————————————————————————————————————————————
+   Lapisan motion halaman publik (marketing & halaman tenant).
+   Entrance di atas lipatan memakai .anim-* (waktu), sisanya .reveal*
+   (scroll-driven, hanya dikirim bila browser mendukung animation-timeline).
+   ———————————————————————————————————————————————— */
+@keyframes m-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes m-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes m-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes m-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -12px, 0);
+  }
+}
+@keyframes m-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -5%, 0) scale(1.18);
+  }
+}
+@keyframes m-sheen {
+  0% {
+    transform: translateX(-140%);
+  }
+  60%,
+  100% {
+    transform: translateX(140%);
+  }
+}
+@keyframes m-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes m-ping {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+@layer utilities {
+  .anim-rise,
+  .anim-fade,
+  .anim-pop {
+    animation-duration: 0.85s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+    /* --i = urutan, --d = jeda dasar dalam ms. */
+    animation-delay: calc(var(--i, 0) * 70ms + var(--d, 0ms));
+  }
+  .anim-rise {
+    animation-name: m-rise;
+  }
+  .anim-fade {
+    animation-name: m-fade;
+  }
+  .anim-pop {
+    animation-name: m-pop;
+  }
+  .anim-float {
+    animation: m-float 9s ease-in-out infinite;
+    animation-delay: var(--d, 0ms);
+  }
+  .anim-drift {
+    animation: m-drift 20s ease-in-out infinite;
+    animation-delay: var(--d, 0ms);
+  }
+  .anim-ping {
+    animation: m-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* Pola garis tipis di atas permukaan gelap. */
+  .bg-ink-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Kilau yang menyapu satu kali tiap siklus. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent 38%, rgb(255 255 255 / 0.13) 50%, transparent 62%);
+    transform: translateX(-140%);
+    animation: m-sheen 9s ease-in-out infinite;
+    animation-delay: var(--d, 2.5s);
+  }
+
+  /* Sorot yang mengikuti kursor; gelap bila tanpa pointer (mobile). */
+  .spotlight {
+    position: relative;
+    isolation: isolate;
+  }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    background: radial-gradient(
+      240px circle at var(--mx, 50%) var(--my, 0%),
+      rgb(245 158 11 / 0.16),
+      transparent 68%
+    );
+  }
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -6px;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal,
+    .reveal-fade,
+    .reveal-grow {
+      animation: m-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-timeline: view();
+      animation-range: entry calc(0% + var(--i, 0) * 3%) entry calc(28% + var(--i, 0) * 3%);
+    }
+    .reveal-fade {
+      animation-name: m-fade;
+    }
+    .reveal-grow {
+      animation-name: m-grow-x;
+      transform-origin: left center;
+    }
+  }
+}
+
+@media print {
+  .anim-rise,
+  .anim-fade,
+  .anim-pop,
+  .reveal,
+  .reveal-fade,
+  .reveal-grow {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
