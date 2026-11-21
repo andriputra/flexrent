@@ -50,6 +50,7 @@ publiknya sudah aktif di `http://localhost:3000/bandung-ride`.
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test` | Vitest (harga, jadwal, tanggal, rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp, mesin status pesanan, checklist handover, denda & deposit) |
+| `npm run test:e2e` | Playwright: alur booking publik + penjaga halaman (lihat "Tes end-to-end") |
 | `npm run db:migrate` | buat migrasi baru saat `schema.prisma` berubah |
 | `npm run db:deploy` | terapkan migrasi ke database target |
 | `npm run db:seed` | isi data demo (idempoten, menghapus baris demo lama) |
@@ -251,11 +252,13 @@ Yang perlu diketahui kalau mengubah bagian ini:
   tersisa ada di `/{slug}/booking/{code}` (rute itu tidak punya gerbang 404).
   Saat menambah halaman publik, jangan menaruh `notFound()` di dalam komponen
   yang dibungkus `<Suspense>`.
-- **Penjaga tampilan:** `src/app/not-found.tsx` (404 di luar rute tenant — rute
-  tenant punya `/{slug}/not-found.tsx` sendiri), `src/app/error.tsx` (gagal render
-  dengan tombol "Coba lagi"), dan `src/app/global-error.tsx` untuk kegagalan root
-  layout; yang terakhir ini sengaja memakai gaya inline karena tidak boleh
-  bergantung pada layout yang sedang rusak.
+- **Penjaga tampilan:** `src/app/error.tsx` (gagal render dengan tombol "Coba lagi")
+  dan `src/app/global-error.tsx` untuk kegagalan root layout; yang terakhir ini
+  sengaja memakai gaya inline karena tidak boleh bergantung pada layout yang sedang
+  rusak. Untuk 404 ada dua boundary: `/{slug}/not-found.tsx` hanya dipakai kalau
+  tenant-nya ada tetapi halamannya tidak (mis. ID kendaraan salah ketik), karena
+  keberadaan tenant sendiri diperiksa di `/{slug}/layout.tsx` — slug asing ikut
+  melempar `notFound()` dari layout sehingga yang tampil `src/app/not-found.tsx`.
 - Langganan `PAST_DUE` / `CANCELLED` membuat `acceptingBookings` false: banner
   "sedang tidak menerima pesanan" muncul, kalkulator berhenti, dan
   `createBookingAction` menolak submit dengan pesan yang sama — halaman tetap
@@ -575,6 +578,34 @@ staf + undangan email.
   Batas `maxStaff` paket dijaga sebelum menambah kursi; tanpa `SMTP_HOST` pesan
   hanya dicetak ke log dan UI menandainya sebagai "belum terkirim".
   Staf non-admin melihat halaman pengaturan dalam mode baca-saja.
+
+## Tes end-to-end (Playwright)
+
+`npm run test:e2e` menjalankan sembilan tes di `e2e/` pada satu worker Chromium.
+Yang perlu diketahui kalau mengubahnya:
+
+- **Tidak ada ID yang dihafal.** Tenant diambil dari `/sitemap.xml`, lalu kendaraan
+  pertama dari katalog bertanggal diklik seperti pengunjung biasa. Ganti seed, tes
+  tetap jalan; kalau sitemap kosong, tes gagal dengan pesan "jalankan
+  `npm run db:seed`".
+- **Jendela tanggal diacak 30–180 hari ke depan.** Pesanan buatan tes terakhir masih
+  `PENDING` dan memblokir kendaraannya, jadi tanggal acak mencegah bentrok saat
+  suite dijalankan dua kali berturut-turut.
+- **Kerelaan 5 detik pada tiket form.** Jalur utama sengaja menunggu ≥7 detik setelah
+  wizard tampil — meniru orang yang membaca ringkasan. Kirim lebih cepat dari itu
+  ditolak `spamRejection`, dan tes jebakan bot membuktikan penolakan itu lewat
+  `input[name="company"]` (diisi lewat setter asal prototype supaya state React ikut
+  berubah).
+- **Sisa data.** Satu kali jalan sukses meninggalkan satu booking `PENDING` bernama
+  `E2E Penyewa …`; tidak ada tombol batal publik, jadi `api/cron/booking-expired`
+  mengubahnya jadi `EXPIRED` setelah dua jam. Jangan jalankan suite ini ke database
+  produksi.
+- **Layar penjaga ikut dijaga.** Selain 404 dan `noindex`, ada tes bahwa halaman
+  status publik tidak menampilkan nama penyewa — kodenya saja yang boleh bocor.
+- **Server.** Config menyalakan `next dev -p 3100` sendiri, atau memakai server yang
+  sudah jalan selama `E2E_BASE_URL` tidak diset. Rute yang baru dikompilasi bisa
+  memakan puluhan detik, sehingga navigasi wizard memakai timeout 90 detik;
+  `playwright.config.ts` juga menyimpan trace hanya saat tes gagal.
 
 ## Desain
 
