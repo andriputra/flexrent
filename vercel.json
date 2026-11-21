@@ -1,4 +1,5 @@
 {
+  "buildCommand": "prisma generate && next build",
   "crons": [
     { "path": "/api/cron/booking-expired", "schedule": "5 * * * *" },
     { "path": "/api/cron/booking-reminders", "schedule": "0 1 * * *" },

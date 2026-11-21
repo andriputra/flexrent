@@ -607,6 +607,63 @@ Yang perlu diketahui kalau mengubahnya:
   memakan puluhan detik, sehingga navigasi wizard memakai timeout 90 detik;
   `playwright.config.ts` juga menyimpan trace hanya saat tes gagal.
 
+## Deploy ke Vercel
+
+Tiga hal harus terjadi sebelum trafik produksi masuk: migrasi terpasang, Prisma
+Client dibangkitkan saat build, dan origin publik sudah benar.
+
+1. **Migrasi lebih dulu.** Vercel tidak menjalankan `prisma migrate`. Dari mesin yang
+   bisa membuka `DIRECT_URL`:
+
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+   Migrasi `20261122103000_add_rate_limit_bucket` wajib ikut terpasang. Tanpa tabelnya
+   `consumeRate` memilih fail-open: booking tetap diterima, tapi pembatasan laju mati
+   tanpa suara — yang tersisa hanya `console.error("[rate-limit] …")` di log.
+2. **Build command membangkitkan client.** `vercel.json` menyetel
+   `"buildCommand": "prisma generate && next build"`. Isian manual di
+   Settings → Build & Deployment → Build Command mengalahkan file itu, dan deploy lalu
+   gagal dengan `Cannot find module '.prisma/client/default'`.
+3. **Environment Production (dan Preview kalau perlu).** Lengkap di bagian
+   "Variabel environment"; yang bikin produksi beda dari dev:
+
+   | Variabel | Nilai produksi | Kalau tidak |
+   | --- | --- | --- |
+   | `DATABASE_URL` | endpoint **pooler** Neon (IPv4) | koneksi direct bisa tidak terbuka dari jaringan Vercel dan semua halaman 500 |
+   | `NEXT_PUBLIC_APP_URL` + `AUTH_URL` | origin produksi, keduanya | canonical, `og:url`, sitemap, tautan status di WhatsApp, `finish_url` Midtrans, dan magic link ikut nilai ini |
+   | `AUTH_SECRET` | `npx auth secret` | tiket form anti-bot dan tanda tangan tautan dokumen ikut mati |
+   | `CRON_SECRET` | nilai baru | keempat rute cron menjawab `401`: booking `PENDING` tidak pernah `EXPIRED` dan pencacah laju tidak pernah dibersihkan |
+   | `SMTP_HOST` dkk | kredensial nyata | tanpa SMTP tautan login hanya tercetak di log server, yang tidak bisa dibaca di Vercel |
+   | `BLOB_READ_WRITE_TOKEN` | token Vercel Blob | unggahan ditulis ke filesystem sementara dan hilang begitu instance dingin — termasuk KTP/SIM pelanggan |
+   | `MIDTRANS_IS_SANDBOX` + `MIDTRANS_SERVER_KEY` | `"false"` + key produksi | webhook masih menunjuk sandbox; daftarkan ulang `https://{origin}/api/webhooks/midtrans` |
+   | `WHATSAPP_PROVIDER` + `FONNTE_API_KEY` | `"fonnte"` | `"stub"` hanya menulis `NotificationLog`; pengingat H-1 dan keterlambatan tidak pernah sampai |
+4. **Cron dan plan.** Jadwal di `vercel.json` ada empat; `5 * * * *` (expiry + prune)
+   dan dua pengingat harian butuh Vercel Cron dengan frekuensi per jam — plan Hobby
+   membatasi cron ke harian. Di host lain, penggantinya scheduler apa pun yang mengirim
+   `Authorization: Bearer ${CRON_SECRET}` ke rute yang sama.
+5. **Smoke test setelah publish.**
+
+   ```bash
+   ORIGIN=https://nama-app.vercel.app
+   for p in / /harga /robots.txt /sitemap.xml /opengraph-image /rute-tak-ada; do
+     printf "%-22s %s\n" "$p" "$(curl -s -o /dev/null -w '%{http_code}' "$ORIGIN$p")"
+   done
+   curl -s "$ORIGIN/robots.txt" | grep -E "Sitemap|Disallow: /dashboard"
+   curl -s -o /dev/null -w 'cron tanpa kunci: %{http_code}\n' "$ORIGIN/api/cron/booking-expired"
+   curl -s "$ORIGIN/api/cron/booking-expired" -H "Authorization: Bearer $CRON_SECRET"
+   ```
+
+   Lima nilai pertama harus `200` dan `/rute-tak-ada` harus `404`. `og:url` di
+   `/{slug}` dan baris `Sitemap:` di robots.txt harus menunjuk `$ORIGIN`, bukan
+   localhost. Rute cron hanya menerima `GET` (Vercel Cron memakai GET); tanpa header
+   `Authorization` jawabannya `401`, dan balasan yang sah berisi hitungan `expired`
+   dan `pruned`.
+6. **Dua hal yang tidak boleh dijalankan ke produksi:** `npm run db:seed` (menghapus
+   lalu menimpa baris demo) dan `npm run test:e2e` (meninggalkan booking `PENDING`
+   sungguhan di database yang disentuhnya).
+
 ## Desain
 
 Navy `#0B1F3A` + amber `#F59E0B`, Plus Jakarta Sans, radius kartu 16px / input &
