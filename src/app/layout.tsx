@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/shared/providers"
+import { SITE_URL } from "@/lib/seo"
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
   },
   description:
     "SaaS booking dan manajemen armada untuk usaha penyewaan motor dan mobil di Indonesia. Kelola kendaraan, pelanggan, dan pembayaran tanpa spreadsheet.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(SITE_URL),
+  openGraph: { type: "website", siteName: "Flexrent", locale: "id_ID" },
+  twitter: { card: "summary_large_image" },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

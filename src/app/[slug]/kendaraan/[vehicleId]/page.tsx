@@ -23,6 +23,7 @@ import {
   VehicleAvailabilitySkeleton,
 } from "@/components/public/vehicle-availability-section"
 import { formatRupiah } from "@/lib/format"
+import { publicMeta } from "@/lib/seo"
 import { termsList } from "@/lib/terms"
 import { getPublicTenant, whatsappLink } from "@/lib/tenant-public"
 import { parseCatalogQuery } from "@/lib/validators/public"
@@ -42,10 +43,13 @@ export async function generateMetadata({
   if (!tenant) return { title: "Rental tidak ditemukan" }
   const vehicle = await getCatalogVehicle(tenant.id, vehicleId)
   if (!vehicle) return { title: "Kendaraan tidak ditemukan" }
-  return {
+  const photo = vehicle.photos.find((item) => item.isPrimary) ?? vehicle.photos[0]
+  return publicMeta({
     title: `Sewa ${vehicle.brand} ${vehicle.model} ${vehicle.year} — ${tenant.name}`,
     description: `Tarif ${formatRupiah(vehicle.priceDaily)} per hari. Cek ketersediaan dan pesan online.`,
-  }
+    path: `/${tenant.slug}/kendaraan/${vehicle.id}`,
+    image: photo?.url ?? tenant.logoUrl,
+  })
 }
 
 export default async function PublicVehicleDetailPage({

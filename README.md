@@ -209,6 +209,20 @@ Gerbang anti-spam di sisi tulis (semuanya dievaluasi sebelum menyentuh DB kecual
 - Cron `/api/cron/booking-expired` (jalan tiap jam) ikut menghapus bucket yang
   jendelanya lewat lebih dari 24 jam, jadi tabel pencacah tidak tumbuh terus.
 
+SEO halaman publik (`src/lib/seo.ts`):
+
+- Tiap halaman katalog & detail kendaraan memakai `publicMeta` → judul, deskripsi,
+  `rel=canonical`, dan kartu Open Graph/Twitter. Gambarnya foto utama kendaraan,
+  lalu logo rental, lalu kartu bawaan `src/app/opengraph-image.tsx` (ImageResponse).
+- `/sitemap.xml` (revalidate 1 jam) berisi `/` + `/harga` plus `/{slug}` dan
+  `/{slug}/kendaraan/{id}` untuk rental yang aktif dan tidak sedang diblokir
+  langganan. Kegagalan DB hanya membuat daftarnya jadi pendek, bukan membatalkan build.
+- `/robots.txt` melarang `/dashboard`, `/api`, `/login`, `/onboarding`.
+- Wizard `pesan/{id}` dan halaman `booking/{code}` diberi `noindex` karena URL-nya
+  memuat kode pesanan / nomor WhatsApp.
+- `NEXT_PUBLIC_APP_URL` harus origin produksi: canonical, `og:url`, dan sitemap
+  dibangun dari nilai itu, bukan dari header permintaan.
+
 Yang perlu diketahui kalau mengubah bagian ini:
 
 - **Harga tidak dihitung di browser.** `useVehicleQuote` menanyakan

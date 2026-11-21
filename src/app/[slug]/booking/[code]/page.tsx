@@ -38,7 +38,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string; code: string }>
 }): Promise<Metadata> {
   const { code } = await params
-  return { title: `Status pesanan ${code}` }
+  // Status pesanan memuat kode + nomor WhatsApp di URL — jangan sampai terindeks.
+  return { title: `Status pesanan ${code}`, robots: { index: false, follow: false } }
 }
 
 export default async function PublicBookingStatusPage({

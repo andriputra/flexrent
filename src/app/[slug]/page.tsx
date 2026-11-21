@@ -8,6 +8,7 @@ import { CatalogFilters } from "@/components/public/catalog-filters"
 import { CatalogSkeleton } from "@/components/public/catalog-skeleton"
 import { VehicleCard } from "@/components/public/vehicle-card"
 import { fromWib, toDayKey } from "@/lib/datetime"
+import { publicMeta } from "@/lib/seo"
 import { getPublicTenant } from "@/lib/tenant-public"
 import { parseCatalogQuery, type CatalogQuery } from "@/lib/validators/public"
 import { listCatalogVehicles } from "@/server/queries/public"
@@ -23,12 +24,14 @@ export async function generateMetadata({
   const { slug } = await params
   const tenant = await getPublicTenant(slug)
   if (!tenant) return { title: "Rental tidak ditemukan" }
-  return {
+  return publicMeta({
     title: `Sewa motor & mobil di ${tenant.city} — ${tenant.name}`,
     description:
       tenant.tagline ??
       `Lihat ketersediaan armada ${tenant.name}, hitung tarif sewa, dan pesan langsung lewat WhatsApp.`,
-  }
+    path: `/${tenant.slug}`,
+    image: tenant.logoUrl,
+  })
 }
 
 async function CatalogResults({ slug, query }: { slug: string; query: CatalogQuery }) {

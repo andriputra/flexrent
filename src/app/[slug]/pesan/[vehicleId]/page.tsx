@@ -18,7 +18,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const tenant = await getPublicTenant(slug)
-  return { title: tenant ? `Pesan kendaraan — ${tenant.name}` : "Pesan kendaraan" }
+  // Form pemesanan bukan halaman yang layak diindeks.
+  return { title: tenant ? `Pesan kendaraan — ${tenant.name}` : "Pesan kendaraan", robots: { index: false, follow: false } }
 }
 
 export default async function PublicBookingWizardPage({
