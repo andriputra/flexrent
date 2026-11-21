@@ -1,0 +1,633 @@
+// Flexrent — multi-tenant SaaS penyewaan motor & mobil.
+// Konvensi: uang disimpan sebagai Int dalam rupiah penuh (tanpa sen).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // DATABASE_URL = connection pooler (dipakai aplikasi runtime).
+  // DIRECT_URL   = endpoint direct (dipakai prisma migrate agar DDL stabil).
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// MARK: - Enum
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  STAFF
+
+  @@map("MembershipRole")
+}
+
+enum PlanCode {
+  STARTER
+  PRO
+  BUSINESS
+
+  @@map("PlanCode")
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+
+  @@map("SubscriptionStatus")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  CANCELLED
+
+  @@map("InvoiceStatus")
+}
+
+enum VehicleType {
+  MOTOR
+  MOBIL
+
+  @@map("VehicleType")
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+  INACTIVE
+
+  @@map("VehicleStatus")
+}
+
+enum Transmission {
+  MANUAL
+  MATIC
+
+  @@map("Transmission")
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+
+  @@map("FuelType")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  EXPIRED
+
+  @@map("BookingStatus")
+}
+
+enum BookingPaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+
+  @@map("BookingPaymentStatus")
+}
+
+enum DeliveryMode {
+  SELF_PICKUP
+  DELIVERY
+
+  @@map("DeliveryMode")
+}
+
+enum PaymentKind {
+  RENTAL
+  DEPOSIT
+  SUBSCRIPTION
+
+  @@map("PaymentKind")
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MIDTRANS
+  OTHER
+
+  @@map("PaymentMethod")
+}
+
+enum PaymentStatus {
+  PENDING
+  SETTLED
+  FAILED
+  EXPIRED
+  REFUNDED
+
+  @@map("PaymentStatus")
+}
+
+enum DepositStatus {
+  HELD
+  PARTIAL_REFUNDED
+  REFUNDED
+  FORFEITED
+
+  @@map("DepositStatus")
+}
+
+enum DocumentType {
+  KTP
+  SIM
+  OTHER
+
+  @@map("DocumentType")
+}
+
+enum HandoverType {
+  PICKUP
+  RETURN
+
+  @@map("HandoverType")
+}
+
+enum HandoverPhotoPosition {
+  FRONT
+  BACK
+  LEFT
+  RIGHT
+  DASHBOARD
+  OTHER
+
+  @@map("HandoverPhotoPosition")
+}
+
+enum FuelLevel {
+  EMPTY
+  QUARTER
+  HALF
+  THREE_QUARTER
+  FULL
+
+  @@map("FuelLevel")
+}
+
+// MARK: - Auth (Auth.js v5 / @auth/prisma-adapter)
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  memberships  Membership[]
+  createdDocs  Document[]     @relation("DocumentUploader")
+  payments     Payment[]      @relation("PaymentRecorder")
+  handovers    Handover[]     @relation("HandoverRecorder")
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// MARK: - SaaS: tenant, paket, langganan
+
+model Tenant {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  city        String
+  address     String?
+  phone       String
+  email       String?
+  logoUrl     String?
+  tagline     String?
+  // JSON: [{ day: "senin", open: "08:00", close: "17:00", closed: false }]
+  openingHours Json?
+  terms       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships         Membership[]
+  vehicles            Vehicle[]
+  customers           Customer[]
+  bookings            Booking[]
+  subscription        Subscription?
+  invoices            Invoice[]
+  documents           Document[]
+  payments            Payment[]
+  maintenancePlans    MaintenancePlan[]
+  webhookEvents       WebhookEvent[]
+
+  @@map("tenants")
+}
+
+model Membership {
+  id        String         @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      MembershipRole @default(STAFF)
+  jobTitle  String?
+  isActive  Boolean        @default(true)
+  // Undangan staff belum menerima akun: menyimpan email yang diundang.
+  invitedEmail String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([userId])
+  @@map("memberships")
+}
+
+model Plan {
+  id              String   @id @default(cuid())
+  code            PlanCode @unique
+  name            String
+  description     String?
+  priceMonthly    Int
+  priceYearly     Int?
+  maxVehicles     Int
+  maxStaff        Int
+  features        Json
+  isPublic        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  tenantId           String             @unique
+  planId             String
+  status             SubscriptionStatus @default(TRIALING)
+  trialEndsAt        DateTime?
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  pastDueAt          DateTime?
+  cancelledAt        DateTime?
+  midtransSubscriptionId String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id])
+  invoices Invoice[]
+
+  @@index([planId])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  tenantId       String
+  subscriptionId String?
+  number         String        @unique
+  periodStart    DateTime
+  periodEnd      DateTime
+  amount         Int
+  status         InvoiceStatus @default(OPEN)
+  dueAt          DateTime
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payments     Payment[]
+
+  @@index([tenantId, status])
+  @@map("invoices")
+}
+
+// MARK: - Armada
+
+model Vehicle {
+  id           String       @id @default(cuid())
+  tenantId     String
+  type         VehicleType
+  plate        String
+  brand        String
+  model        String
+  year         Int
+  color        String?
+  transmission Transmission
+  engineCc     Int?
+  seats        Int?
+  fuelType     FuelType     @default(PETROL)
+  hasDriver    Boolean      @default(false)
+  driverFee    Int          @default(0)
+  priceDaily   Int
+  priceWeekly  Int?
+  priceMonthly Int?
+  deposit      Int          @default(0)
+  status       VehicleStatus @default(AVAILABLE)
+  odometer     Int?
+  description  String?
+  // Disiapkan untuk Fase 3: kendaraan tidak dapat dipesan lewat halaman publik.
+  isPublished  Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  photos           VehiclePhoto[]
+  bookings         Booking[]
+  maintenancePlans MaintenancePlan[]
+
+  @@unique([tenantId, plate])
+  @@index([tenantId, type, status])
+  @@map("vehicles")
+}
+
+model VehiclePhoto {
+  id        String  @id @default(cuid())
+  vehicleId String
+  url       String
+  // Key objek di penyimpanan (Vercel Blob) — dipakai untuk menghapus file.
+  storageKey String?
+  alt       String?
+  sortOrder Int     @default(0)
+  isPrimary Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, sortOrder])
+  @@map("vehicle_photos")
+}
+
+// Jadwal perawatan: rentang ini memblokir kalender kendaraan.
+model MaintenancePlan {
+  id        String    @id @default(cuid())
+  tenantId  String
+  vehicleId String
+  title     String
+  startsAt  DateTime  @db.Timestamptz(3)
+  endsAt    DateTime  @db.Timestamptz(3)
+  notes     String?
+  isDone    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, vehicleId, startsAt])
+  @@map("maintenance_plans")
+}
+
+// MARK: - Pelanggan & dokumen
+
+model Customer {
+  id              String    @id @default(cuid())
+  tenantId        String
+  name            String
+  phone           String
+  email           String?
+  address         String?
+  city            String?
+  notes           String?
+  isBlacklisted   Boolean   @default(false)
+  blacklistReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+  documents Document[]
+
+  @@unique([tenantId, phone])
+  @@index([tenantId, name])
+  @@map("customers")
+}
+
+// KTP/SIM privat: url publik disimpan di storageKey, akses lewat signed URL.
+model Document {
+  id          String       @id @default(cuid())
+  tenantId    String
+  customerId  String?
+  bookingId   String?
+  type        DocumentType
+  storageKey  String
+  fileName    String
+  mimeType    String?
+  sizeBytes   Int?
+  uploadedById String?
+  isVerified  Boolean      @default(false)
+  verifiedAt  DateTime?
+  createdAt   DateTime     @default(now())
+
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  booking    Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  uploadedBy User?     @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, type])
+  @@index([customerId])
+  @@map("documents")
+}
+
+// MARK: - Booking
+
+model Booking {
+  id       String  @id @default(cuid())
+  tenantId String
+  // Kode singkat untuk pelanggan, contoh BR-2411-0042.
+  code     String  @unique
+  vehicleId String
+  customerId  String?
+
+  customerName   String
+  customerPhone  String
+  customerEmail  String?
+  customerIdCard String?
+
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt   DateTime @db.Timestamptz(3)
+  days     Int
+
+  status           BookingStatus        @default(PENDING)
+  paymentStatus    BookingPaymentStatus @default(UNPAID)
+
+  deliveryMode DeliveryMode @default(SELF_PICKUP)
+  deliveryArea String?
+  deliveryAddress String?
+  deliveryFee  Int     @default(0)
+  withDriver   Boolean @default(false)
+  driverFee    Int     @default(0)
+
+  rentalAmount   Int @default(0)
+  depositAmount  Int @default(0)
+  totalAmount    Int @default(0)
+  paidAmount     Int @default(0)
+
+  depositStatus  DepositStatus @default(HELD)
+  depositRefunded Int     @default(0)
+  lateFee        Int       @default(0)
+  damageFee      Int       @default(0)
+
+  // Booking PENDING kedaluwarsa otomatis (cron) setelah batas ini.
+  expiresAt      DateTime?
+  cancelledAt    DateTime?
+  cancelReason   String?
+  notes          String?
+  source         String    @default("PUBLIC")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicle    Vehicle     @relation(fields: [vehicleId], references: [id])
+  customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  payments   Payment[]
+  handovers  Handover[]
+  documents  Document[]
+
+  @@index([tenantId, status, startsAt])
+  @@index([tenantId, endsAt])
+  @@index([vehicleId, startsAt, endsAt])
+  @@map("bookings")
+}
+
+// Bentrok jadwal untuk booking aktif dicegah oleh exclusion constraint
+// (btree_gist + tstzrange) yang dibuat di migrasi SQL manual.
+
+model Payment {
+  id        String        @id @default(cuid())
+  tenantId  String
+  bookingId String?
+  invoiceId String?
+  kind      PaymentKind
+  method    PaymentMethod
+  status    PaymentStatus @default(PENDING)
+  amount    Int
+  refCode   String?
+  midtransOrderId String?
+  midtransTransactionId String?
+  recordedById String?
+  notes     String?
+  paidAt    DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  booking    Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  invoice    Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  recordedBy User?     @relation("PaymentRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, midtransTransactionId])
+  @@index([tenantId, status])
+  @@map("payments")
+}
+
+// Checklist kondisi kendaraan saat serah-terima / pengembalian (Fase 5).
+model Handover {
+  id        String       @id @default(cuid())
+  bookingId String
+  tenantId  String
+  type      HandoverType
+  odometer  Int?
+  fuelLevel FuelLevel?
+  conditionNotes String?
+  damageNotes    String?
+  recordedById   String?
+  createdAt DateTime     @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  photos  HandoverPhoto[]
+  recordedBy User? @relation("HandoverRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([bookingId, type])
+  @@map("handovers")
+}
+
+model HandoverPhoto {
+  id         String                  @id @default(cuid())
+  handoverId String
+  url        String
+  storageKey String?
+  position   HandoverPhotoPosition   @default(OTHER)
+  createdAt  DateTime                @default(now())
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@index([handoverId, position])
+  @@map("handover_photos")
+}
+
+// MARK: - Integrasi
+
+// Jejak webhook payment untuk idempotensi (Fase 4).
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  provider  String
+  eventId   String
+  payload   Json
+  receivedAt DateTime @default(now())
+  processedAt DateTime?
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, eventId])
+  @@map("webhook_events")
+}
