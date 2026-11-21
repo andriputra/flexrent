@@ -648,7 +648,8 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
 4. **Cron tidak lagi dimiliki Vercel.** `vercel.json` hanya menyimpan `buildCommand`;
    jadwal ada di `.github/workflows/cron.yml` dan butuh dua isian di GitHub —
    secret `CRON_SECRET` (nilai yang sama dengan yang dipakai di Vercel) dan variable
-   `APP_URL` (origin produksi). Verifikasi setelah keduanya diisi:
+   `APP_URL` = `https://flexbox-rent.vercel.app` (origin produksi). Verifikasi setelah
+   keduanya diisi:
 
    ```bash
    gh workflow run cron.yml && gh run watch --exit-status
@@ -661,7 +662,7 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
 5. **Smoke test setelah publish.**
 
    ```bash
-   ORIGIN=https://nama-app.vercel.app
+   ORIGIN=https://flexbox-rent.vercel.app
    for p in / /harga /robots.txt /sitemap.xml /opengraph-image /rute-tak-ada; do
      printf "%-22s %s\n" "$p" "$(curl -s -o /dev/null -w '%{http_code}' "$ORIGIN$p")"
    done

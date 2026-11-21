@@ -32,7 +32,7 @@ jobs:
             exit 1
           fi
           if [ -z "$APP_URL" ]; then
-            echo "Repository variable APP_URL belum diisi, misalnya https://flexrent-git-main-agusandriputras-projects.vercel.app"
+            echo "Repository variable APP_URL belum diisi, misalnya https://flexbox-rent.vercel.app"
             exit 1
           fi
 
