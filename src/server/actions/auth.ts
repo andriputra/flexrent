@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { signIn, signOut } from "@/lib/auth"
+import { ipRateRejection } from "@/lib/anti-abuse"
 import { isRedirectError } from "@/lib/result"
 
 export async function signInWithGoogleAction(redirectTo = "/dashboard") {
@@ -19,6 +20,8 @@ export async function signInWithEmailAction(email: string, redirectTo = "/dashbo
   if (!/^\S+@\S+\.\S+$/.test(clean)) {
     return { ok: false as const, error: "Email tidak valid." }
   }
+  const throttled = await ipRateRejection("login", clean)
+  if (throttled) return { ok: false as const, error: throttled.error }
   try {
     await signIn("nodemailer", { email: clean, redirectTo })
   } catch (error) {

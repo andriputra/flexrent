@@ -5,6 +5,7 @@ import { fromWib, rentalDays } from "@/lib/datetime"
 import { getPublicTenant } from "@/lib/tenant-public"
 import { bookingCodePrefix, buildBookingCode } from "@/lib/booking-code"
 import { quoteRental } from "@/lib/quote"
+import { spamRejection } from "@/lib/anti-abuse"
 import { StorageError, deletePrivateFiles, uploadPrivateFile, type StoredPrivateFile } from "@/lib/storage"
 import { fieldErrorsFromZod, fail, ok, safeAction, type ActionResult } from "@/lib/result"
 import type { Quote } from "@/lib/quote"
@@ -123,6 +124,14 @@ export async function createBookingAction(
     if (!tenant.acceptingBookings) {
       return fail(tenant.closedMessage ?? "Rental sedang tidak menerima pesanan baru.", { code: "READ_ONLY" })
     }
+
+    // Gerbang anti-bot ditaruh sebelum validasi & upload supaya spam tidak menyentuh DB.
+    const rejected = await spamRejection(formData, {
+      scope: "booking",
+      identity: slug,
+      ticketBinding: `${slug}:${String(formData.get("vehicleId") ?? "")}`,
+    })
+    if (rejected) return rejected
 
     const parsed = bookingDraftInput.safeParse(readDraft(formData))
     if (!parsed.success) {

@@ -50,12 +50,14 @@ export function BookingWizard({
   tenantName,
   vehicle,
   terms,
+  ticket,
   initial,
 }: {
   slug: string
   tenantName: string
   vehicle: { id: string; name: string; plate: string; hasDriver: boolean }
   terms: string[]
+  ticket: string
   initial: { ambil: string; kembali: string; jamAmbil: string; jamKembali: string; sopir: boolean }
 }) {
   const router = useRouter()
@@ -77,6 +79,7 @@ export function BookingWizard({
     agree: false,
   })
   const [docs, setDocs] = useState<Docs>({ ktp: null, sim: null })
+  const [honeypot, setHoneypot] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, start] = useTransition()
 
@@ -154,6 +157,8 @@ export function BookingWizard({
     formData.set("withDriver", values.withDriver ? "true" : "false")
     formData.set("notes", values.notes.trim())
     formData.set("agree", "true")
+    formData.set("ticket", ticket)
+    formData.set("company", honeypot)
     if (docs.ktp) formData.set("ktp", docs.ktp)
     if (docs.sim) formData.set("sim", docs.sim)
 
@@ -190,6 +195,17 @@ export function BookingWizard({
       {step === 3 ? (
         <ConfirmStep values={values} quote={quote} docs={docs} tenantName={tenantName} terms={terms} set={set} errors={errors} />
       ) : null}
+
+      {/* Jebakan bot: manusia tidak pernah melihat atau mengisi input ini. */}
+      <input
+        name="company"
+        aria-hidden
+        tabIndex={-1}
+        autoComplete="off"
+        value={honeypot}
+        onChange={(event) => setHoneypot(event.target.value)}
+        className="hidden"
+      />
 
       <div className="flex items-center justify-between gap-3 border-t pt-4">
         <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0 || pending}>

@@ -676,3 +676,14 @@ model NotificationLog {
   @@index([tenantId, createdAt])
   @@map("notification_logs")
 }
+
+// Pencacah pembatasan laju. Kunci sudah memuat awal jendela waktu, jadi baris lama
+// tidak pernah dihitung ulang dan tinggal dibersihkan cron harian.
+model RateLimitBucket {
+  key   String   @id
+  count Int      @default(0)
+  at    DateTime @default(now())
+
+  @@index([at])
+  @@map("rate_limit_buckets")
+}

@@ -190,7 +190,24 @@ bentrok) karena tabel perawatan tidak ikut constraint booking.
 | `/{slug}/pesan/{id}` | wizard 4 langkah: tanggal → data diri + KTP/SIM → pembayaran → konfirmasi |
 | `/{slug}/booking` | cek status pesanan dengan kode + nomor WhatsApp |
 | `/{slug}/booking/{code}?phone=08…` | status, timeline, jadwal, total, dan tombol WhatsApp |
-| `/api/dokumen/{id}` | hanya dibuka dengan tautan bertanda tangan yang belum kedaluwarsa |
+| `/api/dokumen/{id}` | hanya dibuka dengan tautan bertanda tangan yang belum kedaluwarsa, dari sesi staf tenant pemilik, dan dibatasi per menit |
+
+Gerbang anti-spam di sisi tulis (semuanya dievaluasi sebelum menyentuh DB kecuali pencacah):
+
+- **Pencacah per jendela** (`src/lib/rate-limit.ts`): satu baris `rate_limit_buckets`
+  per (lingkup, alamat IP + identitas, awal jendela). Naiknya lewat satu
+  `INSERT … ON CONFLICT … RETURNING` sehingga dua permintaan serentak tidak keduanya lolos.
+  Ambang ada di `RATE_RULES` (pemesanan 8/10 menit per IP+slug, tautan masuk 10/5 menit
+  per IP+email, buka dokumen 60/menit per IP+staf). Kalau DB pencacah sedang error,
+  permintaan **diloloskan** — menolak pesanan yang sah lebih mahal.
+- **Tiket form** (`src/lib/form-ticket.ts`): `pesan/{id}` menerbitkan token HMAC saat
+  render; `createBookingAction` menolak kalau token belum berumur 5 detik (bot POST
+  langsung), sudah lewat 30 menit, dipindah ke kendaraan lain, atau tanda tangannya
+  diubah.
+- **Honeypot**: input `company` tersembunyi di wizard; bila terisi, pesanan ditolak
+  tanpa pesan detail.
+- Cron `/api/cron/booking-expired` (jalan tiap jam) ikut menghapus bucket yang
+  jendelanya lewat lebih dari 24 jam, jadi tabel pencacah tidak tumbuh terus.
 
 Yang perlu diketahui kalau mengubah bagian ini:
 

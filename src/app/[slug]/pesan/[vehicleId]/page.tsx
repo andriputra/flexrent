@@ -5,6 +5,7 @@ import { AlertTriangle, ArrowLeft, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BookingWizard } from "@/components/public/booking-wizard"
 import { termsList } from "@/lib/terms"
+import { issueFormTicket } from "@/lib/form-ticket"
 import { getPublicTenant } from "@/lib/tenant-public"
 import { getCatalogVehicle } from "@/server/queries/public"
 
@@ -74,6 +75,7 @@ export default async function PublicBookingWizardPage({
               hasDriver: vehicle.hasDriver,
             }}
             terms={termsList(tenant.terms)}
+            ticket={issueFormTicket(`${tenant.slug}:${vehicle.id}`)}
             initial={{
               ambil,
               kembali,

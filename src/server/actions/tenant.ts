@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { prisma, TX_OPTIONS } from "@/lib/db"
 import { auth } from "@/lib/auth"
+import { ipRateRejection } from "@/lib/anti-abuse"
 import { ACTIVE_TENANT_COOKIE } from "@/lib/tenant"
 import { slugify } from "@/lib/slug"
 import { fieldErrorsFromZod, fail, ok, type ActionResult } from "@/lib/result"
@@ -33,6 +34,9 @@ export async function createTenantAction(
   if (!userId) {
     return fail("Sesi berakhir. Silakan masuk kembali.", { code: "UNAUTHENTICATED" })
   }
+
+  const throttled = await ipRateRejection("register", userId)
+  if (throttled) return throttled
 
   const parsed = tenantOnboardingInput.safeParse(values)
   if (!parsed.success) {
