@@ -234,23 +234,25 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
+  id              String    @id @default(cuid())
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime?
+  image           String?
   // Hash scrypt untuk masuk lewat email+sandi. Null bila akun hanya memakai tautan
   // email/Google, jadi akun lama tetap bisa masuk dengan cara yang lama.
-  passwordHash  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  passwordHash    String?
+  isPlatformAdmin Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  accounts     Account[]
-  sessions     Session[]
-  memberships  Membership[]
-  createdDocs  Document[]     @relation("DocumentUploader")
-  payments     Payment[]      @relation("PaymentRecorder")
-  handovers    Handover[]     @relation("HandoverRecorder")
+  accounts    Account[]
+  sessions    Session[]
+  memberships Membership[]
+  createdDocs Document[]   @relation("DocumentUploader")
+  payments    Payment[]    @relation("PaymentRecorder")
+  handovers   Handover[]   @relation("HandoverRecorder")
+  auditLogs   AuditLog[]   @relation("AuditActor")
 
   @@map("users")
 }
@@ -267,48 +269,49 @@ model VerificationToken {
 // MARK: - SaaS: tenant, paket, langganan
 
 model Tenant {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  city        String
-  address     String?
-  phone       String
-  email       String?
-  logoUrl     String?
-  tagline     String?
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  city         String
+  address      String?
+  phone        String
+  email        String?
+  logoUrl      String?
+  tagline      String?
   // JSON: [{ day: "senin", open: "08:00", close: "17:00", closed: false }]
   openingHours Json?
-  terms       String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  terms        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  memberships         Membership[]
-  vehicles            Vehicle[]
-  customers           Customer[]
-  bookings            Booking[]
-  subscription        Subscription?
-  invoices            Invoice[]
-  documents           Document[]
-  payments            Payment[]
-  maintenancePlans    MaintenancePlan[]
-  webhookEvents       WebhookEvent[]
-  notifications       NotificationLog[]
+  memberships      Membership[]
+  vehicles         Vehicle[]
+  customers        Customer[]
+  bookings         Booking[]
+  subscription     Subscription?
+  invoices         Invoice[]
+  documents        Document[]
+  payments         Payment[]
+  maintenancePlans MaintenancePlan[]
+  webhookEvents    WebhookEvent[]
+  notifications    NotificationLog[]
+  auditLogs        AuditLog[]        @relation("TenantAudit")
 
   @@map("tenants")
 }
 
 model Membership {
-  id        String         @id @default(cuid())
-  tenantId  String
-  userId    String
-  role      MembershipRole @default(STAFF)
-  jobTitle  String?
-  isActive  Boolean        @default(true)
+  id           String         @id @default(cuid())
+  tenantId     String
+  userId       String
+  role         MembershipRole @default(STAFF)
+  jobTitle     String?
+  isActive     Boolean        @default(true)
   // Undangan staff belum menerima akun: menyimpan email yang diundang.
   invitedEmail String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -319,19 +322,19 @@ model Membership {
 }
 
 model Plan {
-  id              String   @id @default(cuid())
-  code            PlanCode @unique
-  name            String
-  description     String?
-  priceMonthly    Int
-  priceYearly     Int?
-  maxVehicles     Int
-  maxStaff        Int
-  features        Json
-  isPublic        Boolean  @default(true)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  code         PlanCode @unique
+  name         String
+  description  String?
+  priceMonthly Int
+  priceYearly  Int?
+  maxVehicles  Int
+  maxStaff     Int
+  features     Json
+  isPublic     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   subscriptions Subscription[]
 
@@ -339,19 +342,19 @@ model Plan {
 }
 
 model Subscription {
-  id                 String             @id @default(cuid())
-  tenantId           String             @unique
-  planId             String
-  status             SubscriptionStatus @default(TRIALING)
-  trialEndsAt        DateTime?
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-  cancelAtPeriodEnd  Boolean            @default(false)
-  pastDueAt          DateTime?
-  cancelledAt        DateTime?
+  id                     String             @id @default(cuid())
+  tenantId               String             @unique
+  planId                 String
+  status                 SubscriptionStatus @default(TRIALING)
+  trialEndsAt            DateTime?
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  cancelAtPeriodEnd      Boolean            @default(false)
+  pastDueAt              DateTime?
+  cancelledAt            DateTime?
   midtransSubscriptionId String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   plan     Plan      @relation(fields: [planId], references: [id])
@@ -383,10 +386,29 @@ model Invoice {
   @@map("invoices")
 }
 
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  tenantId   String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor  User    @relation("AuditActor", fields: [actorId], references: [id], onDelete: Cascade)
+  tenant Tenant? @relation("TenantAudit", fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
 // MARK: - Armada
 
 model Vehicle {
-  id           String       @id @default(cuid())
+  id           String        @id @default(cuid())
   tenantId     String
   type         VehicleType
   plate        String
@@ -397,13 +419,13 @@ model Vehicle {
   transmission Transmission
   engineCc     Int?
   seats        Int?
-  fuelType     FuelType     @default(PETROL)
-  hasDriver    Boolean      @default(false)
-  driverFee    Int          @default(0)
+  fuelType     FuelType      @default(PETROL)
+  hasDriver    Boolean       @default(false)
+  driverFee    Int           @default(0)
   priceDaily   Int
   priceWeekly  Int?
   priceMonthly Int?
-  deposit      Int          @default(0)
+  deposit      Int           @default(0)
   // Denda per hari saat kendaraan kembali lewat dari endsAt. Kosong = tidak didenda otomatis.
   lateFeeDaily Int?
   status       VehicleStatus @default(AVAILABLE)
@@ -425,15 +447,15 @@ model Vehicle {
 }
 
 model VehiclePhoto {
-  id        String  @id @default(cuid())
-  vehicleId String
-  url       String
+  id         String   @id @default(cuid())
+  vehicleId  String
+  url        String
   // Key objek di penyimpanan (Vercel Blob) — dipakai untuk menghapus file.
   storageKey String?
-  alt       String?
-  sortOrder Int     @default(0)
-  isPrimary Boolean @default(false)
-  createdAt DateTime @default(now())
+  alt        String?
+  sortOrder  Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
   vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
@@ -443,16 +465,16 @@ model VehiclePhoto {
 
 // Jadwal perawatan: rentang ini memblokir kalender kendaraan.
 model MaintenancePlan {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   tenantId  String
   vehicleId String
   title     String
-  startsAt  DateTime  @db.Timestamptz(3)
-  endsAt    DateTime  @db.Timestamptz(3)
+  startsAt  DateTime @db.Timestamptz(3)
+  endsAt    DateTime @db.Timestamptz(3)
   notes     String?
-  isDone    Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  isDone    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
@@ -464,7 +486,7 @@ model MaintenancePlan {
 // MARK: - Pelanggan & dokumen
 
 model Customer {
-  id              String    @id @default(cuid())
+  id              String   @id @default(cuid())
   tenantId        String
   name            String
   phone           String
@@ -472,10 +494,10 @@ model Customer {
   address         String?
   city            String?
   notes           String?
-  isBlacklisted   Boolean   @default(false)
+  isBlacklisted   Boolean  @default(false)
   blacklistReason String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   bookings  Booking[]
@@ -488,19 +510,19 @@ model Customer {
 
 // KTP/SIM privat: url publik disimpan di storageKey, akses lewat signed URL.
 model Document {
-  id          String       @id @default(cuid())
-  tenantId    String
-  customerId  String?
-  bookingId   String?
-  type        DocumentType
-  storageKey  String
-  fileName    String
-  mimeType    String?
-  sizeBytes   Int?
+  id           String       @id @default(cuid())
+  tenantId     String
+  customerId   String?
+  bookingId    String?
+  type         DocumentType
+  storageKey   String
+  fileName     String
+  mimeType     String?
+  sizeBytes    Int?
   uploadedById String?
-  isVerified  Boolean      @default(false)
-  verifiedAt  DateTime?
-  createdAt   DateTime     @default(now())
+  isVerified   Boolean      @default(false)
+  verifiedAt   DateTime?
+  createdAt    DateTime     @default(now())
 
   tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -515,12 +537,12 @@ model Document {
 // MARK: - Booking
 
 model Booking {
-  id       String  @id @default(cuid())
-  tenantId String
+  id         String  @id @default(cuid())
+  tenantId   String
   // Kode singkat untuk pelanggan, contoh BR-2411-0042.
-  code     String  @unique
-  vehicleId String
-  customerId  String?
+  code       String  @unique
+  vehicleId  String
+  customerId String?
 
   customerName   String
   customerPhone  String
@@ -531,41 +553,41 @@ model Booking {
   endsAt   DateTime @db.Timestamptz(3)
   days     Int
 
-  status           BookingStatus        @default(PENDING)
-  paymentStatus    BookingPaymentStatus @default(UNPAID)
+  status        BookingStatus        @default(PENDING)
+  paymentStatus BookingPaymentStatus @default(UNPAID)
 
-  deliveryMode DeliveryMode @default(SELF_PICKUP)
-  deliveryArea String?
+  deliveryMode    DeliveryMode @default(SELF_PICKUP)
+  deliveryArea    String?
   deliveryAddress String?
-  deliveryFee  Int     @default(0)
-  withDriver   Boolean @default(false)
-  driverFee    Int     @default(0)
+  deliveryFee     Int          @default(0)
+  withDriver      Boolean      @default(false)
+  driverFee       Int          @default(0)
 
-  rentalAmount   Int @default(0)
-  depositAmount  Int @default(0)
-  totalAmount    Int @default(0)
-  paidAmount     Int @default(0)
+  rentalAmount  Int @default(0)
+  depositAmount Int @default(0)
+  totalAmount   Int @default(0)
+  paidAmount    Int @default(0)
 
-  depositStatus  DepositStatus @default(HELD)
-  depositRefunded Int     @default(0)
-  lateFee        Int       @default(0)
-  damageFee      Int       @default(0)
+  depositStatus   DepositStatus @default(HELD)
+  depositRefunded Int           @default(0)
+  lateFee         Int           @default(0)
+  damageFee       Int           @default(0)
 
   // Booking PENDING kedaluwarsa otomatis (cron) setelah batas ini.
-  expiresAt      DateTime?
-  cancelledAt    DateTime?
-  cancelReason   String?
-  notes          String?
-  source         String    @default("PUBLIC")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  expiresAt    DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?
+  notes        String?
+  source       String    @default("PUBLIC")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  vehicle    Vehicle     @relation(fields: [vehicleId], references: [id])
-  customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  payments   Payment[]
-  handovers  Handover[]
-  documents  Document[]
+  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle           @relation(fields: [vehicleId], references: [id])
+  customer      Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  payments      Payment[]
+  handovers     Handover[]
+  documents     Document[]
   notifications NotificationLog[]
 
   @@index([tenantId, status, startsAt])
@@ -578,27 +600,27 @@ model Booking {
 // (btree_gist + tstzrange) yang dibuat di migrasi SQL manual.
 
 model Payment {
-  id        String        @id @default(cuid())
-  tenantId  String
-  bookingId String?
-  invoiceId String?
-  kind      PaymentKind
-  method    PaymentMethod
-  status    PaymentStatus @default(PENDING)
-  amount    Int
-  refCode   String?
-  midtransOrderId String?
+  id                    String        @id @default(cuid())
+  tenantId              String
+  bookingId             String?
+  invoiceId             String?
+  kind                  PaymentKind
+  method                PaymentMethod
+  status                PaymentStatus @default(PENDING)
+  amount                Int
+  refCode               String?
+  midtransOrderId       String?
   midtransTransactionId String?
-  recordedById String?
-  notes     String?
-  paidAt    DateTime?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  recordedById          String?
+  notes                 String?
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 
-  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  booking    Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  invoice    Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  recordedBy User?     @relation("PaymentRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  booking    Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  invoice    Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  recordedBy User?    @relation("PaymentRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
 
   @@unique([tenantId, midtransTransactionId])
   @@index([tenantId, status])
@@ -607,32 +629,32 @@ model Payment {
 
 // Checklist kondisi kendaraan saat serah-terima / pengembalian (Fase 5).
 model Handover {
-  id        String       @id @default(cuid())
-  bookingId String
-  tenantId  String
-  type      HandoverType
-  odometer  Int?
-  fuelLevel FuelLevel?
+  id             String       @id @default(cuid())
+  bookingId      String
+  tenantId       String
+  type           HandoverType
+  odometer       Int?
+  fuelLevel      FuelLevel?
   conditionNotes String?
   damageNotes    String?
   recordedById   String?
-  createdAt DateTime     @default(now())
+  createdAt      DateTime     @default(now())
 
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  photos  HandoverPhoto[]
-  recordedBy User? @relation("HandoverRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+  booking    Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  photos     HandoverPhoto[]
+  recordedBy User?           @relation("HandoverRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
 
   @@index([bookingId, type])
   @@map("handovers")
 }
 
 model HandoverPhoto {
-  id         String                  @id @default(cuid())
+  id         String                @id @default(cuid())
   handoverId String
   url        String
   storageKey String?
-  position   HandoverPhotoPosition   @default(OTHER)
-  createdAt  DateTime                @default(now())
+  position   HandoverPhotoPosition @default(OTHER)
+  createdAt  DateTime              @default(now())
 
   handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
 
@@ -644,12 +666,12 @@ model HandoverPhoto {
 
 // Jejak webhook payment untuk idempotensi (Fase 4).
 model WebhookEvent {
-  id        String   @id @default(cuid())
-  tenantId  String?
-  provider  String
-  eventId   String
-  payload   Json
-  receivedAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  tenantId    String?
+  provider    String
+  eventId     String
+  payload     Json
+  receivedAt  DateTime  @default(now())
   processedAt DateTime?
 
   tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)

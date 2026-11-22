@@ -7,10 +7,13 @@ Fase yang sudah jalan di repo ini: **Fase 1 (fondasi)**, **Fase 2 (armada &
 perawatan)**, **Fase 3 (halaman publik & booking)**, **Fase 4 (pembayaran Midtrans
 + pencatatan manual, notifikasi WhatsApp, cron)**, **Fase 5 (operasional
 harian: status pesanan, kalender armada, checklist serah-terima, denda & deposit,
-halaman pelanggan)**, dan **Fase 6 (langganan SaaS: tagihan & cron, dashboard
+halaman pelanggan)**, **Fase 6 (langganan SaaS tenant: tagihan & cron, dashboard
 ringkasan + grafik, laporan pendapatan per kendaraan + CSV, pengaturan tenant &
-staf)**. Undangan staf lewat email sudah ada; penjadwalan biaya antar-jemput dan
-halaman riwayat notifikasi masih terbuka — lihat bagian **Belum dikerjakan**.
+staf)**, dan **Fase 7 (control center platform: super-admin, tenant, paket,
+suspend/reactivate, serta audit log)**. Undangan staf lewat email sudah ada;
+penjadwalan biaya antar-jemput dan halaman riwayat notifikasi masih terbuka —
+lihat bagian **Belum dikerjakan**. Dashboard platform diakses lewat `/admin` oleh
+akun yang diberi akses menggunakan `npm run account:platform-admin -- email on|off`.
 
 ## Menjalankan
 
