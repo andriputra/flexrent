@@ -46,7 +46,7 @@ const PERBANDINGAN: { label: string; nilai: Record<string, string | boolean> }[]
 
 const TERANG = {
   card: "border border-border/70 bg-card text-card-foreground shadow-card hover:border-accent/40 hover:shadow-pop",
-  name: "text-lg font-semibold tracking-tight",
+  name: "font-display text-lg font-semibold tracking-tight",
   desc: "mt-1.5 text-sm leading-relaxed text-muted-foreground",
   price: "text-card-foreground",
   unit: "text-muted-foreground",
@@ -63,7 +63,7 @@ const TERANG = {
 const TINTA = {
   card:
     "border border-white/12 bg-ink bg-[radial-gradient(125%_92%_at_50%_0%,rgb(245_158_11/0.16),transparent_58%)] text-ink-foreground shadow-pop hover:border-accent/45",
-  name: "text-lg font-semibold tracking-tight text-ink-foreground",
+  name: "font-display text-lg font-semibold tracking-tight text-ink-foreground",
   desc: "mt-1.5 text-sm leading-relaxed text-ink-muted",
   price: "text-ink-foreground",
   unit: "text-ink-muted",
@@ -94,7 +94,7 @@ export default async function PricingPage() {
           <div className="anim-rise">
             <Eyebrow>Harga</Eyebrow>
           </div>
-          <h1 className="anim-rise mt-2 max-w-[24ch] text-[2rem] font-extrabold leading-[1.1] tracking-tight sm:text-[2.6rem] [--d:90ms]">
+          <h1 className="anim-rise font-display mt-2 max-w-[24ch] text-[2rem] font-bold leading-[1.1] tracking-tight sm:text-[2.6rem] [--d:90ms]">
             Harga yang mengikuti besar armada
           </h1>
           <p className="anim-rise max-w-2xl text-base leading-relaxed text-muted-foreground [--d:180ms]">
@@ -235,7 +235,7 @@ export default async function PricingPage() {
       <section className="page-container space-y-6 py-16">
         <div className="max-w-2xl space-y-4">
           <Eyebrow>Perbandingan</Eyebrow>
-          <h2 className="text-2xl font-bold tracking-tight sm:text-[1.7rem]">Perbandingan fitur</h2>
+          <h2 className="font-display text-2xl font-bold tracking-tight sm:text-[1.7rem]">Perbandingan fitur</h2>
           <p className="text-muted-foreground">
             Semua paket mendapat pembaruan sistem dan penyimpanan data terpisah per rental.
           </p>

@@ -71,8 +71,8 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
           <div className="bg-grid absolute inset-0 opacity-80 [mask-image:radial-gradient(70%_70%_at_50%_0%,black,transparent_78%)]" />
         </div>
 
-        <div className="page-container space-y-3 py-14 sm:py-16">
-          <h1 className="anim-rise max-w-[20ch] text-[1.85rem] leading-[1.12] font-extrabold tracking-tight sm:text-[2.3rem]">
+        <div className="page-container space-y-3 pt-20 pb-16 sm:pt-24 sm:pb-20">
+          <h1 className="anim-rise font-display max-w-[20ch] text-[1.85rem] leading-[1.12] font-bold tracking-tight sm:text-[2.3rem]">
             {tenant.tagline ?? `Sewa motor & mobil di ${tenant.city}`}
           </h1>
           <p className="anim-rise max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base [--d:120ms]">
@@ -82,7 +82,7 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
         </div>
       </section>
 
-      <div className="page-container -mt-10 space-y-5 pb-2 pt-10 sm:space-y-7">
+      <div className="page-container -mt-10 space-y-5 pb-14 pt-10 sm:space-y-7 sm:pb-20">
         <AvailabilitySearch
           slug={tenant.slug}
           today={toDayKey(new Date())}
@@ -93,7 +93,7 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
 
         <section className="space-y-4 pt-1">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-lg font-semibold tracking-tight">
+            <h2 className="font-display text-lg font-semibold tracking-tight">
               {rows.length} kendaraan{" "}
               <span className="text-muted-foreground font-normal">
                 {rangeLabel ? `tersedia ${rangeLabel}` : "di armada ini"}

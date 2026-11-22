@@ -38,7 +38,7 @@ export default async function PublicBookingLookupPage({
           <span className="anim-pop mb-3 flex size-11 items-center justify-center rounded-2xl border border-border/70 bg-card text-primary shadow-card">
             <KeyRound aria-hidden className="size-5" />
           </span>
-          <h1 className="anim-rise text-[1.85rem] leading-tight font-extrabold tracking-tight sm:text-[2.2rem]">
+          <h1 className="anim-rise font-display text-[1.85rem] leading-tight font-bold tracking-tight sm:text-[2.2rem]">
             Cek status pesanan
           </h1>
           <p className="anim-rise mt-2 text-sm leading-6 text-muted-foreground [--d:120ms]">

@@ -21,7 +21,7 @@ export default function TenantNotFound() {
         <span className="anim-pop mx-auto flex size-14 items-center justify-center rounded-2xl border border-border/70 bg-card/80 text-muted-foreground shadow-card backdrop-blur-sm">
           <SearchX aria-hidden className="size-7" />
         </span>
-        <h1 className="anim-rise text-2xl leading-8 font-semibold tracking-tight">Halaman rental tidak ditemukan</h1>
+        <h1 className="anim-rise font-display text-2xl leading-8 font-bold tracking-tight">Halaman rental tidak ditemukan</h1>
         <p className="anim-rise text-sm leading-6 text-muted-foreground [--d:120ms]">
           Tautan ini mungkin sudah berubah. Periksa kembali alamatnya atau buka halaman utama Flexrent.
         </p>

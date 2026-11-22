@@ -98,7 +98,7 @@ function HeroTitle() {
     segment.text.split(" ").map((text) => ({ text, accent: segment.accent }))
   )
   return (
-    <h1 className="mt-6 max-w-[20ch] text-[2.1rem] font-extrabold leading-[1.08] tracking-tight sm:text-[2.5rem] lg:text-[2.8rem]">
+    <h1 className="mt-6 font-display max-w-[20ch] text-[2.1rem] font-bold leading-[1.08] tracking-tight sm:text-[2.5rem] lg:text-[2.8rem]">
       {words.map((word, index) => (
         <Fragment key={`${word.text}-${index}`}>
           {index === 0 ? null : " "}
@@ -269,7 +269,7 @@ export default async function MarketingHome() {
         <div className="page-container">
           <div className="max-w-2xl space-y-4">
             <Eyebrow>Fitur</Eyebrow>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-[2.1rem]">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-[2.1rem]">
               Semua yang dibutuhkan rental harian
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
@@ -287,7 +287,7 @@ export default async function MarketingHome() {
                     <span className="flex size-11 items-center justify-center rounded-xl bg-primary/[0.08] text-primary ring-1 ring-primary/10 transition-all duration-500 group-hover/card:-translate-y-0.5 group-hover/card:bg-accent/15 group-hover/card:text-accent-hover group-hover/card:ring-accent/25">
                       <Icon aria-hidden className="size-5" />
                     </span>
-                    <h3 className="mt-5 text-base font-semibold tracking-tight">{feature.title}</h3>
+                    <h3 className="font-display mt-5 text-base font-semibold tracking-tight">{feature.title}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {feature.description}
                     </p>
@@ -306,7 +306,7 @@ export default async function MarketingHome() {
         <div className="page-container">
           <div className="max-w-2xl space-y-4">
             <Eyebrow>Cara kerja</Eyebrow>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-[2.1rem]">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-[2.1rem]">
               Mulai dalam tiga langkah
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
@@ -334,7 +334,7 @@ export default async function MarketingHome() {
                 <span className="relative z-10 flex size-10 items-center justify-center rounded-full border border-border bg-card text-sm font-bold tabular-nums text-primary shadow-card transition-all duration-500 group-hover/step:-translate-y-1 group-hover/step:border-accent group-hover/step:bg-accent group-hover/step:text-accent-foreground group-hover/step:shadow-pop">
                   {index + 1}
                 </span>
-                <h3 className="mt-5 text-lg font-semibold tracking-tight">{step.title}</h3>
+                <h3 className="font-display mt-5 text-lg font-semibold tracking-tight">{step.title}</h3>
                 <p className="mt-2 max-w-[40ch] text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>

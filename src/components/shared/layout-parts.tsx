@@ -104,7 +104,7 @@ export function SectionHeading({
         </span>
       ) : null}
       <div className="min-w-0 flex-1 space-y-0.5">
-        <h2 className="text-base leading-6 font-semibold tracking-tight">{children}</h2>
+        <h2 className="font-display text-base leading-6 font-semibold tracking-tight">{children}</h2>
         {description ? (
           <p className="text-sm leading-5 text-muted-foreground">{description}</p>
         ) : null}

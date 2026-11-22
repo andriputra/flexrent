@@ -145,7 +145,7 @@ export default async function PublicVehicleDetailPage({
                 {vehicle.plate}
               </span>
             </div>
-            <h1 className="anim-rise max-w-[22ch] text-[1.9rem] leading-tight font-extrabold tracking-tight sm:text-[2.35rem] [--d:80ms]">
+            <h1 className="anim-rise font-display max-w-[22ch] text-[1.9rem] leading-tight font-bold tracking-tight sm:text-[2.35rem] [--d:80ms]">
               {name} <span className="font-normal text-muted-foreground">{vehicle.year}</span>
             </h1>
             <p className="anim-rise max-w-2xl text-sm leading-6 text-muted-foreground sm:text-[0.9rem] [--d:160ms]">
@@ -161,6 +161,7 @@ export default async function PublicVehicleDetailPage({
             <div className="reveal">
               <VehicleGallery
                 name={name}
+                type={vehicle.type}
                 shots={vehicle.photos.map((photo) => ({ id: photo.id, url: photo.url, caption: photo.alt }))}
               />
             </div>

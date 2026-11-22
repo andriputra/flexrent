@@ -23,7 +23,7 @@ export function CtaBanner({
 
           <div className="flex flex-col items-start justify-between gap-7 sm:flex-row sm:items-center">
             <div className="space-y-3">
-              <h2 className="max-w-xl text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl">
+              <h2 className="font-display max-w-xl text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl">
                 {title}
               </h2>
               <p className="max-w-xl text-sm leading-relaxed text-ink-muted">{description}</p>

@@ -1,23 +1,43 @@
 "use client"
 
 import { useState } from "react"
-import { Car } from "lucide-react"
+import { Bike, Car } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type Shot = { id: string; url: string; caption: string | null }
 
 /** Galeri foto kendaraan: satu gambar besar + deretan miniature yang bisa diklik. */
-export function VehicleGallery({ shots, name }: { shots: Shot[]; name: string }) {
+export function VehicleGallery({
+  shots,
+  name,
+  type,
+}: {
+  shots: Shot[]
+  name: string
+  type: "MOTOR" | "MOBIL"
+}) {
+  const PlaceholderIcon = type === "MOTOR" ? Bike : Car
   const [active, setActive] = useState(0)
   const current = shots[Math.min(active, shots.length - 1)]
 
   if (!current) {
     return (
-      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-muted shadow-card">
-        <div aria-hidden className="bg-grid absolute inset-0 opacity-70" />
-        <span className="flex size-14 items-center justify-center rounded-2xl border border-border/70 bg-card/80 text-muted-foreground shadow-card backdrop-blur-sm">
-          <Car aria-hidden className="size-7" />
-        </span>
+      <div className="group/gallery relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-ink/20 bg-ink text-ink-foreground shadow-pop">
+        <div aria-hidden className="bg-ink-grid absolute inset-0 opacity-80" />
+        <div
+          aria-hidden
+          className="absolute -top-28 -right-20 size-72 rounded-full border border-accent/20 bg-[radial-gradient(circle,rgb(245_158_11/0.18),transparent_65%)] blur-[2px]"
+        />
+        <div
+          aria-hidden
+          className="absolute -bottom-32 -left-24 size-80 rounded-full border border-white/8"
+        />
+        <div className="relative flex flex-col items-center gap-4 px-6 text-center">
+          <span className="anim-pop flex size-20 items-center justify-center rounded-[1.5rem] border border-accent/35 bg-accent text-accent-foreground shadow-[0_18px_42px_-18px_var(--accent)] transition-transform duration-500 group-hover/gallery:-translate-y-1 motion-reduce:animate-none motion-reduce:transition-none motion-reduce:group-hover/gallery:translate-y-0">
+            <PlaceholderIcon aria-hidden className="size-9" />
+          </span>
+          <p className="font-display text-xl font-semibold tracking-tight">{name}</p>
+        </div>
       </div>
     )
   }

@@ -68,8 +68,8 @@ export default async function TenantPublicLayout({
 
       <main className="flex-1">{children}</main>
 
-      <footer className="mt-auto border-t border-border/70 bg-card">
-        <div className="page-container grid gap-8 py-10 sm:grid-cols-2">
+      <footer className="mt-12 border-t border-border/70 bg-card">
+        <div className="page-container grid gap-8 py-12 sm:grid-cols-2 sm:py-14">
           <div className="space-y-2.5 text-sm">
             <p className="text-base font-semibold tracking-tight">{tenant.name}</p>
             {tenant.tagline ? <p className="max-w-sm text-muted-foreground">{tenant.tagline}</p> : null}

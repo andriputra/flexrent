@@ -61,7 +61,7 @@ function LookupHero({ title, description }: { title: string; description: string
         className="bg-grid pointer-events-none absolute inset-0 -z-10 opacity-70 [mask-image:radial-gradient(120%_90%_at_50%_0%,black,transparent_75%)]"
       />
       <div className="page-container pb-14 pt-10 sm:pb-16 sm:pt-12">
-        <h1 className="anim-rise text-[1.85rem] leading-tight font-extrabold tracking-tight sm:text-[2.2rem]">{title}</h1>
+        <h1 className="anim-rise font-display text-[1.85rem] leading-tight font-bold tracking-tight sm:text-[2.2rem]">{title}</h1>
         <p className="anim-rise mt-2 max-w-xl text-sm leading-6 text-muted-foreground [--d:120ms]">{description}</p>
       </div>
     </section>
@@ -172,7 +172,7 @@ export default async function PublicBookingStatusPage({
           <div className="anim-fade flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-1.5">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground/70">Kode booking</p>
-              <h1 className="anim-rise text-[2rem] leading-tight font-extrabold tracking-tight tabular-nums sm:text-[2.4rem]">
+              <h1 className="anim-rise font-display text-[2rem] leading-tight font-bold tracking-tight tabular-nums sm:text-[2.4rem]">
                 {booking.code}
               </h1>
             </div>

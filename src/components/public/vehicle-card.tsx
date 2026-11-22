@@ -86,7 +86,7 @@ export function VehicleCard({
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-0.5">
-          <h3 className="leading-6 font-semibold tracking-tight">
+          <h3 className="font-display leading-6 font-semibold tracking-tight">
             {vehicle.brand} {vehicle.model}
           </h3>
           <p className="text-sm text-muted-foreground tabular-nums">

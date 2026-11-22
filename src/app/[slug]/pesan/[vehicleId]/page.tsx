@@ -72,7 +72,7 @@ export default async function PublicBookingWizardPage({
             </Button>
           </div>
           <div className="mt-3 space-y-2 pb-14 sm:pb-16">
-            <h1 className="anim-rise max-w-[24ch] text-[1.85rem] leading-tight font-extrabold tracking-tight sm:text-[2.2rem]">
+            <h1 className="anim-rise font-display max-w-[24ch] text-[1.85rem] leading-tight font-bold tracking-tight sm:text-[2.2rem]">
               Pesan {vehicle.brand} {vehicle.model}
             </h1>
             <p className="anim-rise text-sm text-muted-foreground tabular-nums [--d:120ms]">
