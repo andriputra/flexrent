@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { dayLabel, type OpeningHour } from "@/lib/opening-hours"
 import { updateOpeningHoursAction } from "@/server/actions/settings"
 import { FormFeedback } from "./form-field"
@@ -61,9 +60,7 @@ export function OpeningHoursForm({
       <FormFeedback message={serverError} />
 
       {usingDefault ? (
-        <p className="text-xs text-muted-foreground">
-          Nilai di bawah masih bawaan — halaman publik belum menampilkan jam sampai Anda menyimpan.
-        </p>
+        <p className="text-xs text-muted-foreground">Nilai di bawah masih bawaan dan belum tampil di halaman publik.</p>
       ) : null}
 
       <ul className="divide-y rounded-xl border">
@@ -123,9 +120,6 @@ export function OpeningHoursForm({
         >
           {pending ? "Menyimpan…" : "Simpan jam operasional"}
         </Button>
-        <Label className="text-xs font-normal text-muted-foreground">
-          Ditampilkan di footer halaman publik rental Anda.
-        </Label>
       </div>
     </form>
   )

@@ -27,7 +27,7 @@ type SearchParams = { dari?: string; sampai?: string }
 function ShareBar({ share }: { share: number }) {
   return (
     <div className="flex items-center justify-end gap-2">
-      <span className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+      <span className="h-1.5 w-20 overflow-hidden rounded-full bg-muted ring-1 ring-inset ring-border/60">
         <span
           className="block h-full rounded-full bg-chart-2"
           style={{ width: `${Math.min(100, Math.round(share * 100))}%` }}
@@ -87,11 +87,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         }
       />
 
-      <Card className="shadow-card">
-        <CardContent className="space-y-4 px-5 py-4">
-          <div className="flex flex-wrap items-center gap-2">
+      <Card className="border-border/70 shadow-card">
+        <CardContent className="flex flex-col gap-4 px-5 py-4 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between">
+          <div className="inline-flex items-center gap-0.5 self-start rounded-lg border bg-muted/70 p-0.5 lg:self-auto">
             {presets.map((preset) => (
-              <Button key={preset.label} asChild variant={preset.active ? "secondary" : "outline"} size="sm">
+              <Button key={preset.label} asChild variant={preset.active ? "secondary" : "ghost"} size="sm">
                 <Link href={preset.href}>{preset.label}</Link>
               </Button>
             ))}
@@ -99,11 +99,17 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           <form method="get" action="/dashboard/reports" className="flex flex-wrap items-end gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="dari">Dari tanggal</Label>
-              <Input id="dari" name="dari" type="date" defaultValue={fromKey} className="w-44" />
+              <Input id="dari" name="dari" type="date" defaultValue={fromKey} className="w-44 bg-background font-medium" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="sampai">Sampai tanggal</Label>
-              <Input id="sampai" name="sampai" type="date" defaultValue={toKey} className="w-44" />
+              <Input
+                id="sampai"
+                name="sampai"
+                type="date"
+                defaultValue={toKey}
+                className="w-44 bg-background font-medium"
+              />
             </div>
             <Button type="submit" size="sm" className="bg-accent text-accent-foreground hover:bg-accent-hover">
               Terapkan
@@ -156,11 +162,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Kendaraan</TableHead>
+                    <TableHead className="w-[300px]">Kendaraan</TableHead>
                     <TableHead className="w-[110px] text-right">Booking</TableHead>
-                    <TableHead className="w-[100px] text-right">Hari sewa</TableHead>
-                    <TableHead className="w-[150px] text-right">Pendapatan</TableHead>
-                    <TableHead className="w-[160px] text-right">Kontribusi</TableHead>
+                    <TableHead className="w-[110px] text-right">Hari sewa</TableHead>
+                    <TableHead className="w-[160px] text-right">Pendapatan</TableHead>
+                    <TableHead className="w-[190px] text-right">Kontribusi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -172,7 +178,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                           <div className="min-w-0">
                             <Link
                               href={`/dashboard/vehicles/${row.vehicleId}`}
-                              className="text-sm hover:underline"
+                              className="text-sm font-medium hover:underline"
                             >
                               {row.brand} {row.model}
                             </Link>

@@ -62,9 +62,9 @@ export function BookingFilterBar({
   const hasFilter = Boolean(params.get("status") || params.get("kendaraan") || params.get("cari"))
 
   return (
-    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-card p-3 shadow-card lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex items-center gap-0.5 rounded-lg border bg-card p-0.5">
+        <div className="inline-flex items-center gap-0.5 rounded-lg border bg-muted/70 p-0.5">
           <Button variant={mode === "daftar" ? "secondary" : "ghost"} size="sm" onClick={() => switchMode("daftar")}>
             <List aria-hidden />
             Daftar
@@ -90,19 +90,19 @@ export function BookingFilterBar({
             >
               <Search
                 aria-hidden
-                className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground"
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
               />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Cari kode, nama, WhatsApp, atau plat"
                 aria-label="Cari booking"
-                className="w-[280px] pl-8"
+                className="w-[280px] bg-background pl-9 font-medium"
               />
             </form>
 
             <Select value={status} onValueChange={(value) => apply({ status: value })}>
-              <SelectTrigger size="sm" className="w-[190px]" aria-label="Saring status booking">
+              <SelectTrigger size="sm" className="w-[190px] bg-background font-medium" aria-label="Saring status booking">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -115,7 +115,7 @@ export function BookingFilterBar({
             </Select>
 
             <Select value={vehicle} onValueChange={(value) => apply({ kendaraan: value })}>
-              <SelectTrigger size="sm" className="w-[210px]" aria-label="Saring kendaraan">
+              <SelectTrigger size="sm" className="w-[210px] bg-background font-medium" aria-label="Saring kendaraan">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -130,7 +130,7 @@ export function BookingFilterBar({
 
             {hasFilter ? (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => {
                   setQuery("")
@@ -149,7 +149,11 @@ export function BookingFilterBar({
         )}
       </div>
 
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p
+        className="inline-flex h-7 shrink-0 items-center gap-1.5 self-start rounded-full border border-border bg-muted/70 px-2.5 text-xs font-medium tabular-nums lg:self-auto"
+        aria-live="polite"
+      >
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
         {mode === "daftar" ? `${total} booking` : `${vehicles.length} kendaraan`} · {activeCount} masih berjalan
       </p>
     </div>

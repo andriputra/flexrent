@@ -15,7 +15,7 @@ import { EmptyState, PageHeader } from "@/components/shared/layout-parts"
 import { PaymentStatusBadge } from "@/components/shared/status-badge"
 import { PaymentFilterBar } from "@/components/payments/payment-filter-bar"
 import { RecordPaymentDialog } from "@/components/payments/record-payment-dialog"
-import { formatDateTimeId } from "@/lib/datetime"
+import { formatDateId, formatDateTimeId } from "@/lib/datetime"
 import { formatRupiah } from "@/lib/format"
 import { requireTenant } from "@/lib/tenant"
 import { getPayableBookingOptions, listPayments } from "@/server/queries/payments"
@@ -88,32 +88,48 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Pesanan</TableHead>
-                  <TableHead>Jenis</TableHead>
-                  <TableHead>Metode</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead className="w-[120px]">Status</TableHead>
-                  <TableHead>Dicatat oleh</TableHead>
+                  <TableHead className="w-[190px]">Tanggal</TableHead>
+                  <TableHead className="w-[220px]">Pesanan</TableHead>
+                  <TableHead className="w-[104px]">Jenis</TableHead>
+                  <TableHead className="w-[180px]">Metode</TableHead>
+                  <TableHead className="w-[140px] text-right">Jumlah</TableHead>
+                  <TableHead className="w-[140px]">Status</TableHead>
+                  <TableHead className="w-[140px]">Dicatat oleh</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell className="text-sm tabular-nums text-muted-foreground">
-                      {formatDateTimeId(payment.paidAt ?? payment.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <p className="font-mono text-sm tracking-wider">{payment.booking?.code ?? "—"}</p>
-                      <p className="max-w-[260px] truncate text-xs text-muted-foreground">
-                        {payment.booking?.customerName ?? "Langganan"}
+                    <TableCell className="py-2.5 text-sm leading-5 tabular-nums">
+                      <p>{formatDateId(payment.paidAt ?? payment.createdAt, "EEE, d MMM yyyy")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDateId(payment.paidAt ?? payment.createdAt, "HH:mm")}
                       </p>
                     </TableCell>
-                    <TableCell className="text-sm">{kindLabel(payment.kind)}</TableCell>
+                    <TableCell>
+                      {payment.booking ? (
+                        <>
+                          <Link
+                            href={`/dashboard/bookings/${payment.booking.code}`}
+                            className="font-mono text-sm font-medium tracking-wider text-primary hover:underline"
+                          >
+                            {payment.booking.code}
+                          </Link>
+                          <p className="max-w-[196px] truncate text-xs text-muted-foreground">
+                            {payment.booking.customerName}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="font-mono text-sm font-medium tracking-wider">Langganan</p>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm font-medium">{kindLabel(payment.kind)}</TableCell>
                     <TableCell className="text-sm">
-                      {METHOD_LABELS[payment.method]}
+                      <p className="font-medium">{METHOD_LABELS[payment.method]}</p>
                       {payment.refCode ? (
-                        <p className="max-w-[200px] truncate font-mono text-xs text-muted-foreground">{payment.refCode}</p>
+                        <p className="max-w-[156px] truncate font-mono text-xs text-muted-foreground">
+                          {payment.refCode}
+                        </p>
                       ) : null}
                     </TableCell>
                     <TableCell className="text-right text-sm font-medium tabular-nums">

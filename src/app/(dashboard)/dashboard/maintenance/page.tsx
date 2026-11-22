@@ -16,12 +16,28 @@ import { MaintenanceFilterBar } from "@/components/maintenance/maintenance-filte
 import { MaintenanceRowActions } from "@/components/maintenance/maintenance-row-actions"
 import { NewMaintenanceDialog } from "@/components/maintenance/new-maintenance-dialog"
 import { requireTenant } from "@/lib/tenant"
-import { formatDateTimeId } from "@/lib/datetime"
+import { formatDateTimeId, diffInCalendarDays } from "@/lib/datetime"
 import { listMaintenancePlans, getVehicleOptions } from "@/server/queries/maintenance"
 
 export const metadata = { title: "Perawatan" }
 
 type SearchParams = { vehicle?: string; selesai?: string; page?: string }
+
+function SlotRange({ startsAt, endsAt }: { startsAt: Date; endsAt: Date }) {
+  const days = diffInCalendarDays(startsAt, endsAt)
+  const span =
+    days === 0
+      ? `${Math.max(1, Math.round((endsAt.getTime() - startsAt.getTime()) / 3_600_000))} jam`
+      : `${days + 1} hari`
+  return (
+    <div className="text-sm leading-5 tabular-nums">
+      <p>{formatDateTimeId(startsAt)}</p>
+      <p className="text-xs text-muted-foreground">
+        s/d {formatDateTimeId(endsAt)} · {span}
+      </p>
+    </div>
+  )
+}
 
 export default async function MaintenancePage({
   searchParams,
@@ -110,20 +126,20 @@ export default async function MaintenancePage({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Kendaraan</TableHead>
-                  <TableHead>Jadwal</TableHead>
-                  <TableHead>Rentang waktu</TableHead>
-                  <TableHead className="w-[120px]">Status</TableHead>
+                  <TableHead className="w-[250px]">Kendaraan</TableHead>
+                  <TableHead className="w-[300px]">Jadwal</TableHead>
+                  <TableHead className="w-[240px]">Rentang waktu</TableHead>
+                  <TableHead className="w-[130px]">Status</TableHead>
                   <TableHead className="w-[56px] text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((plan) => (
                   <TableRow key={plan.id}>
-                    <TableCell>
+                    <TableCell className="py-2.5">
                       <Link
                         href={`/dashboard/vehicles/${plan.vehicle.id}`}
-                        className="text-sm font-medium hover:underline"
+                        className="inline-block max-w-[226px] truncate align-bottom text-sm font-medium hover:underline"
                       >
                         {plan.vehicle.brand} {plan.vehicle.model}
                       </Link>
@@ -132,16 +148,15 @@ export default async function MaintenancePage({
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm">{plan.title}</p>
+                      <p className="max-w-[276px] truncate text-sm font-medium">{plan.title}</p>
                       {plan.notes ? (
-                        <p className="max-w-[320px] truncate text-xs text-muted-foreground">
+                        <p className="max-w-[276px] truncate text-xs text-muted-foreground">
                           {plan.notes}
                         </p>
                       ) : null}
                     </TableCell>
-                    <TableCell className="text-sm tabular-nums text-muted-foreground">
-                      <p>{formatDateTimeId(plan.startsAt)}</p>
-                      <p>s/d {formatDateTimeId(plan.endsAt)}</p>
+                    <TableCell>
+                      <SlotRange startsAt={plan.startsAt} endsAt={plan.endsAt} />
                     </TableCell>
                     <TableCell>
                       <MaintenanceStatus plan={plan} />
@@ -182,10 +197,8 @@ export default async function MaintenancePage({
                         canDelete={context.canManage}
                       />
                     </div>
-                    <p className="text-sm">{plan.title}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums">
-                      {formatDateTimeId(plan.startsAt)} — {formatDateTimeId(plan.endsAt)}
-                    </p>
+                    <p className="text-sm font-medium">{plan.title}</p>
+                    <SlotRange startsAt={plan.startsAt} endsAt={plan.endsAt} />
                     {plan.notes ? (
                       <p className="text-xs text-muted-foreground">{plan.notes}</p>
                     ) : null}
@@ -233,5 +246,9 @@ function MaintenanceStatus({ plan }: { plan: { isDone: boolean; startsAt: Date; 
       </Badge>
     )
   }
-  return <Badge variant="secondary">Terjadwal</Badge>
+  return (
+    <Badge variant="secondary" className="border-transparent bg-info/12 text-info">
+      Terjadwal
+    </Badge>
+  )
 }

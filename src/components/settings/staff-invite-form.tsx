@@ -75,7 +75,7 @@ export function StaffInviteForm({
           />
         </Field>
 
-        <Field htmlFor="staffRole" label="Peran" error={errors.role} hint="Admin bisa mengubah pengaturan dan langganan.">
+        <Field htmlFor="staffRole" label="Peran" error={errors.role} hint="Admin bisa mengubah pengaturan.">
           <Select value={values.role} onValueChange={(value) => set("role", value)} disabled={blocked || pending}>
             <SelectTrigger id="staffRole" className="w-full">
               <SelectValue placeholder="Pilih peran" />
@@ -88,11 +88,12 @@ export function StaffInviteForm({
         </Field>
       </div>
 
-      <Field htmlFor="staffJob" label="Jabatan" error={errors.jobTitle} hint='Opsional, mis. "Front office".'>
+      <Field htmlFor="staffJob" label="Jabatan" error={errors.jobTitle}>
         <Input
           id="staffJob"
           value={values.jobTitle}
           onChange={(event) => set("jobTitle", event.target.value)}
+          placeholder="mis. Front office"
           maxLength={60}
           disabled={blocked || pending}
         />
@@ -111,11 +112,14 @@ export function StaffInviteForm({
       </div>
 
       {!emailConfigured ? (
-        <p className="text-xs text-muted-foreground">
-          SMTP belum dipasang, jadi undangannya tidak terkirim dan hanya tercatat di dashboard. Staf tetap bisa
-          masuk memakai email ini begitu sandinya dibuat:{" "}
-          <code className="rounded bg-muted px-1 py-0.5">{`npm run account:password -- email@staf.id SANDI_BARU`}</code>
-        </p>
+        <div className="space-y-1.5 rounded-xl border border-border/70 bg-muted/40 px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            SMTP belum dipasang — undangan hanya tercatat di dashboard. Staf masuk setelah sandinya dibuat:
+          </p>
+          <code className="block overflow-x-auto font-mono text-xs">
+            npm run account:password -- email@staf.id SANDI_BARU
+          </code>
+        </div>
       ) : null}
     </form>
   )

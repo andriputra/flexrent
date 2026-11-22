@@ -61,7 +61,7 @@ export function LogoForm({ logoUrl, readOnly }: { logoUrl: string | null; readOn
         </div>
         <div className="space-y-1 text-sm">
           <p className="font-medium">{logoUrl ? "Logo aktif" : "Belum ada logo"}</p>
-          <p className="text-muted-foreground">JPG, PNG, atau WebP sampai {MAX_IMAGE_LABEL}. Tampil di header halaman publik.</p>
+          <p className="text-muted-foreground">JPG, PNG, atau WebP sampai {MAX_IMAGE_LABEL}.</p>
         </div>
       </div>
 

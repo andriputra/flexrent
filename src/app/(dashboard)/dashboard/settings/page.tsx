@@ -1,9 +1,11 @@
 import Link from "next/link"
-import { Building2, Clock, Eye, Receipt, Users } from "lucide-react"
+import { Building2, Clock, Eye, ImageIcon, Lock, ScrollText, Users } from "lucide-react"
+import type { ReactNode } from "react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/shared/layout-parts"
+import { Notice, PageHeader } from "@/components/shared/layout-parts"
 import { LogoForm } from "@/components/settings/logo-form"
 import { OpeningHoursForm } from "@/components/settings/opening-hours-form"
 import { ProfileForm } from "@/components/settings/profile-form"
@@ -11,7 +13,7 @@ import { StaffInviteForm } from "@/components/settings/staff-invite-form"
 import { TermsForm } from "@/components/settings/terms-form"
 import { defaultOpeningHours, dayLabel } from "@/lib/opening-hours"
 import { isEmailConfigured } from "@/lib/email"
-import { formatRupiah } from "@/lib/format"
+import { formatRupiah, initials } from "@/lib/format"
 import { termsList } from "@/lib/terms"
 import { requireTenant } from "@/lib/tenant"
 import { getSettingsOverview } from "@/server/queries/settings"
@@ -22,6 +24,17 @@ const ROLE_LABELS: Record<string, string> = {
   OWNER: "Pemilik",
   ADMIN: "Admin",
   STAFF: "Staf",
+}
+
+function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+  return (
+    <CardTitle className="flex items-center gap-2.5 text-base">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary [&_svg]:size-4">
+        {icon}
+      </span>
+      {children}
+    </CardTitle>
+  )
 }
 
 export default async function SettingsPage() {
@@ -43,7 +56,7 @@ export default async function SettingsPage() {
     <>
       <PageHeader
         title="Pengaturan rental"
-        description="Identitas yang tampil di halaman publik, jam operasional, syarat sewa, dan staf yang bisa membuka dashboard."
+        description="Identitas halaman publik, jam operasional, syarat sewa, dan akses tim."
         actions={
           <Button asChild variant="outline" size="sm">
             <Link href={`/${tenant.slug}`} target="_blank" rel="noreferrer">
@@ -55,22 +68,15 @@ export default async function SettingsPage() {
       />
 
       {!context.canManage ? (
-        <Card className="shadow-card">
-          <CardContent className="px-5 py-4 text-sm text-muted-foreground">{blockedReason}</CardContent>
-        </Card>
+        <Notice tone="warning" icon={<Lock aria-hidden />}>{blockedReason}</Notice>
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-5">
           <Card className="shadow-card">
             <CardHeader className="gap-1">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Building2 aria-hidden className="size-4 text-muted-foreground" />
-                Profil rental
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Nama, kota, dan kontak dipakai di dashboard, halaman publik, dan tagihan langganan.
-              </p>
+              <SectionTitle icon={<Building2 aria-hidden />}>Profil rental</SectionTitle>
+              <p className="text-sm text-muted-foreground">Dipakai di halaman publik dan tagihan langganan.</p>
             </CardHeader>
             <CardContent className="px-5 pb-5">
               <ProfileForm
@@ -90,11 +96,8 @@ export default async function SettingsPage() {
 
           <Card className="shadow-card">
             <CardHeader className="gap-1">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Receipt aria-hidden className="size-4 text-muted-foreground" />
-                Logo
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">Logo kecil di header halaman publik.</p>
+              <SectionTitle icon={<ImageIcon aria-hidden />}>Logo</SectionTitle>
+              <p className="text-sm text-muted-foreground">Tampil di header halaman publik.</p>
             </CardHeader>
             <CardContent className="px-5 pb-5">
               <LogoForm logoUrl={tenant.logoUrl} readOnly={readOnly} />
@@ -103,12 +106,9 @@ export default async function SettingsPage() {
 
           <Card className="shadow-card">
             <CardHeader className="gap-1">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Clock aria-hidden className="size-4 text-muted-foreground" />
-                Jam operasional
-              </CardTitle>
+              <SectionTitle icon={<Clock aria-hidden />}>Jam operasional</SectionTitle>
               <p className="text-sm text-muted-foreground">
-                Hanya informasi untuk pelanggan. Jam pengambilan pesanan tetap disepakati lewat WhatsApp.
+                Tampil di footer halaman publik; jam pengambilan tetap disepakati lewat WhatsApp.
               </p>
             </CardHeader>
             <CardContent className="px-5 pb-5">
@@ -118,12 +118,9 @@ export default async function SettingsPage() {
 
           <Card className="shadow-card">
             <CardHeader className="gap-1">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Receipt aria-hidden className="size-4 text-muted-foreground" />
-                Syarat sewa
-              </CardTitle>
+              <SectionTitle icon={<ScrollText aria-hidden />}>Syarat sewa</SectionTitle>
               <p className="text-sm text-muted-foreground">
-                Muncul di halaman detail kendaraan dan langkah konfirmasi pemesanan.
+                Tampil di detail kendaraan dan langkah konfirmasi pesanan.
               </p>
             </CardHeader>
             <CardContent className="px-5 pb-5">
@@ -133,13 +130,9 @@ export default async function SettingsPage() {
 
           <Card className="shadow-card">
             <CardHeader className="gap-1">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Users aria-hidden className="size-4 text-muted-foreground" />
-                Staf
-              </CardTitle>
+              <SectionTitle icon={<Users aria-hidden />}>Staf</SectionTitle>
               <p className="text-sm text-muted-foreground">
-                Staf masuk memakai email mereka sendiri lewat tautan di halaman login — tidak ada kata sandi yang harus
-                dibagikan.
+                Staf masuk lewat tautan di halaman login memakai email masing-masing.
               </p>
             </CardHeader>
             <CardContent className="space-y-5 px-5 pb-5">
@@ -147,20 +140,30 @@ export default async function SettingsPage() {
 
               <ul className="divide-y rounded-xl border">
                 {overview.staff.map((member) => (
-                  <li key={member.id} className="flex flex-wrap items-center gap-2 px-4 py-2.5">
+                  <li key={member.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
+                    <Avatar size="sm">
+                      <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                        {initials(member.name || member.email)}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">
                         {member.name ?? member.invitedEmail ?? member.email}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="truncate text-xs tabular-nums text-muted-foreground">
                         {member.email}
                         {member.jobTitle ? ` · ${member.jobTitle}` : ""}
                       </p>
                     </div>
                     {member.pendingLogin ? (
-                      <Badge variant="outline">Undangan belum diterima</Badge>
+                      <Badge variant="outline" className="shrink-0 border-transparent bg-warning/12 text-warning">
+                        Undangan tertunda
+                      </Badge>
                     ) : null}
-                    <Badge variant={member.role === "OWNER" ? "secondary" : "outline"}>
+                    <Badge
+                      variant={member.role === "OWNER" ? "secondary" : "outline"}
+                      className={member.role === "ADMIN" ? "border-transparent bg-info/12 text-info" : undefined}
+                    >
                       {ROLE_LABELS[member.role] ?? member.role}
                     </Badge>
                   </li>
@@ -176,12 +179,14 @@ export default async function SettingsPage() {
               <CardTitle className="text-base">Pratinjau halaman publik</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 px-5 pb-5 text-sm">
-              <div className="flex items-center gap-3">
-                <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+              <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-muted/40 px-3 py-2.5">
+                <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-card">
                   {tenant.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={tenant.logoUrl} alt="Logo rental" className="size-full object-contain" />
-                  ) : null}
+                  ) : (
+                    <span className="text-xs font-semibold text-primary">{initials(tenant.name)}</span>
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{tenant.name}</p>
@@ -190,34 +195,40 @@ export default async function SettingsPage() {
               </div>
               <p className="font-mono text-xs text-muted-foreground">/{tenant.slug}</p>
 
-              <div className="space-y-1 border-t pt-3">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Jam operasional</p>
+              <div className="space-y-1.5 border-t pt-3">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Jam operasional
+                </p>
                 {hoursAreDefault ? (
-                  <p className="text-sm text-muted-foreground">
-                    Belum tersimpan — pelanggan hanya melihat catatan bahwa jam pengambilan disepakati lewat WhatsApp.
-                  </p>
+                  <p className="text-xs text-muted-foreground">Belum disimpan — tidak tampil di halaman publik.</p>
                 ) : (
                   <ul className="space-y-0.5 text-sm">
                     {overview.openingHours.map((row) => (
                       <li key={row.day} className="flex justify-between gap-3 tabular-nums">
                         <span>{dayLabel(row.day)}</span>
-                        <span>{row.closed ? "Tutup" : `${row.open}–${row.close}`}</span>
+                        <span className={row.closed ? "text-muted-foreground" : undefined}>
+                          {row.closed ? "Tutup" : `${row.open}–${row.close}`}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
 
-              <div className="space-y-1 border-t pt-3">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Syarat sewa</p>
+              <div className="space-y-1.5 border-t pt-3">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Syarat sewa
+                </p>
                 <p className="text-sm">
-                  {tenant.terms ? `${terms.length} butir dari rental ini` : "Masih memakai syarat bawaan Flexrent"}
+                  {tenant.terms ? `${terms.length} butir` : <span className="text-muted-foreground">Bawaan Flexrent</span>}
                 </p>
               </div>
 
-              <div className="space-y-1 border-t pt-3">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Akses tim</p>
-                <p className="text-sm">
+              <div className="space-y-1.5 border-t pt-3">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Akses tim
+                </p>
+                <p className="text-sm tabular-nums">
                   {overview.staff.length} anggota
                   {overview.staffLimit !== null ? ` dari ${overview.staffLimit} kursi paket` : ""}
                 </p>
@@ -226,7 +237,7 @@ export default async function SettingsPage() {
                     Paket {context.plan.name} · {formatRupiah(context.plan.priceMonthly)} per bulan
                   </p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">Belum ada paket langganan aktif.</p>
+                  <p className="text-xs text-muted-foreground">Belum ada paket aktif.</p>
                 )}
                 <Button asChild variant="link" size="sm" className="h-auto p-0">
                   <Link href="/dashboard/billing">Kelola langganan</Link>

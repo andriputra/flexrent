@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google"
 import "./globals.css"
-import { Providers } from "@/components/shared/providers"
 import { SITE_URL } from "@/lib/seo"
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -31,9 +30,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" suppressHydrationWarning className={`${plusJakarta.variable} ${spaceGrotesk.variable}`}>
-      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
-        <Providers>{children}</Providers>
-      </body>
+      {/* Providers dipasang di layout tiap permukaan: default temanya berbeda (halaman publik gelap, aplikasi ikut sistem). */}
+      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">{children}</body>
     </html>
   )
 }

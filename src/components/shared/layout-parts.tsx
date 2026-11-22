@@ -178,15 +178,19 @@ export function StatCard({
         : "text-muted-foreground"
 
   return (
-    <Card className="shadow-card">
+    <Card className="group relative overflow-hidden border-border/70 shadow-card transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-pop">
+      <span
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+      />
       <CardContent className="space-y-3 px-5 py-5">
         <div className="flex items-start justify-between gap-3">
           <p className="text-sm leading-5 text-muted-foreground">{label}</p>
-          <span className="flex size-9 items-center justify-center rounded-full bg-muted text-primary [&_svg]:size-4">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/40 text-primary ring-1 ring-inset ring-border/60 transition-colors duration-300 [&_svg]:size-4 group-hover:bg-accent/15 group-hover:text-accent-hover">
             {icon}
           </span>
         </div>
-        <p className="text-[1.75rem] leading-8 font-semibold tracking-tight">{value}</p>
+        <p className="text-[1.75rem] leading-8 font-semibold tracking-tight tabular-nums">{value}</p>
         <div className="flex items-center gap-2 text-xs leading-4">
           {trend ? (
             <span className={cn("inline-flex items-center gap-1 font-medium", trendColor)}>

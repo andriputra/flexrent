@@ -27,9 +27,10 @@ describe("verifyPassword", () => {
 
   it("menolak hash yang bentuknya tidak dikenal atau dirusak", async () => {
     const hash = await hashPassword("sandi-kuat-1")
+    const rusak = hash.slice(0, -1) + (hash.endsWith("0") ? "1" : "0")
     expect(await verifyPassword("sandi-kuat-1", "md5$sandi-kuat-1")).toBe(false)
     expect(await verifyPassword("sandi-kuat-1", "scrypt$abc$8$1$00$00")).toBe(false)
-    expect(await verifyPassword("sandi-kuat-1", hash.replace(/.$/, "0"))).toBe(false)
+    expect(await verifyPassword("sandi-kuat-1", rusak)).toBe(false)
   })
 
   it("menghormati parameter yang tersimpan di dalam hash", async () => {

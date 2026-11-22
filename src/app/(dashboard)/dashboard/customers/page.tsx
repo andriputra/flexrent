@@ -80,12 +80,14 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pelanggan</TableHead>
-                  <TableHead className="text-right">Pesanan</TableHead>
-                  <TableHead className="text-right">Nilai sewa</TableHead>
-                  <TableHead>Pesanan terakhir</TableHead>
-                  <TableHead className="w-[170px]">Dokumen</TableHead>
-                  <TableHead className="w-[48px]" />
+                  <TableHead className="w-[280px]">Pelanggan</TableHead>
+                  <TableHead className="w-[104px] text-right">Pesanan</TableHead>
+                  <TableHead className="w-[150px] text-right">Nilai sewa</TableHead>
+                  <TableHead className="w-[168px]">Pesanan terakhir</TableHead>
+                  <TableHead className="w-[232px]">Dokumen</TableHead>
+                  <TableHead className="w-[52px]">
+                    <span className="sr-only">Aksi</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -93,33 +95,35 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                   const summary = summaries.get(customer.id)
                   return (
                     <TableRow key={customer.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
+                      <TableCell className="py-2.5">
+                        <div className="flex min-w-0 items-center gap-2">
                           <Link
                             href={`/dashboard/customers/${customer.id}`}
-                            className="text-sm font-medium hover:underline"
+                            className="max-w-[250px] truncate text-sm font-medium hover:underline"
                           >
                             {customer.name}
                           </Link>
                           {customer.isBlacklisted ? (
-                            <Badge variant="outline" className="border-transparent bg-danger/12 text-danger">
+                            <Badge variant="outline" className="shrink-0 border-transparent bg-danger/12 text-danger">
                               <Ban aria-hidden className="size-3" />
                               Daftar hitam
                             </Badge>
                           ) : null}
                         </div>
-                        <p className="text-xs text-muted-foreground tabular-nums">
-                          {customer.phone}
-                          {customer.city ? ` · ${customer.city}` : ""}
+                        <p className="max-w-[250px] truncate text-xs tabular-nums">
+                          <span className="text-foreground/80">{customer.phone}</span>
+                          {customer.city ? (
+                            <span className="text-muted-foreground"> · {customer.city}</span>
+                          ) : null}
                         </p>
                         {customer.isBlacklisted && customer.blacklistReason ? (
-                          <p className="max-w-[320px] truncate text-xs text-danger/80">{customer.blacklistReason}</p>
+                          <p className="max-w-[250px] truncate text-xs text-danger/80">{customer.blacklistReason}</p>
                         ) : null}
                       </TableCell>
                       <TableCell className="text-right text-sm tabular-nums">
                         {summary?.bookings ?? 0}
                       </TableCell>
-                      <TableCell className="text-right text-sm tabular-nums">
+                      <TableCell className="text-right text-sm font-medium tabular-nums">
                         {formatRupiah(summary?.orderValue ?? 0)}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground tabular-nums">

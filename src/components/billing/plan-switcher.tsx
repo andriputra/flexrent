@@ -65,7 +65,21 @@ export function PlanSwitcher({
               : null
 
         return (
-          <Card key={plan.code} className={active ? "border-accent shadow-pop" : "shadow-card"}>
+          <Card
+            key={plan.code}
+            className={cn(
+              "group relative overflow-hidden transition-[border-color,box-shadow,transform] duration-300",
+              active
+                ? "border-accent/70 shadow-pop ring-1 ring-accent/20"
+                : "border-border/70 shadow-card hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-pop"
+            )}
+          >
+            {active ? (
+              <span
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent via-accent/70 to-accent/20"
+              />
+            ) : null}
             <CardContent className="space-y-4 px-5 py-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="space-y-1">

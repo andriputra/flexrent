@@ -820,6 +820,16 @@ Aturan UI yang sudah diterapkan dan silakan diikuti saat menambah halaman:
   garis aksen amber di tepi (hairline/rail 3px), `shadow-pop` untuk panel yang
   ditonjolkan. Kendaraan tanpa foto tidak dibiarkan kosong — areanya diisi gradasi
   navy→amber + `bg-grid` bertopeng dan ubin ikon 64px.
+- Baris filter/pencarian daftar admin (`{entity}-filter-bar.tsx`) selalu ditempatkan
+  di panel `rounded-xl border border-border/70 bg-card p-3 shadow-card` — kendali
+  tidak dibiarkan mengambang di atas latar halaman; field memakai `bg-background`
+  dengan garis tepi `--input` (#cbd5e1, satu tingkat lebih gelap dari `--border`),
+  jumlah hasil sebagai chip, dan tombol Reset `variant="outline"`.
+- Pita kepala tabel dibuat seragam di `ui/table.tsx` (`bg-muted/40`, kapital,
+  `text-[0.72rem] font-semibold tracking-[0.08em]`), bukan per halaman. Kolom
+  daftar booking diberi lebar eksplisit agar total minimumnya ±1110px sehingga
+  muat di layar 1440px dengan sidebar terbuka; kolom yang terlalu sempit hanya
+  memicu gulir horizontal di dalam `overflow-x-auto` bawaan tabel.
 - Uang dan tanggal dalam format Indonesia (`Rp 1.500.000`, `Sen, 21 Nov 2026`),
   seluruh perhitungan tanggal memakai WIB lewat `src/lib/datetime.ts`.
 

@@ -82,7 +82,8 @@
   --danger: #dc2626;
   --info: #2563eb;
   --border: #e2e8f0;
-  --input: #e2e8f0;
+  /* Garis tepi kendali: sedikit lebih gelap dari --border agar field tidak samar di atas kartu putih. */
+  --input: #cbd5e1;
   --ring: #0b1f3a;
   --chart-1: #0b1f3a;
   --chart-2: #f59e0b;

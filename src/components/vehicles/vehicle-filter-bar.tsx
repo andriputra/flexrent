@@ -71,7 +71,7 @@ export function VehicleFilterBar({ total }: { total: number }) {
   const hasFilter = Boolean(params.get("q") || params.get("type") || params.get("status"))
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-card p-3 shadow-card sm:flex-row sm:items-center">
       <div className="relative flex-1 sm:max-w-sm">
         <Search
           aria-hidden
@@ -82,7 +82,7 @@ export function VehicleFilterBar({ total }: { total: number }) {
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Cari plat, merek, atau model"
           aria-label="Cari kendaraan"
-          className="pl-9"
+          className="bg-background pl-9 font-medium"
         />
       </div>
 
@@ -93,7 +93,7 @@ export function VehicleFilterBar({ total }: { total: number }) {
             apply({ type: value })
           }}
         >
-          <SelectTrigger size="sm" className="w-[150px]" aria-label="Saring jenis kendaraan">
+          <SelectTrigger size="sm" className="w-[150px] bg-background font-medium" aria-label="Saring jenis kendaraan">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -111,7 +111,7 @@ export function VehicleFilterBar({ total }: { total: number }) {
             apply({ status: value })
           }}
         >
-          <SelectTrigger size="sm" className="w-[150px]" aria-label="Saring status kendaraan">
+          <SelectTrigger size="sm" className="w-[150px] bg-background font-medium" aria-label="Saring status kendaraan">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -123,13 +123,17 @@ export function VehicleFilterBar({ total }: { total: number }) {
           </SelectContent>
         </Select>
 
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p
+          className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-muted/70 px-2.5 text-xs font-medium tabular-nums"
+          aria-live="polite"
+        >
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
           {total} kendaraan
           {pending ? " · memuat…" : ""}
         </p>
 
         {hasFilter ? (
-          <Button variant="ghost" size="sm" onClick={reset}>
+          <Button variant="outline" size="sm" onClick={reset}>
             <X aria-hidden />
             Reset
           </Button>

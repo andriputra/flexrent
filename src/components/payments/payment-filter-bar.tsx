@@ -45,26 +45,29 @@ export function PaymentFilterBar({ total, monthSettled }: { total: number; month
   const hasFilter = Boolean(params.get("status") || params.get("metode") || params.get("cari"))
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-card p-3 shadow-card">
       <form
-        className="relative"
+        className="relative min-w-[240px] flex-1"
         onSubmit={(event) => {
           event.preventDefault()
           apply({ cari: query })
         }}
       >
-        <Search aria-hidden className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <Search
+          aria-hidden
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        />
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Cari kode booking, pelanggan, referensi"
           aria-label="Cari pembayaran"
-          className="w-[260px] pl-8"
+          className="bg-background pl-9 font-medium"
         />
       </form>
 
       <Select value={status} onValueChange={(value) => apply({ status: value })}>
-        <SelectTrigger size="sm" className="w-[150px]" aria-label="Saring status pembayaran">
+        <SelectTrigger size="sm" className="w-[150px] bg-background font-medium" aria-label="Saring status pembayaran">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -77,7 +80,7 @@ export function PaymentFilterBar({ total, monthSettled }: { total: number; month
       </Select>
 
       <Select value={method} onValueChange={(value) => apply({ metode: value })}>
-        <SelectTrigger size="sm" className="w-[150px]" aria-label="Saring metode pembayaran">
+        <SelectTrigger size="sm" className="w-[150px] bg-background font-medium" aria-label="Saring metode pembayaran">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -89,13 +92,14 @@ export function PaymentFilterBar({ total, monthSettled }: { total: number; month
         </SelectContent>
       </Select>
 
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-muted/70 px-2.5 text-xs font-medium tabular-nums" aria-live="polite">
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
         {total} pembayaran · {monthSettled} masuk bulan ini
       </p>
 
       {hasFilter ? (
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => {
             setQuery("")

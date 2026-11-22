@@ -38,11 +38,7 @@ export function TermsForm({ initial, readOnly }: { initial: string; readOnly: bo
     <form onSubmit={submit} className="space-y-4">
       <FormFeedback message={serverError} />
 
-      <Field
-        htmlFor="terms"
-        label="Syarat sewa"
-        hint="Satu baris untuk satu butir. Baris kosong dan tanda bullet di awal baris diabaikan."
-      >
+      <Field htmlFor="terms" label="Daftar syarat" hint="Satu baris = satu butir.">
         <Textarea
           id="terms"
           rows={6}
@@ -61,9 +57,7 @@ export function TermsForm({ initial, readOnly }: { initial: string; readOnly: bo
           ))}
         </ol>
         {value.trim() ? null : (
-          <p className="text-xs text-muted-foreground">
-            Masih kosong, jadi halaman publik memakai syarat bawaan Flexrent di atas.
-          </p>
+          <p className="text-xs text-muted-foreground">Masih kosong — di atas syarat bawaan Flexrent.</p>
         )}
       </div>
 

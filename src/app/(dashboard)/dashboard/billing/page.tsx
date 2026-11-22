@@ -39,8 +39,8 @@ function fiturList(value: unknown): string[] {
 
 function Fact({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="space-y-1 px-5 py-4">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+    <div className="space-y-1 bg-card px-5 py-4 transition-colors duration-300 hover:bg-muted">
+      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
       <p className="text-lg font-semibold tabular-nums">{value}</p>
       {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
     </div>
@@ -131,8 +131,8 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
             </Alert>
           ) : null}
 
-          <Card className="shadow-card">
-            <CardContent className="grid gap-px overflow-hidden p-0 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-border/70 shadow-card">
+            <CardContent className="grid gap-px overflow-hidden bg-border/70 p-0 sm:grid-cols-2 lg:grid-cols-4">
               <Fact
                 label="Paket aktif"
                 value={plan?.name ?? "—"}
@@ -160,8 +160,8 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
                 value={formatDateId(subscription.currentPeriodStart, "d MMM")}
                 hint={`sampai ${formatDateId(subscription.currentPeriodEnd, "d MMM yyyy")}`}
               />
-              <div className="space-y-2 px-5 py-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Status</p>
+              <div className="space-y-2 bg-card px-5 py-4 transition-colors duration-300 hover:bg-muted">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Status</p>
                 <SubscriptionStatusBadge status={subscription.status} />
                 <p className="text-xs text-muted-foreground">
                   {subscription.status === "TRIALING"
@@ -176,7 +176,7 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
+          <Card className="border-border/70 shadow-card">
             <CardContent className="space-y-4 px-5 py-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
@@ -192,17 +192,19 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
 
               {openInvoice ? (
                 <>
-                  <dl className="grid gap-3 text-sm sm:grid-cols-3">
-                    <div className="space-y-0.5">
-                      <dt className="text-muted-foreground">Total tagihan</dt>
+                  <dl className="grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 text-sm sm:grid-cols-3">
+                    <div className="space-y-0.5 bg-card px-4 py-3">
+                      <dt className="text-xs text-muted-foreground">Total tagihan</dt>
                       <dd className="text-base font-semibold tabular-nums">{formatRupiah(openInvoice.amount)}</dd>
                     </div>
-                    <div className="space-y-0.5">
-                      <dt className="text-muted-foreground">Sudah masuk</dt>
-                      <dd className="text-base font-semibold tabular-nums">{formatRupiah(openInvoice.paidTotal)}</dd>
+                    <div className="space-y-0.5 bg-card px-4 py-3">
+                      <dt className="text-xs text-muted-foreground">Sudah masuk</dt>
+                      <dd className="text-base font-semibold tabular-nums text-success">
+                        {formatRupiah(openInvoice.paidTotal)}
+                      </dd>
                     </div>
-                    <div className="space-y-0.5">
-                      <dt className="text-muted-foreground">Sisa bayar</dt>
+                    <div className="space-y-0.5 bg-card px-4 py-3">
+                      <dt className="text-xs text-muted-foreground">Sisa bayar</dt>
                       <dd className="text-base font-semibold tabular-nums text-danger">
                         {formatRupiah(Math.max(0, openInvoice.amount - openInvoice.paidTotal))}
                       </dd>
@@ -272,13 +274,13 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
             <Table className="min-w-[640px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nomor</TableHead>
-                  <TableHead>Periode</TableHead>
-                  <TableHead>Jatuh tempo</TableHead>
-                  <TableHead className="text-right">Tagihan</TableHead>
-                  <TableHead className="text-right">Masuk</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Dibayar lewat</TableHead>
+                  <TableHead className="w-[170px]">Nomor</TableHead>
+                  <TableHead className="w-[190px]">Periode</TableHead>
+                  <TableHead className="w-[150px]">Jatuh tempo</TableHead>
+                  <TableHead className="w-[140px] text-right">Tagihan</TableHead>
+                  <TableHead className="w-[130px] text-right">Masuk</TableHead>
+                  <TableHead className="w-[130px]">Status</TableHead>
+                  <TableHead className="w-[150px]">Dibayar lewat</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

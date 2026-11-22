@@ -18,6 +18,7 @@ import { BookingRowActions } from "@/components/bookings/booking-row-actions"
 import { BookingTimeline } from "@/components/bookings/booking-timeline"
 import { addWibDays, formatDateId, fromWib, toDayKey } from "@/lib/datetime"
 import { formatRupiah } from "@/lib/format"
+import { cn } from "@/lib/utils"
 import { rentDueOf } from "@/lib/payments/reconcile"
 import { requireTenant } from "@/lib/tenant"
 import { getBookingVehicleOptions, getFleetTimeline, listBookings } from "@/server/queries/bookings"
@@ -60,13 +61,19 @@ function Period({ startsAt, endsAt, days }: { startsAt: Date; endsAt: Date; days
 
 function ChecklistMark({ label, done }: { label: string; done: boolean }) {
   return (
-    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-      {done ? (
-        <Check aria-hidden className="size-3.5 text-success" />
-      ) : (
-        <Clock aria-hidden className="size-3.5" />
+    <p
+      className={cn(
+        "flex items-center gap-1.5 text-xs font-medium",
+        done ? "text-success" : "text-warning"
       )}
-      {label}
+      title={done ? `${label}: selesai` : `${label}: belum`}
+    >
+      {done ? (
+        <Check aria-hidden className="size-3.5 shrink-0" />
+      ) : (
+        <Clock aria-hidden className="size-3.5 shrink-0" />
+      )}
+      <span className="truncate">{label}</span>
     </p>
   )
 }
@@ -173,13 +180,15 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pesanan</TableHead>
-                  <TableHead>Kendaraan</TableHead>
-                  <TableHead>Periode sewa</TableHead>
-                  <TableHead className="text-right">Tagihan</TableHead>
-                  <TableHead className="w-[190px]">Status</TableHead>
-                  <TableHead className="w-[130px]">Checklist</TableHead>
-                  <TableHead className="w-[48px]" />
+                  <TableHead className="w-[250px]">Pesanan</TableHead>
+                  <TableHead className="w-[165px]">Kendaraan</TableHead>
+                  <TableHead className="w-[195px]">Periode sewa</TableHead>
+                  <TableHead className="w-[140px] text-right">Tagihan</TableHead>
+                  <TableHead className="w-[160px]">Status</TableHead>
+                  <TableHead className="w-[125px]">Checklist</TableHead>
+                  <TableHead className="w-[52px]">
+                    <span className="sr-only">Aksi</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -188,21 +197,22 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
                   const labels = booking.handovers.map((handover) => handover.type)
                   return (
                     <TableRow key={booking.id}>
-                      <TableCell>
+                      <TableCell className="py-2.5">
                         <Link
                           href={`/dashboard/bookings/${booking.code}`}
-                          className="font-mono text-sm tracking-wider hover:underline"
+                          className="font-mono text-sm font-medium tracking-wider text-primary hover:underline"
                         >
                           {booking.code}
                         </Link>
-                        <p className="max-w-[220px] truncate text-xs text-muted-foreground">
-                          {booking.customerName} · {booking.customerPhone}
+                        <p className="max-w-[225px] truncate text-xs">
+                          <span className="text-foreground/80">{booking.customerName}</span>
+                          <span className="text-muted-foreground"> · {booking.customerPhone}</span>
                         </p>
                       </TableCell>
                       <TableCell>
                         <Link
                           href={`/dashboard/vehicles/${booking.vehicle.id}`}
-                          className="text-sm hover:underline"
+                          className="text-sm font-medium hover:underline"
                         >
                           {booking.vehicle.brand} {booking.vehicle.model}
                         </Link>

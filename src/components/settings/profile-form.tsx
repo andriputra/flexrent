@@ -65,7 +65,7 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
       <FormFeedback message={serverError} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field htmlFor="name" label="Nama rental" error={errors.name} hint="Dipakai di dashboard dan halaman publik.">
+        <Field htmlFor="name" label="Nama rental" error={errors.name}>
           <Input
             id="name"
             value={values.name}
@@ -73,6 +73,28 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
             maxLength={60}
             disabled={readOnly || pending}
             required
+          />
+        </Field>
+
+        <Field htmlFor="city" label="Kota" error={errors.city}>
+          <Input
+            id="city"
+            value={values.city}
+            onChange={(event) => set("city", event.target.value)}
+            maxLength={60}
+            disabled={readOnly || pending}
+            required
+          />
+        </Field>
+
+        <Field htmlFor="tagline" label="Tagline" error={errors.tagline}>
+          <Input
+            id="tagline"
+            value={values.tagline}
+            onChange={(event) => set("tagline", event.target.value)}
+            maxLength={120}
+            placeholder="Sewa motor harian tanpa ribet"
+            disabled={readOnly || pending}
           />
         </Field>
 
@@ -89,7 +111,7 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
                 </span>
               </span>
             ) : (
-              "Kosongkan untuk memakai nama rental sebagai alamat."
+              "Kosong = memakai nama rental."
             )
           }
         >
@@ -106,24 +128,10 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
             />
           </div>
         </Field>
+      </div>
 
-        <Field htmlFor="city" label="Kota" error={errors.city}>
-          <Input
-            id="city"
-            value={values.city}
-            onChange={(event) => set("city", event.target.value)}
-            maxLength={60}
-            disabled={readOnly || pending}
-            required
-          />
-        </Field>
-
-        <Field
-          htmlFor="phone"
-          label="Nomor WhatsApp"
-          error={errors.phone}
-          hint="Tujuan notifikasi pesanan dan tombol chat di halaman publik."
-        >
+      <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
+        <Field htmlFor="phone" label="Nomor WhatsApp" error={errors.phone}>
           <Input
             id="phone"
             type="tel"
@@ -135,7 +143,7 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
           />
         </Field>
 
-        <Field htmlFor="email" label="Email usaha" error={errors.email} hint="Tercetak di tagihan langganan.">
+        <Field htmlFor="email" label="Email usaha" error={errors.email}>
           <Input
             id="email"
             type="email"
@@ -146,28 +154,19 @@ export function ProfileForm({ initial, readOnly }: { initial: ProfileValues; rea
           />
         </Field>
 
-        <Field htmlFor="tagline" label="Tagline" error={errors.tagline} hint="Satu baris di bawah nama rental.">
-          <Input
-            id="tagline"
-            value={values.tagline}
-            onChange={(event) => set("tagline", event.target.value)}
-            maxLength={120}
-            placeholder="Sewa motor harian tanpa ribet"
-            disabled={readOnly || pending}
-          />
-        </Field>
+        <div className="sm:col-span-2">
+          <Field htmlFor="address" label="Alamat usaha" error={errors.address}>
+            <Textarea
+              id="address"
+              rows={2}
+              value={values.address}
+              onChange={(event) => set("address", event.target.value)}
+              maxLength={200}
+              disabled={readOnly || pending}
+            />
+          </Field>
+        </div>
       </div>
-
-      <Field htmlFor="address" label="Alamat usaha" error={errors.address}>
-        <Textarea
-          id="address"
-          rows={2}
-          value={values.address}
-          onChange={(event) => set("address", event.target.value)}
-          maxLength={200}
-          disabled={readOnly || pending}
-        />
-      </Field>
 
       <div className="flex items-center gap-3">
         <Button

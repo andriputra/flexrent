@@ -49,9 +49,9 @@ export function MaintenanceFilterBar({
   const hasFilter = Boolean(params.get("vehicle") || params.get("selesai"))
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/70 bg-card p-3 shadow-card">
       <Select value={vehicle} onValueChange={(value) => apply({ vehicle: value })}>
-        <SelectTrigger size="sm" className="w-[220px]" aria-label="Saring kendaraan">
+        <SelectTrigger size="sm" className="w-[220px] bg-background font-medium" aria-label="Saring kendaraan">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -65,7 +65,7 @@ export function MaintenanceFilterBar({
       </Select>
 
       <Select value={selesai} onValueChange={(value) => apply({ selesai: value })}>
-        <SelectTrigger size="sm" className="w-[160px]" aria-label="Saring status perawatan">
+        <SelectTrigger size="sm" className="w-[160px] bg-background font-medium" aria-label="Saring status perawatan">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -77,13 +77,14 @@ export function MaintenanceFilterBar({
         </SelectContent>
       </Select>
 
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-muted/70 px-2.5 text-xs font-medium tabular-nums" aria-live="polite">
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
         {total} jadwal · {open} belum selesai
         {pending ? " · memuat…" : ""}
       </p>
 
       {hasFilter ? (
-        <Button variant="ghost" size="sm" onClick={() => apply({ vehicle: "ALL", selesai: "ALL" })}>
+        <Button variant="outline" size="sm" onClick={() => apply({ vehicle: "ALL", selesai: "ALL" })}>
           <X aria-hidden />
           Reset
         </Button>
