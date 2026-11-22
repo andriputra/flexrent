@@ -13,7 +13,7 @@ const phoneField = z
 const emailField = z
   .union([z.string(), z.undefined(), z.null()])
   .transform((value) => (value ? String(value).trim().toLowerCase() : ""))
-  .refine((value) => value === "" || /^\S+@\S+\.\d+$/.test(value), "Email tidak valid")
+  .refine((value) => value === "" || /^\S+@\S+\.[A-Za-z]{2,}$/.test(value), "Email tidak valid")
 
 export const MAX_RENTAL_DAYS = 180
 

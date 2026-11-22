@@ -42,7 +42,9 @@ export async function setPlatformTenantActiveAction(formData: FormData): Promise
 
     revalidatePath("/admin")
     revalidatePath("/admin/tenants")
-    revalidatePath(`/${tenant.slug}`)
+    // "layout": seluruh situs tenant ikut diperbarui, bukan hanya halaman utamanya,
+    // supaya halaman kendaraan & wizard yang masih tercache ikut 404 saat disuspend.
+    revalidatePath(`/${tenant.slug}`, "layout")
     return ok(null)
   })
 }
