@@ -44,11 +44,17 @@ export function AvailabilitySearch({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-2xl border bg-card p-4 shadow-card sm:p-5">
+    <form
+      onSubmit={submit}
+      className="reveal space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-pop sm:p-5"
+    >
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="ambil" className="flex items-center gap-1.5">
-            <CalendarDays aria-hidden className="size-3.5 text-muted-foreground" />
+          <Label
+            htmlFor="ambil"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <CalendarDays aria-hidden className="size-3.5" />
             Tanggal ambil
           </Label>
           <Input
@@ -60,8 +66,11 @@ export function AvailabilitySearch({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="kembali" className="flex items-center gap-1.5">
-            <CalendarDays aria-hidden className="size-3.5 text-muted-foreground" />
+          <Label
+            htmlFor="kembali"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <CalendarDays aria-hidden className="size-3.5" />
             Tanggal kembali
           </Label>
           <Input
@@ -74,9 +83,13 @@ export function AvailabilitySearch({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Jenis</span>
-        <div className="flex gap-1.5" role="group" aria-label="Jenis kendaraan">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <span className="text-xs font-medium text-muted-foreground">Jenis</span>
+        <div
+          role="group"
+          aria-label="Jenis kendaraan"
+          className="inline-flex gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
+        >
           {TYPES.map((option) => {
             const active = jenis === option.value
             return (
@@ -87,8 +100,8 @@ export function AvailabilitySearch({
                 onClick={() => setJenis(option.value)}
                 className={
                   active
-                    ? "rounded-xl bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground transition-colors duration-150"
-                    : "rounded-xl border bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                    ? "rounded-full bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200"
+                    : "rounded-full px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
                 }
               >
                 {option.label}
@@ -110,7 +123,7 @@ export function AvailabilitySearch({
 
       <Button
         type="submit"
-        className="w-full bg-accent text-accent-foreground hover:bg-accent-hover sm:w-auto"
+        className="h-10 w-full rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover sm:w-auto"
       >
         <Search aria-hidden />
         Cek ketersediaan

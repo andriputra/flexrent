@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { CSSProperties } from "react"
 import type { Metadata } from "next"
 import type { Transmission, VehicleType } from "@prisma/client"
 import { SearchX } from "lucide-react"
@@ -15,6 +16,10 @@ import { listCatalogVehicles } from "@/server/queries/public"
 
 const TYPE_VALUES = { motor: "MOTOR", mobil: "MOBIL" } as const
 const TRANSMISI_VALUES = { matic: "MATIC", manual: "MANUAL" } as const
+
+function order(index: number) {
+  return { "--i": index } as CSSProperties
+}
 
 export async function generateMetadata({
   params,
@@ -58,64 +63,76 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
       : null
 
   return (
-    <div className="page-container space-y-6 py-6 sm:space-y-8 sm:py-8">
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <h1 className="text-[1.75rem] leading-9 font-semibold tracking-tight sm:text-[2rem] sm:leading-11">
+    <>
+      <section className="relative isolate overflow-hidden border-b bg-background">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="anim-drift absolute -top-56 right-[-14%] size-[32rem] rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.16),transparent_62%)] blur-[70px]" />
+          <div className="anim-drift absolute -bottom-64 left-[-16%] size-[28rem] rounded-full bg-[radial-gradient(circle,rgb(37_99_235/0.12),transparent_62%)] blur-[70px] [--d:-8s]" />
+          <div className="bg-grid absolute inset-0 opacity-80 [mask-image:radial-gradient(70%_70%_at_50%_0%,black,transparent_78%)]" />
+        </div>
+
+        <div className="page-container space-y-3 py-14 sm:py-16">
+          <h1 className="anim-rise max-w-[20ch] text-[1.85rem] leading-[1.12] font-extrabold tracking-tight sm:text-[2.3rem]">
             {tenant.tagline ?? `Sewa motor & mobil di ${tenant.city}`}
           </h1>
-          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+          <p className="anim-rise max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base [--d:120ms]">
             Pilih tanggal, lihat kendaraan yang benar-benar bebas pada rentang itu, lalu pesan.
             {tenant.address ? ` Kantor kami di ${tenant.address}.` : ""}
           </p>
         </div>
+      </section>
 
+      <div className="page-container -mt-10 space-y-5 pb-2 pt-10 sm:space-y-7">
         <AvailabilitySearch
           slug={tenant.slug}
           today={toDayKey(new Date())}
           initial={{ ambil: query.ambil, kembali: query.kembali, jenis: query.jenis }}
         />
-      </section>
 
-      <CatalogFilters slug={tenant.slug} current={query} />
+        <CatalogFilters slug={tenant.slug} current={query} />
 
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg leading-6 font-semibold">
-            {rows.length} kendaraan {rangeLabel ? `tersedia ${rangeLabel}` : "di armada ini"}
-          </h2>
-          {hiddenByDates > 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {hiddenByDates} kendaraan sudah terisi pada tanggal itu.
-            </p>
-          ) : null}
-        </div>
+        <section className="space-y-4 pt-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-lg font-semibold tracking-tight">
+              {rows.length} kendaraan{" "}
+              <span className="text-muted-foreground font-normal">
+                {rangeLabel ? `tersedia ${rangeLabel}` : "di armada ini"}
+              </span>
+            </h2>
+            {hiddenByDates > 0 ? (
+              <p className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs text-muted-foreground">
+                <span aria-hidden className="size-1.5 rounded-full bg-muted-foreground/60" />
+                {hiddenByDates} kendaraan sudah terisi pada tanggal itu.
+              </p>
+            ) : null}
+          </div>
 
-        {rows.length === 0 ? (
-          <EmptyState
-            icon={<SearchX aria-hidden />}
-            title="Belum ada kendaraan yang cocok"
-            description={
-              rangeLabel
-                ? "Coba ubah rentang tanggal atau atur ulang filter. Kendaraan yang sedang terisi otomatis disembunyikan."
-                : "Armada sedang diperbarui. Hubungi kami lewat WhatsApp untuk alternatif."
-            }
-          />
-        ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {rows.map((vehicle) => (
-              <li key={vehicle.id}>
-                <VehicleCard
-                  vehicle={vehicle}
-                  slug={tenant.slug}
-                  range={{ ambil: query.ambil, kembali: query.kembali }}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+          {rows.length === 0 ? (
+            <EmptyState
+              icon={<SearchX aria-hidden />}
+              title="Belum ada kendaraan yang cocok"
+              description={
+                rangeLabel
+                  ? "Coba ubah rentang tanggal atau atur ulang filter. Kendaraan yang sedang terisi otomatis disembunyikan."
+                  : "Armada sedang diperbarui. Hubungi kami lewat WhatsApp untuk alternatif."
+              }
+            />
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {rows.map((vehicle, index) => (
+                <li key={vehicle.id} className="reveal" style={order(index % 3)}>
+                  <VehicleCard
+                    vehicle={vehicle}
+                    slug={tenant.slug}
+                    range={{ ambil: query.ambil, kembali: query.kembali }}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </>
   )
 }
 

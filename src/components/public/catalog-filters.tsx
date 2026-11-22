@@ -36,9 +36,11 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border bg-card p-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="reveal flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:flex-row sm:items-end sm:justify-between">
       <div className="space-y-1.5 sm:w-44">
-        <Label htmlFor="transmisi">Transmisi</Label>
+        <Label htmlFor="transmisi" className="text-xs font-medium text-muted-foreground">
+          Transmisi
+        </Label>
         <Select
           value={current.transmisi || "all"}
           onValueChange={(value) =>
@@ -65,8 +67,10 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
           apply({ min: digits(min), maks: digits(maks) })
         }}
       >
-        <div className="space-y-1.5 w-full sm:max-w-40">
-          <Label htmlFor="min-harga">Harga minimal / hari</Label>
+        <div className="w-full space-y-1.5 sm:max-w-40">
+          <Label htmlFor="min-harga" className="text-xs font-medium text-muted-foreground">
+            Harga minimal / hari
+          </Label>
           <Input
             id="min-harga"
             inputMode="numeric"
@@ -75,8 +79,10 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
             onChange={(event) => setMin(event.target.value)}
           />
         </div>
-        <div className="space-y-1.5 w-full sm:max-w-40">
-          <Label htmlFor="maks-harga">Harga maksimal / hari</Label>
+        <div className="w-full space-y-1.5 sm:max-w-40">
+          <Label htmlFor="maks-harga" className="text-xs font-medium text-muted-foreground">
+            Harga maksimal / hari
+          </Label>
           <Input
             id="maks-harga"
             inputMode="numeric"
@@ -86,13 +92,18 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
           />
         </div>
         <div className="flex gap-2 self-end">
-          <Button type="submit" variant="outline">
+          <Button
+            type="submit"
+            variant="outline"
+            className="h-8 rounded-full border-border/70 px-3.5 text-[0.8rem] font-medium transition-colors duration-300 hover:bg-muted"
+          >
             Terapkan harga
           </Button>
           {hasFilter ? (
             <Button
               type="button"
               variant="ghost"
+              className="h-8 rounded-full px-3 text-[0.8rem]"
               onClick={() => {
                 setMin("")
                 setMaks("")
