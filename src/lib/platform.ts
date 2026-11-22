@@ -4,23 +4,27 @@ import type { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/db"
 import { auth } from "@/lib/auth"
 
-export const getPlatformContext = cache(async () => {
+/** Sesi dibaca sekali per permintaan: layout dan halaman memakai pengguna yang sama. */
+const getSessionUser = cache(async () => {
   const session = await auth()
-  const userId = session?.user?.id
-  if (!userId) return null
+  return session?.user?.id ? session.user : null
+})
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
+export const getPlatformContext = cache(async () => {
+  const user = await getSessionUser()
+  if (!user) return null
+
+  const actor = await prisma.user.findUnique({
+    where: { id: user.id },
     select: { id: true, name: true, email: true, image: true, isPlatformAdmin: true },
   })
-  if (!user?.isPlatformAdmin) return null
+  if (!actor?.isPlatformAdmin) return null
 
-  return { user }
+  return { user: actor }
 })
 
 export async function requirePlatformAdmin() {
-  const session = await auth()
-  if (!session?.user?.id) redirect("/login")
+  if (!(await getSessionUser())) redirect("/login")
 
   const context = await getPlatformContext()
   if (!context) redirect("/dashboard")

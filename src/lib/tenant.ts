@@ -37,15 +37,21 @@ export function isSubscriptionBlocked(subscription: Subscription | null): boolea
   return status === "PAST_DUE" || status === "CANCELLED"
 }
 
+/** Sesi dibaca sekali per permintaan: layout dan halaman memakai pengguna yang sama. */
+const getSessionUser = cache(async () => {
+  const session = await auth()
+  return session?.user?.id ? session.user : null
+})
+
 /**
  * Membaca sesi lalu mengembalikan tenant aktif + role.
  * Tenant dipilih dari cookie pilihan, jatuh ke membership pertama.
  * Nilai tenantId dari klien tidak pernah dipakai.
  */
 export const getTenantContext = cache(async (): Promise<TenantContext | null> => {
-  const session = await auth()
-  const userId = session?.user?.id
-  if (!userId) return null
+  const user = await getSessionUser()
+  if (!user?.id) return null
+  const userId = user.id
 
   const rows = await prisma.membership.findMany({
     where: { userId, isActive: true, tenant: { isActive: true } },
@@ -65,9 +71,9 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
   return {
     user: {
       id: userId,
-      name: session.user?.name ?? null,
-      email: session.user?.email ?? active.invitedEmail ?? null,
-      image: session.user?.image ?? null,
+      name: user.name ?? null,
+      email: user.email ?? active.invitedEmail ?? null,
+      image: user.image ?? null,
     },
     tenant: active.tenant,
     plan: active.tenant.subscription?.plan ?? null,
@@ -91,8 +97,7 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
 
 /** Untuk halaman: selalu punya tenant, kalau tidak diarahkan ke login/onboarding. */
 export async function requireTenant(): Promise<TenantContext> {
-  const session = await auth()
-  if (!session?.user?.id) redirect("/login")
+  if (!(await getSessionUser())) redirect("/login")
   const context = await getTenantContext()
   if (!context) redirect("/onboarding")
   return context

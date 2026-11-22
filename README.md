@@ -720,6 +720,15 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
    `"buildCommand": "prisma generate && next build"`. Isian manual di
    Settings → Build & Deployment → Build Command mengalahkan file itu, dan deploy lalu
    gagal dengan `Cannot find module '.prisma/client/default'`.
+   `vercel.json` juga menyetel `"regions": ["sin1"]`: basis data Neon berada di
+   `ap-southeast-1` (Singapura) sementara fungsi Vercel default jalan di `iad1`
+   (Virginia), dan setiap permintaan dashboard minimal dua kali bolak-balik ke basis
+   data — satu kali untuk membaca keanggotaan di layout, satu lagi untuk query halaman.
+   Selisihnya ±220 ms per gelombang kalau regionnya berbeda benua, jadi halaman publik
+   `/{slug}` yang query-nya cuma ±50 ms tetap butuh ±1 detik. Region fungsi bisa
+   dicek dari header `x-vercel-id` (`sin1::iad1::…` berarti edge-nya Singapura tetapi
+   fungsinya masih Virginia). Plan Hobby boleh memilih satu region; kalau project ini
+   someday pindah ke beberapa region, Neon yang harus ikut pindah.
 3. **Environment Production (dan Preview kalau perlu).** Lengkap di bagian
    "Variabel environment"; yang bikin produksi beda dari dev:
 
@@ -733,7 +742,8 @@ Client dibangkitkan saat build, dan origin publik sudah benar.
    | `BLOB_READ_WRITE_TOKEN` | token Vercel Blob | unggahan ditulis ke filesystem sementara dan hilang begitu instance dingin — termasuk KTP/SIM pelanggan |
    | `MIDTRANS_IS_SANDBOX` + `MIDTRANS_SERVER_KEY` | `"false"` + key produksi | webhook masih menunjuk sandbox; daftarkan ulang `https://{origin}/api/webhooks/midtrans` |
    | `WHATSAPP_PROVIDER` + `FONNTE_API_KEY` | `"fonnte"` | `"stub"` hanya menulis `NotificationLog`; pengingat H-1 dan keterlambatan tidak pernah sampai |
-4. **Cron tidak lagi dimiliki Vercel.** `vercel.json` hanya menyimpan `buildCommand`;
+4. **Cron tidak lagi dimiliki Vercel.** `vercel.json` hanya menyimpan `buildCommand`
+   dan `regions`;
    jadwal ada di `.github/workflows/cron.yml` dan butuh dua isian di GitHub —
    secret `CRON_SECRET` (nilai yang sama dengan yang dipakai di Vercel) dan variable
    `APP_URL` = `https://flexbox-rent.vercel.app` (origin produksi). Verifikasi setelah

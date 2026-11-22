@@ -18,16 +18,15 @@ export const metadata = { title: "Detail kendaraan" }
 export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const context = await requireTenant()
   const { id } = await params
-  const vehicle = await getVehicle(context.tenant.id, id)
-  if (!vehicle) notFound()
-
   const now = new Date()
-  const intervals = await getVehicleCalendar(
-    context.tenant.id,
-    vehicle.id,
-    addDays(now, -30),
-    addDays(now, 150)
-  )
+
+  // Dua query jalan sekaligus; yang kalender tetap tersaring tenantId jadi id asing
+  // hanya menghasilkan kalender kosong, bukan data tenant lain.
+  const [vehicle, intervals] = await Promise.all([
+    getVehicle(context.tenant.id, id),
+    getVehicleCalendar(context.tenant.id, id, addDays(now, -30), addDays(now, 150)),
+  ])
+  if (!vehicle) notFound()
 
   const name = `${vehicle.brand} ${vehicle.model}`
 

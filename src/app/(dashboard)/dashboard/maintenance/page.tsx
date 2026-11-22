@@ -31,10 +31,19 @@ export default async function MaintenancePage({
   const context = await requireTenant()
   const params = await searchParams
 
-  const vehicles = await getVehicleOptions(context.tenant.id)
-  const vehicleIds = new Set(vehicles.map((vehicle) => vehicle.id))
-  const activeVehicle = params.vehicle && vehicleIds.has(params.vehicle) ? params.vehicle : undefined
+  const requestedVehicle = params.vehicle || undefined
   const isDone = params.selesai === "DONE" ? true : params.selesai === "OPEN" ? false : undefined
+  const listFilters = {
+    isDone,
+    page: Math.max(1, Number(params.page ?? 1) || 1),
+  }
+
+  const [vehicles, filtered] = await Promise.all([
+    getVehicleOptions(context.tenant.id),
+    listMaintenancePlans(context.tenant.id, { ...listFilters, vehicleId: requestedVehicle }),
+  ])
+  const vehicleIds = new Set(vehicles.map((vehicle) => vehicle.id))
+  const activeVehicle = requestedVehicle && vehicleIds.has(requestedVehicle) ? requestedVehicle : undefined
 
   const pageHref = (target: number) => {
     const query = new URLSearchParams()
@@ -45,11 +54,11 @@ export default async function MaintenancePage({
     return `/dashboard/maintenance${suffix ? `?${suffix}` : ""}`
   }
 
-  const { rows, total, open, page, totalPages } = await listMaintenancePlans(context.tenant.id, {
-    vehicleId: activeVehicle,
-    isDone,
-    page: Math.max(1, Number(params.page ?? 1) || 1),
-  })
+  // Filter kendaraan asing menghasilkan nol baris, jadi daftar diambil ulang tanpa filter.
+  const { rows, total, open, page, totalPages } =
+    activeVehicle || !requestedVehicle
+      ? filtered
+      : await listMaintenancePlans(context.tenant.id, listFilters)
 
   const options = vehicles.map((vehicle) => ({
     id: vehicle.id,
