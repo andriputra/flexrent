@@ -1,0 +1,84 @@
+(node:11148) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4880) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12432) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/Flexbox/Flexbox Rental/flexrent[39m
+
+(node:6052) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17712) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17684) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/payments/midtrans.test.ts [2m([22m[2m25 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m src/lib/notifications/templates.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+(node:18028) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/pricing.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+(node:15964) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2292) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/reports.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m src/lib/billing.test.ts [2m([22m[2m13 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+(node:10624) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/payments/reconcile.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+(node:1220) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15752) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/schedule.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m src/lib/datetime.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+(node:5940) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:688) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/bookings/status.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m src/lib/payments/fees.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 9[2mms[22m[39m
+(node:12524) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5936) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/password.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 888[2mms[22m[39m
+   [33m[2m✓[22m[39m hashPassword[2m > [22mverifikasi bolak-balik [33m330[2mms[22m[39m
+ [32m✓[39m src/lib/handover.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m src/lib/quote.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+(node:4720) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14636) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13576) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/form-ticket.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+(node:5288) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/validators/public.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m src/lib/validators/tenant.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+(node:15620) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15512) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/payments/provider.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+(node:10872) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/booking-code.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+(node:2476) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/rate-limit.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m src/lib/csv.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+(node:5056) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15940) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m src/lib/upload-limits.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m21 passed[39m[22m[90m (21)[39m
+[2m      Tests [22m [1m[32m159 passed[39m[22m[90m (159)[39m
+[2m   Start at [22m 12:32:36
+[2m   Duration [22m 4.63s[2m (transform 1.09s, setup 0ms, collect 1.85s, tests 1.11s, environment 7ms, prepare 5.06s)[22m
+

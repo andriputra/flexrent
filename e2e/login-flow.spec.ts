@@ -62,6 +62,16 @@ test.describe("masuk dengan email + sandi", () => {
     expect(page.url()).toContain("/login?mode=register")
   })
 
+  test("sandi tidak mungkin terkirim lewat URL", async ({ page }) => {
+    // Klik sebelum hydration React menjalankan submit native, dan form tanpa
+    // `method` mengirim field lewat GET — sandi lalu tinggal di URL, riwayat
+    // browser, dan log server. HTML hasil server yang diperiksa di sini, bukan
+    // DOM yang sudah di-klaim ulang React.
+    const html = await (await page.request.get("/login")).text()
+    expect(html).toContain('method="post"')
+    expect(html).toContain('name="password"')
+  })
+
   test("tanpa sesi, dashboard diarahkan ke halaman masuk", async ({ browser }) => {
     // Konteks baru tidak mewarisi cookie sesi, jadi ini memeriksa penjaga server.
     const anonim = await browser.newContext()

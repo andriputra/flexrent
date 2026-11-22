@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto"
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { del, get, put, type PutBlobResult } from "@vercel/blob"
+import { MAX_DOC_BYTES, MAX_DOC_LABEL } from "@/lib/upload-limits"
 
 export type StoredFile = { url: string; storageKey: string }
 
@@ -13,7 +14,6 @@ const ALLOWED_TYPES: Record<string, string> = {
 }
 
 /** Dokumen pelanggan (KTP/SIM) lebih besar dan tidak boleh berada di folder public. */
-const MAX_DOC_BYTES = 5 * 1024 * 1024
 const DOC_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -113,7 +113,7 @@ export async function uploadPrivateFile(file: File, group: string): Promise<Stor
     throw new StorageError(`Format dokumen tidak didukung: ${file.type || "tidak diketahui"}`)
   }
   if (file.size > MAX_DOC_BYTES) {
-    throw new StorageError(`Ukuran dokumen maksimal ${Math.round(MAX_DOC_BYTES / 1024 / 1024)} MB`)
+    throw new StorageError(`Ukuran dokumen maksimal ${MAX_DOC_LABEL}`)
   }
   if (file.size === 0) throw new StorageError("File kosong, unggah ulang dokumennya")
 

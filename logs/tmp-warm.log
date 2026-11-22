@@ -1,0 +1,22 @@
+(node:10808) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3588) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10892) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:2116) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › e2e\login-flow.spec.ts:8:3 › masuk dengan email + sandi › sandi salah ditolak dan tetap di halaman masuk (4.8s)
+  ok 2 [chromium] › e2e\login-flow.spec.ts:22:3 › masuk dengan email + sandi › email tanpa akun ditolak dengan pesan yang sama (1.9s)
+  ok 3 [chromium] › e2e\login-flow.spec.ts:34:3 › masuk dengan email + sandi › sandi benar membuka dashboard (33.6s)
+  ok 4 [chromium] › e2e\login-flow.spec.ts:45:3 › masuk dengan email + sandi › halaman masuk tidak lagi menawarkan tautan email tanpa SMTP (6.8s)
+  ok 5 [chromium] › e2e\login-flow.spec.ts:54:3 › masuk dengan email + sandi › form pendaftaran menolak sandi pendek sebelum mengirim apa pun (9.9s)
+  ok 6 [chromium] › e2e\login-flow.spec.ts:65:3 › masuk dengan email + sandi › sandi tidak mungkin terkirim lewat URL (482ms)
+  ok 7 [chromium] › e2e\login-flow.spec.ts:75:3 › masuk dengan email + sandi › tanpa sesi, dashboard diarahkan ke halaman masuk (3.2s)
+URL AKHIR: http://localhost:3100/dashboard
+  ok 8 [chromium] › e2e\tmp-newaccount.spec.ts:5:1 › akun hasil daftar bisa masuk (3.1s)
+
+  8 passed (1.1m)

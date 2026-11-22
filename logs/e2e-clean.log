@@ -1,0 +1,29 @@
+(node:17860) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9068) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17396) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 16 tests using 1 worker
+
+(node:8228) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [chromium] › e2e\booking-flow.spec.ts:10:1 › penyewa publik menyelesaikan wizard sampai mendapat kode booking (12.1s)
+  ok  2 [chromium] › e2e\booking-flow.spec.ts:47:1 › langkah data diri menolak nama dan nomor yang belum sah (1.7s)
+  ok  3 [chromium] › e2e\booking-flow.spec.ts:61:1 › kirim lewat jebakan bot ditolak tanpa membuat pesanan (4.0s)
+  ok  4 [chromium] › e2e\login-flow.spec.ts:8:3 › masuk dengan email + sandi › sandi salah ditolak dan tetap di halaman masuk (725ms)
+  ok  5 [chromium] › e2e\login-flow.spec.ts:22:3 › masuk dengan email + sandi › email tanpa akun ditolak dengan pesan yang sama (657ms)
+  ok  6 [chromium] › e2e\login-flow.spec.ts:34:3 › masuk dengan email + sandi › sandi benar membuka dashboard (1.4s)
+  ok  7 [chromium] › e2e\login-flow.spec.ts:45:3 › masuk dengan email + sandi › halaman masuk tidak lagi menawarkan tautan email tanpa SMTP (347ms)
+  ok  8 [chromium] › e2e\login-flow.spec.ts:54:3 › masuk dengan email + sandi › form pendaftaran menolak sandi pendek sebelum mengirim apa pun (464ms)
+  ok  9 [chromium] › e2e\login-flow.spec.ts:65:3 › masuk dengan email + sandi › sandi tidak mungkin terkirim lewat URL (119ms)
+  ok 10 [chromium] › e2e\login-flow.spec.ts:75:3 › masuk dengan email + sandi › tanpa sesi, dashboard diarahkan ke halaman masuk (448ms)
+  ok 11 [chromium] › e2e\public-guards.spec.ts:5:1 › slug tenant asing menjawab 404 lewat penjaga root (392ms)
+  ok 12 [chromium] › e2e\public-guards.spec.ts:11:1 › ID kendaraan asing menjawab 404 lewat penjaga rute tenant (561ms)
+  ok 13 [chromium] › e2e\public-guards.spec.ts:18:1 › rute di luar tenant menjawab 404 lewat penjaga root (343ms)
+  ok 14 [chromium] › e2e\public-guards.spec.ts:24:1 › robots dan sitemap hanya membuka halaman publik (31ms)
+  ok 15 [chromium] › e2e\public-guards.spec.ts:36:1 › halaman pemesanan tidak diindeks dan jebakan bot tidak terlihat (1.6s)
+  ok 16 [chromium] › e2e\public-guards.spec.ts:44:1 › halaman tenant membawa canonical dan kartu open graph (589ms)
+
+  16 passed (27.5s)

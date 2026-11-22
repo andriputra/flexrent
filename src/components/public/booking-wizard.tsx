@@ -33,6 +33,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useVehicleQuote } from "@/components/public/use-vehicle-quote"
 import { addDays, fromWib, rentalDays, toDayKey } from "@/lib/datetime"
 import { formatRupiah, normalizePhone } from "@/lib/format"
+import { shrinkDoc } from "@/lib/shrink-doc"
+import { DOC_HINT, MAX_DOC_BYTES, MAX_DOC_LABEL } from "@/lib/upload-limits"
 import { MAX_RENTAL_DAYS } from "@/lib/validators/booking"
 import { createBookingAction } from "@/server/actions/booking"
 import type { ActionResult } from "@/lib/result"
@@ -43,9 +45,6 @@ const STEPS = [
   { title: "Pembayaran", description: "Rincian biaya & deposit" },
   { title: "Konfirmasi", description: "Periksa lalu kirim" },
 ]
-
-const MAX_DOC_BYTES = 5 * 1024 * 1024
-const DOC_HINT = "JPG, PNG, WebP, atau PDF maksimal 5 MB"
 
 type Values = {
   startDay: string
@@ -495,14 +494,27 @@ function DocInput({
         accept="image/jpeg,image/png,image/webp,application/pdf"
         className="sr-only"
         onChange={(event) => {
-          const next = event.target.files?.[0] ?? null
-          if (next && next.size > MAX_DOC_BYTES) {
-            toast.error(`${label} maksimal 5 MB`)
-            event.target.value = ""
-            onSelect(null)
-            return
-          }
-          onSelect(next)
+          const field = event.target
+          const next = field.files?.[0] ?? null
+          if (!next) return onSelect(null)
+          field.disabled = true
+          shrinkDoc(next)
+            .then((prepared) => {
+              if (prepared.size > MAX_DOC_BYTES) {
+                toast.error(`${label} melebihi ${MAX_DOC_LABEL} — foto ulang lebih dekat atau kompres dulu`)
+                field.value = ""
+                onSelect(null)
+                return
+              }
+              onSelect(prepared)
+            })
+            .catch(() => {
+              toast.error(`${label} gagal dibaca, pilih berkas lain`)
+              onSelect(null)
+            })
+            .finally(() => {
+              field.disabled = false
+            })
         }}
       />
       <FieldError message={error} />

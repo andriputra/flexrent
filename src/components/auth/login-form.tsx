@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -50,6 +50,11 @@ export function LoginForm({
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  // Tombol baru boleh dikirim setelah React menempelkan onSubmit-nya. Klik lebih
+  // awal adalah submit native: tanpa `method`, email + sandi pergi lewat GET
+  // sehingga sandi tertinggal di URL, riwayat browser, dan log server.
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => setHydrated(true), [])
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -135,7 +140,7 @@ export function LoginForm({
         {googleEnabled ? (
           <>
             <form action={signInWithGoogleAction.bind(null, isRegister ? "/onboarding" : "/dashboard")}>
-              <Button type="submit" variant="outline" className="w-full" disabled={pending}>
+              <Button type="submit" variant="outline" className="w-full" disabled={pending || !hydrated}>
                 {GOOGLE_LOGO}
                 Lanjut dengan Google
               </Button>
@@ -149,7 +154,7 @@ export function LoginForm({
           </>
         ) : null}
 
-        <form onSubmit={submitPassword} className="space-y-3">
+        <form onSubmit={submitPassword} method="post" className="space-y-3">
           {isRegister ? (
             <div className="space-y-1.5">
               <Label htmlFor="name">Nama Anda</Label>
@@ -199,7 +204,7 @@ export function LoginForm({
           <Button
             type="submit"
             className="w-full bg-accent text-accent-foreground hover:bg-accent-hover"
-            disabled={pending}
+            disabled={pending || !hydrated}
           >
             {isRegister ? <User aria-hidden /> : <LogIn aria-hidden />}
             {pending ? "Memproses…" : isRegister ? "Buat akun" : "Masuk"}
@@ -207,12 +212,12 @@ export function LoginForm({
         </form>
 
         {emailConfigured ? (
-          <form onSubmit={submitEmailLink} className="space-y-2">
+          <form onSubmit={submitEmailLink} method="post" className="space-y-2">
             <Separator />
             <p className="text-xs text-muted-foreground">
               Lupa sandi atau belum membuatnya? Kami kirim tautan masuk sekali pakai ke email ini.
             </p>
-            <Button type="submit" variant="outline" className="w-full" disabled={pending}>
+            <Button type="submit" variant="outline" className="w-full" disabled={pending || !hydrated}>
               <Mail aria-hidden />
               {pending ? "Mengirim…" : "Kirim tautan masuk"}
             </Button>

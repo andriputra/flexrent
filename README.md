@@ -37,7 +37,9 @@ dipasang `npm run db:seed` sebagai hash scrypt; override lewat env
 Cara masuk utama adalah **email + sandi**, jadi tidak perlu email yang benar-benar
 terkirim. Tautan sekali pakai (magic link) masih ada sebagai jalan kedua, tetapi
 tombolnya hanya muncul bila `SMTP_HOST` terisi; tanpa SMTP isi email — termasuk
-undangan staf — hanya dicetak ke log.
+undangan staf — hanya dicetak ke log. Formulir masuk butuh JavaScript: tombol baru
+aktif setelah halaman siap supaya klik lebih awal tidak bisa mengirim sandi lewat
+URL (form tetap dipasang `method="post"` sebagai penjaga kedua).
 Data seed membuat satu tenant `bandung-ride` ("Bandung Ride Rental") dengan 10
 kendaraan (lengkap dengan tarif denda keterlambatan per unit), 5 pelanggan, 10
 pesanan, 3 jadwal perawatan, serta checklist PICKUP/RETURN untuk pesanan
@@ -607,7 +609,7 @@ staf + undangan email.
 
 ## Tes end-to-end (Playwright)
 
-`npm run test:e2e` menjalankan lima belas tes di `e2e/` pada satu worker Chromium.
+`npm run test:e2e` menjalankan enam belas tes di `e2e/` pada satu worker Chromium.
 Yang perlu diketahui kalau mengubahnya:
 
 - **`login-flow.spec.ts` memakai sandi seed.** Nilainya harus sama dengan
@@ -624,6 +626,19 @@ Yang perlu diketahui kalau mengubahnya:
   rute `/booking` dan suite mati menunggu halaman wizard. Di dev kesalahan ini
   tidak kelihatan — ulangi suite terhadap build produksi:
   `npx next start -p 3100` lalu `E2E_BASE_URL=http://localhost:3100 npm run test:e2e`.
+- **Klik tombol masuk, jangan `requestSubmit()`.** Sebelum React menempelkan
+  `onSubmit`, submit apa pun adalah submit native: form tanpa `method` mengirim
+  email + sandi lewat GET sehingga sandi tertinggal di URL, riwayat browser, dan
+  log server. `login-form.tsx` memasang `method="post"` dan menahan tombol sampai
+  halaman siap; karena Playwright menunggu elemen menjadi bisa diklik,
+  `button.click()` otomatis aman, sedangkan `form.requestSubmit()` dari
+  `page.evaluate` melompati penjaga itu dan menghasilkan halaman kosong yang
+  disangka "data test attribute".
+- **Angka waktu dev tidak bisa dipercaya.** Rute yang belum pernah dibuka
+  dikompilasi saat disentuh: suite login berjalan 27 detik terhadap build produksi
+  tapi 1–2 menit terhadap `npm run dev`, dan `page.goto` pertama bisa habis
+  melewati timeout 90 detik. Vonis "lambat" atau "mati" diambil dari
+  `npm run build` + `next start`, bukan dari dev.
 - **Jendela tanggal diacak 30–180 hari ke depan.** Pesanan buatan tes terakhir masih
   `PENDING` dan memblokir kendaraannya, jadi tanggal acak mencegah bentrok saat
   suite dijalankan dua kali berturut-turut.

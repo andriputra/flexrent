@@ -1,0 +1,91 @@
+(node:7056) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13960) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15248) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:7412) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [chromium] › e2e\tmp-dev-login.spec.ts:5:1 › dev: masuk email+sandi sampai dashboard (46.1s)
+(node:2732) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 [chromium] › e2e\tmp-dev-login.spec.ts:14:1 › dev: register minta nama, email, sandi (5.7s)
+AKUN_UJI: e2e-tmp-1795324320387@flexrent.local
+  x  3 [chromium] › e2e\tmp-dev-login.spec.ts:23:1 › dev: daftar akun baru lalu masuk (32.1s)
+
+
+  1) [chromium] › e2e\tmp-dev-login.spec.ts:5:1 › dev: masuk email+sandi sampai dashboard ──────────
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /\/dashboard$/
+    Received string:  "http://localhost:3100/login?email=demo%40flexrent.local&password=Flexrent-Demo-2026%21"
+    Timeout: 30000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 30000ms
+        2 × locator resolved to <html lang="id" class="__variable_532bb9 __variable_c219ed">…</html>
+          - unexpected value "http://localhost:3100/login?email=demo%40flexrent.local&password=Flexrent-Demo-2026%21"
+        57 × locator resolved to <html lang="id" class="__variable_532bb9 __variable_c219ed light">…</html>
+           - unexpected value "http://localhost:3100/login?email=demo%40flexrent.local&password=Flexrent-Demo-2026%21"
+
+
+       9 |   await page.getByLabel("Sandi").fill(process.env.E2E_DEMO_PASSWORD ?? "Flexrent-Demo-2026!")
+      10 |   await page.getByRole("button", { name: "Masuk" }).click()
+    > 11 |   await expect(page).toHaveURL(/\/dashboard$/, { timeout: 30_000 })
+         |                      ^
+      12 | })
+      13 |
+      14 | test("dev: register minta nama, email, sandi", async ({ page }) => {
+        at D:\Flexbox\Flexbox Rental\flexrent\e2e\tmp-dev-login.spec.ts:11:22
+
+    Error Context: test-results\tmp-dev-login-dev-masuk-email-sandi-sampai-dashboard-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\tmp-dev-login-dev-masuk-email-sandi-sampai-dashboard-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\tmp-dev-login-dev-masuk-email-sandi-sampai-dashboard-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › e2e\tmp-dev-login.spec.ts:23:1 › dev: daftar akun baru lalu masuk ────────────────
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /\/onboarding$/
+    Received string:  "http://localhost:3100/login?mode=register"
+    Timeout: 30000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 30000ms
+        62 × locator resolved to <html lang="id" class="__variable_532bb9 __variable_c219ed light">…</html>
+           - unexpected value "http://localhost:3100/login?mode=register"
+
+
+      28 |   await page.getByLabel("Sandi").fill("SandiE2ESementara1")
+      29 |   await page.getByRole("button", { name: "Buat akun" }).click()
+    > 30 |   await expect(page).toHaveURL(/\/onboarding$/, { timeout: 30_000 })
+         |                      ^
+      31 |   await page.goto("/login")
+      32 |   await page.getByLabel("Email").fill(E2E_EMAIL)
+      33 |   await page.getByLabel("Sandi").fill("salah")
+        at D:\Flexbox\Flexbox Rental\flexrent\e2e\tmp-dev-login.spec.ts:30:22
+
+    Error Context: test-results\tmp-dev-login-dev-daftar-akun-baru-lalu-masuk-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\tmp-dev-login-dev-daftar-akun-baru-lalu-masuk-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\tmp-dev-login-dev-daftar-akun-baru-lalu-masuk-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › e2e\tmp-dev-login.spec.ts:5:1 › dev: masuk email+sandi sampai dashboard ───────────
+    [chromium] › e2e\tmp-dev-login.spec.ts:23:1 › dev: daftar akun baru lalu masuk ─────────────────
+  1 passed (1.6m)
