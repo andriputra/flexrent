@@ -46,8 +46,17 @@ export function AvailabilitySearch({
   return (
     <form
       onSubmit={submit}
-      className="reveal space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-pop sm:p-5"
+      className="reveal relative space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-pop ring-1 ring-accent/15 sm:p-5"
     >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-accent/65 to-transparent"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-20 -right-16 size-44 rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.16),transparent_70%)] blur-2xl"
+      />
+
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label

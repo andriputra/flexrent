@@ -38,3 +38,84 @@
 (node:12916) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
  GET /sw.js 404 in 377ms
+ ✓ Compiled in 1394ms
+ GET /dashboard 200 in 1648ms
+ ✓ Compiled in 426ms
+ GET /dashboard 200 in 751ms
+ ✓ Compiled in 722ms
+ GET /dashboard 200 in 1273ms
+ ✓ Compiled in 458ms
+ GET /dashboard 200 in 853ms
+ ✓ Compiled in 473ms
+ GET /dashboard 200 in 1110ms
+ ✓ Compiled /[slug] in 318ms
+ ✓ Compiled in 526ms
+(node:10356) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 6583ms
+ GET /dashboard 200 in 6448ms
+ ✓ Compiled in 363ms
+ GET /dashboard 200 in 550ms
+ ✓ Compiled in 355ms
+ ✓ Compiled in 452ms
+ ✓ Compiled in 253ms
+ GET /dashboard 200 in 586ms
+ ✓ Compiled in 336ms
+ GET /dashboard 200 in 568ms
+ ✓ Compiled /[slug] in 203ms
+(node:1552) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 962ms
+ ✓ Compiled in 255ms
+ GET /dashboard 200 in 559ms
+ ✓ Compiled /[slug] in 96ms
+(node:3568) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1857ms
+(node:6400) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 339ms
+(node:5624) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 300ms
+ ✓ Compiled in 453ms
+ ✓ Compiled /[slug] in 92ms
+(node:32) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 846ms
+(node:4612) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 377ms
+(node:3016) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1593ms
+(node:7980) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 310ms
+(node:6036) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 1253ms
+(node:736) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride?ambil=2026-11-25&kembali=2026-11-28&transmisi=matic 200 in 1536ms
+(node:13936) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 1249ms
+(node:16416) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 795ms
+ ✓ Compiled in 924ms
+ ✓ Compiled in 1033ms
+ ✓ Compiled /[slug] in 194ms
+(node:4748) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride?ambil=2026-11-25&kembali=2026-11-28&transmisi=matic 200 in 1773ms
+(node:1384) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 2412ms
+(node:5676) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 370ms
+(node:11148) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 529ms

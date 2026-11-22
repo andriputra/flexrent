@@ -68,7 +68,13 @@ export default async function TenantPublicLayout({
 
       <main className="flex-1">{children}</main>
 
-      <footer className="mt-12 border-t border-border/70 bg-card">
+      <footer className="relative isolate mt-12 overflow-hidden bg-card">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="bg-grid absolute inset-0 opacity-70 [mask-image:radial-gradient(65%_75%_at_18%_0%,black,transparent_78%)]" />
+          <div className="anim-drift absolute -top-28 right-[-10%] size-[22rem] rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.13),transparent_65%)] blur-[60px]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
+        </div>
+
         <div className="page-container grid gap-8 py-12 sm:grid-cols-2 sm:py-14">
           <div className="space-y-2.5 text-sm">
             <p className="text-base font-semibold tracking-tight">{tenant.name}</p>

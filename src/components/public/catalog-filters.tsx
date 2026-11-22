@@ -36,7 +36,11 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
   }
 
   return (
-    <div className="reveal flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:flex-row sm:items-end sm:justify-between">
+    <div className="reveal relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-card sm:flex-row sm:items-end sm:justify-between">
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-accent/80 via-accent/30 to-transparent"
+      />
       <div className="space-y-1.5 sm:w-44">
         <Label htmlFor="transmisi" className="text-xs font-medium text-muted-foreground">
           Transmisi

@@ -7,20 +7,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function CatalogSkeleton() {
   return (
     <>
-      <div className="border-b bg-background">
-        <div className="page-container space-y-3 py-14 sm:py-16">
+      <div className="bg-background">
+        <div className="page-container space-y-3 pt-20 pb-24 sm:pt-28 sm:pb-32">
           <Skeleton className="h-9 w-72 max-w-full sm:h-11" />
           <Skeleton className="h-4 w-full max-w-xl" />
         </div>
       </div>
 
-      <div className="page-container -mt-10 space-y-5 pb-2 pt-10 sm:space-y-7">
-        <Skeleton className="h-44 w-full rounded-2xl sm:h-40" />
+      <div className="page-container -mt-16 space-y-6 pb-16 sm:-mt-20 sm:space-y-8 sm:pb-20">
+        <Skeleton className="h-44 w-full rounded-2xl ring-1 ring-accent/15 sm:h-40" />
         <Skeleton className="h-[76px] w-full rounded-2xl" />
 
-        <div className="space-y-4 pt-1">
+        <div className="space-y-5">
           <Skeleton className="h-6 w-56" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2, 3, 4, 5].map((index) => (
               <div key={index} className="overflow-hidden rounded-2xl border border-border/70">
                 <Skeleton className="aspect-[4/3] w-full rounded-none" />

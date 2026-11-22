@@ -813,6 +813,13 @@ Aturan UI yang sudah diterapkan dan silakan diikuti saat menambah halaman:
   (`190px repeat(hari, minmax(52px,1fr))`) dengan kolom label sticky; sel latar
   berwarna dan bar segmen sama-sama diletakkan di `gridRow: 1`, jadi pesanan yang
   bertumpuk tampil menumpuk alih-alih berpindah baris.
+- Katalog publik `/{slug}` memakai satu ritme ruang: hero `pt-20 pb-24`
+  (`sm:pt-28 pb-32`), kartu pencarian menarik diri ke atas hero (`-mt-16 sm:-mt-20`)
+  supaya terlihat melayang di tepi hero, lalu `space-y-6 sm:space-y-8` antarseksi dan
+  `gap-5` antar kartu. Panel (pencarian, filter, kartu) berbagi permukaan yang sama:
+  garis aksen amber di tepi (hairline/rail 3px), `shadow-pop` untuk panel yang
+  ditonjolkan. Kendaraan tanpa foto tidak dibiarkan kosong — areanya diisi gradasi
+  navy→amber + `bg-grid` bertopeng dan ubin ikon 64px.
 - Uang dan tanggal dalam format Indonesia (`Rp 1.500.000`, `Sen, 21 Nov 2026`),
   seluruh perhitungan tanggal memakai WIB lewat `src/lib/datetime.ts`.
 

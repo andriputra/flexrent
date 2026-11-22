@@ -8,7 +8,7 @@ import { AvailabilitySearch } from "@/components/public/availability-search"
 import { CatalogFilters } from "@/components/public/catalog-filters"
 import { CatalogSkeleton } from "@/components/public/catalog-skeleton"
 import { VehicleCard } from "@/components/public/vehicle-card"
-import { fromWib, toDayKey } from "@/lib/datetime"
+import { formatDateId, fromWib, toDayKey } from "@/lib/datetime"
 import { publicMeta } from "@/lib/seo"
 import { getPublicTenant } from "@/lib/tenant-public"
 import { parseCatalogQuery, type CatalogQuery } from "@/lib/validators/public"
@@ -59,19 +59,20 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
 
   const rangeLabel =
     startsAt && endsAt
-      ? `${toDayKey(startsAt)} sampai ${toDayKey(endsAt)}`
+      ? `${formatDateId(startsAt, "EEE, d MMM")} sampai ${formatDateId(endsAt, "EEE, d MMM")}`
       : null
 
   return (
     <>
-      <section className="relative isolate overflow-hidden border-b bg-background">
+      <section className="relative isolate overflow-hidden bg-background">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="anim-drift absolute -top-56 right-[-14%] size-[32rem] rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.16),transparent_62%)] blur-[70px]" />
           <div className="anim-drift absolute -bottom-64 left-[-16%] size-[28rem] rounded-full bg-[radial-gradient(circle,rgb(37_99_235/0.12),transparent_62%)] blur-[70px] [--d:-8s]" />
           <div className="bg-grid absolute inset-0 opacity-80 [mask-image:radial-gradient(70%_70%_at_50%_0%,black,transparent_78%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
         </div>
 
-        <div className="page-container space-y-3 pt-20 pb-16 sm:pt-24 sm:pb-20">
+        <div className="page-container space-y-3 pt-20 pb-24 sm:pt-28 sm:pb-32">
           <h1 className="anim-rise font-display max-w-[20ch] text-[1.85rem] leading-[1.12] font-bold tracking-tight sm:text-[2.3rem]">
             {tenant.tagline ?? `Sewa motor & mobil di ${tenant.city}`}
           </h1>
@@ -82,7 +83,7 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
         </div>
       </section>
 
-      <div className="page-container -mt-10 space-y-5 pb-14 pt-10 sm:space-y-7 sm:pb-20">
+      <div className="page-container -mt-16 space-y-6 pb-16 sm:-mt-20 sm:space-y-8 sm:pb-20">
         <AvailabilitySearch
           slug={tenant.slug}
           today={toDayKey(new Date())}
@@ -91,12 +92,15 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
 
         <CatalogFilters slug={tenant.slug} current={query} />
 
-        <section className="space-y-4 pt-1">
+        <section className="space-y-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="font-display text-lg font-semibold tracking-tight">
-              {rows.length} kendaraan{" "}
-              <span className="text-muted-foreground font-normal">
-                {rangeLabel ? `tersedia ${rangeLabel}` : "di armada ini"}
+            <h2 className="font-display flex items-center gap-2.5 text-lg font-semibold tracking-tight">
+              <span aria-hidden className="h-5 w-1 shrink-0 rounded-full bg-gradient-to-b from-accent to-accent/40" />
+              <span>
+                {rows.length} kendaraan{" "}
+                <span className="text-muted-foreground font-normal">
+                  {rangeLabel ? `tersedia ${rangeLabel}` : "di armada ini"}
+                </span>
               </span>
             </h2>
             {hiddenByDates > 0 ? (
@@ -118,7 +122,7 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
               }
             />
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {rows.map((vehicle, index) => (
                 <li key={vehicle.id} className="reveal" style={order(index % 3)}>
                   <VehicleCard
