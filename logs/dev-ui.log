@@ -1,0 +1,40 @@
+(node:15768) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16028) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11928) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:644) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+   ▲ Next.js 15.5.29 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://100.68.78.44:3000
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 5.8s
+ ○ Compiling /dashboard ...
+(node:3428) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled /dashboard in 13.3s
+ GET /dashboard 200 in 17616ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1333ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 1885ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 1176ms
+(node:13176) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 2941ms
+(node:676) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 452ms
+ GET /dashboard 200 in 1778ms
+(node:13100) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 464ms
+(node:12916) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /sw.js 404 in 377ms

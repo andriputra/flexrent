@@ -6,19 +6,27 @@ import { LogOut, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { signOutAction } from "@/server/actions/auth"
-import { isActiveItem, NAV_ITEMS } from "./nav-config"
+import { isActiveItem, NAV_GROUPS, NAV_ITEMS } from "./nav-config"
 import { cn } from "@/lib/utils"
+
+const PINNED_COUNT = 3
 
 export function DashboardBottomNav({ publicUrl }: { publicUrl: string }) {
   const pathname = usePathname()
-  const items = NAV_ITEMS.slice(0, 3)
-  const moreItems = NAV_ITEMS.slice(3)
+  const items = NAV_ITEMS.slice(0, PINNED_COUNT)
+  const pinnedHrefs = new Set(items.map((item) => item.href))
+  const moreGroups = NAV_GROUPS.map((group) => ({
+    label: group.label,
+    items: group.items.filter((item) => !pinnedHrefs.has(item.href)),
+  })).filter((group) => group.items.length > 0)
+  const moreItems = moreGroups.flatMap((group) => group.items)
   const moreActive = moreItems.some((item) => isActiveItem(pathname, item)) || items.every((item) => !isActiveItem(pathname, item))
 
   return (
@@ -58,19 +66,23 @@ export function DashboardBottomNav({ publicUrl }: { publicUrl: string }) {
               <MoreHorizontal aria-hidden className="size-5" />
               Lainnya
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="top" className="w-56">
-              <DropdownMenuLabel>Lainnya</DropdownMenuLabel>
-              {moreItems.map((item) => {
-                const Icon = item.icon
-                return (
-                  <DropdownMenuItem key={item.href} asChild>
-                    <Link href={item.href}>
-                      <Icon aria-hidden />
-                      {item.label}
-                    </Link>
-                  </DropdownMenuItem>
-                )
-              })}
+            <DropdownMenuContent align="end" side="top" className="max-h-[70dvh] w-56 overflow-y-auto">
+              {moreGroups.map((group) => (
+                <DropdownMenuGroup key={group.label}>
+                  <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                  {group.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <DropdownMenuItem key={item.href} asChild>
+                        <Link href={item.href}>
+                          <Icon aria-hidden />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    )
+                  })}
+                </DropdownMenuGroup>
+              ))}
               <DropdownMenuItem asChild>
                 <a href={publicUrl} target="_blank" rel="noreferrer">
                   Halaman publik

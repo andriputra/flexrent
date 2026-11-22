@@ -559,11 +559,24 @@ cancelAtPeriodEnd ──cron saat periode habis──▶ CANCELLED
 ### Dashboard ringkasan
 
 `getDashboardSummary()` membaca semuanya dalam satu `Promise.all`. "Pendapatan bulan
-ini" dan grafik 30 hari memakai baris `Payment` `SETTLED` (`kind: "RENTAL"`), sehingga
+ini" dan grafik kas memakai baris `Payment` `SETTLED` (`kind: "RENTAL"`), sehingga
 kas yang tampil adalah uang yang benar-benar masuk — bukan nilai pesanan. Okupansi
 30 hari dihitung dari irisan `startsAt`/`endsAt` booking aktif dengan jendela 30 hari
-dibagi `jumlah kendaraan × 30`. Grafik memakai Recharts (`components/dashboard/
-revenue-chart.tsx`) dengan warna token `--chart-2`.
+dibagi `jumlah kendaraan × 30`.
+
+Deret kas dibaca 90 hari sekaligus; `revenue-chart.tsx` memotongnya untuk pilihan
+rentang 7/30/90 hari dan membandingkan dengan periode sebelumnya (chip persen hanya
+muncul kalau periode pembandingnya berisi pembayaran). Kartu metrik di atasnya
+memakai pembanding yang sama: tren bulan ini vs bulan lalu, dan `prevMonthRevenue`
+nol berarti tidak ada tren, bukan "naik 100%".
+
+Panel tambahan membaca data yang sudah ada: beban pengembalian 7 hari dan daftar
+jatuh tempo hari ini diambil dari satu query `endsAt` (status `CONFIRMED`/`ONGOING`),
+"Perlu perhatian" menampung pengembalian lewat jadwal, booking `PENDING`, sewa dengan
+`paymentStatus` UNPAID/PARTIAL, dan `MaintenancePlan` `isDone: false` yang mulai 14
+hari ke depan atau sudah terlewat. Angka di panel memakai `count` penuh, sedangkan
+daftarnya dibatasi 5 baris. Grafik memakai Recharts
+(`components/dashboard/revenue-chart.tsx`) dengan warna token `--chart-2`.
 
 ### Laporan per kendaraan + CSV
 
@@ -793,7 +806,9 @@ Aturan UI yang sudah diterapkan dan silakan diikuti saat menambah halaman:
 - Semua field ber-`label`, tombol ikon ber-`aria-label`, focus state terlihat,
   animasi menghormati `prefers-reduced-motion`.
 - Sidebar bisa diciutkan (tersimpan di localStorage), di mobile diganti bottom
-  nav dengan tombol "Lainnya".
+  nav dengan tombol "Lainnya". Menu dikelompokkan lewat `NAV_GROUPS`
+  (Utama → Operasional → Keuangan → Pengelolaan); judul grup hilang saat
+  ciut dan digantikan garis pemisah, dan dropdown mobile memakai grup yang sama.
 - Kalender armada digambar sebagai satu CSS grid per kendaraan
   (`190px repeat(hari, minmax(52px,1fr))`) dengan kolom label sticky; sel latar
   berwarna dan bar segmen sama-sama diletakkan di `gridRow: 1`, jadi pesanan yang
