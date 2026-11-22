@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Fragment, type CSSProperties, type ReactNode } from "react"
+import { Fragment, type CSSProperties } from "react"
 import {
   ArrowRight,
   Bike,
@@ -14,6 +14,7 @@ import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { SpotlightCard } from "@/components/marketing/spotlight-card"
 import { CtaBanner } from "@/components/marketing/cta-banner"
+import { Eyebrow } from "@/components/marketing/eyebrow"
 import { getPublicPlans } from "@/server/queries/plans"
 import { formatRupiah, formatRupiahShort } from "@/lib/format"
 
@@ -90,15 +91,6 @@ const AVAILABILITY = [
 
 function order(index: number) {
   return { "--i": index } as CSSProperties
-}
-
-function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-      <span aria-hidden className="h-px w-6 bg-accent/60" />
-      {children}
-    </p>
-  )
 }
 
 function HeroTitle() {

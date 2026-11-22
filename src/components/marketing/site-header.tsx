@@ -60,7 +60,8 @@ export function SiteHeader({ loggedIn }: { loggedIn: boolean }) {
             </Button>
           ) : (
             <>
-              <Button asChild size="sm" variant="ghost">
+              {/* Di layar sempit cukup satu pintu: tautan Masuk ada di halaman /login. */}
+              <Button asChild size="sm" variant="ghost" className="hidden sm:inline-flex">
                 <Link href="/login">Masuk</Link>
               </Button>
               <Button
