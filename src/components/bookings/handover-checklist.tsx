@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { FUEL_LABEL, FUEL_LEVELS, PHOTO_POSITIONS, POSITION_LABEL } from "@/lib/handover"
+import { shrinkDoc } from "@/lib/shrink-doc"
+import { perFileBudget } from "@/lib/upload-limits"
 import { cn } from "@/lib/utils"
 import { saveHandoverAction } from "@/server/actions/handovers"
 
@@ -52,6 +54,22 @@ export function HandoverChecklist({
     payload.set("code", code)
     payload.set("type", type)
     payload.set("fuelLevel", fuel === "NONE" ? "" : fuel)
+
+    // Foto checklist bisa delapan sekaligus; tanpa pengecilan total body menembus
+    // plafon Server Action dan pengisian checklist hilang sebelum tersimpan.
+    const photosByKey = new Map<string, File[]>()
+    for (const [key, value] of payload.entries()) {
+      if (value instanceof File && value.size > 0) photosByKey.set(key, [...(photosByKey.get(key) ?? []), value])
+    }
+    const photoCount = [...photosByKey.values()].reduce((total, list) => total + list.length, 0)
+    if (photoCount > 0) {
+      const budget = perFileBudget(photoCount)
+      for (const [key, list] of photosByKey) {
+        const prepared = await Promise.all(list.map((file) => shrinkDoc(file, budget)))
+        payload.delete(key)
+        for (const file of prepared) payload.append(key, file)
+      }
+    }
 
     setServerError(null)
     setFields({})

@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { useConfirmAction } from "@/components/shared/confirm-action"
 import { MAX_VEHICLE_PHOTOS } from "@/lib/validators/vehicle"
+import { shrinkDoc } from "@/lib/shrink-doc"
+import { perFileBudget } from "@/lib/upload-limits"
 import {
   deleteVehiclePhotoAction,
   saveVehiclePhotoLayoutAction,
@@ -68,17 +70,21 @@ export function VehiclePhotoManager({
     )
   }
 
-  function addFiles(files: FileList | null) {
-    if (!files || files.length === 0) return
+  async function addFiles(selected: File[]) {
+    if (selected.length === 0) return
     const room = MAX_VEHICLE_PHOTOS - photos.length
     if (room <= 0) {
       toast.error(`Maksimal ${MAX_VEHICLE_PHOTOS} foto per kendaraan.`)
       return
     }
+    const chosen = selected.slice(0, room)
+    if (selected.length > room) toast.warning(`Hanya ${room} foto pertama yang diunggah.`)
+    // Dikecilkan di browser: enam foto kamera langsung menembus plafon body
+    // Server Action dan korbannya halaman error tanpa penjelasan.
+    const prepared = await Promise.all(chosen.map((file) => shrinkDoc(file, perFileBudget(chosen.length))))
     const formData = new FormData()
     formData.set("vehicleId", vehicleId)
-    for (const file of Array.from(files).slice(0, room)) formData.append("photos", file)
-    if (files.length > room) toast.warning(`Hanya ${room} foto pertama yang diunggah.`)
+    for (const file of prepared) formData.append("photos", file)
     run(() => uploadVehiclePhotosAction(formData), "Foto berhasil diunggah.")
   }
 
@@ -177,8 +183,13 @@ export function VehiclePhotoManager({
             multiple
             className="sr-only"
             onChange={(event) => {
-              addFiles(event.target.files)
-              event.target.value = ""
+              const field = event.target
+              const selected = Array.from(field.files ?? [])
+              field.value = ""
+              field.disabled = true
+              addFiles(selected).finally(() => {
+                field.disabled = false
+              })
             }}
           />
           <Label

@@ -7,6 +7,7 @@ import { ImageIcon, Trash2, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useConfirmAction } from "@/components/shared/confirm-action"
 import { removeTenantLogoAction, uploadTenantLogoAction } from "@/server/actions/settings"
+import { MAX_IMAGE_BYTES, MAX_IMAGE_LABEL } from "@/lib/upload-limits"
 import { cn } from "@/lib/utils"
 
 export function LogoForm({ logoUrl, readOnly }: { logoUrl: string | null; readOnly: boolean }) {
@@ -60,7 +61,7 @@ export function LogoForm({ logoUrl, readOnly }: { logoUrl: string | null; readOn
         </div>
         <div className="space-y-1 text-sm">
           <p className="font-medium">{logoUrl ? "Logo aktif" : "Belum ada logo"}</p>
-          <p className="text-muted-foreground">JPG, PNG, atau WebP sampai 4 MB. Tampil di header halaman publik.</p>
+          <p className="text-muted-foreground">JPG, PNG, atau WebP sampai {MAX_IMAGE_LABEL}. Tampil di header halaman publik.</p>
         </div>
       </div>
 
@@ -72,8 +73,18 @@ export function LogoForm({ logoUrl, readOnly }: { logoUrl: string | null; readOn
             accept="image/jpeg,image/png,image/webp"
             className="sr-only"
             onChange={(event) => {
-              setFile(event.target.files?.[0] ?? null)
-              if (event.target.files?.length) toast.info(`${event.target.files[0].name} siap diunggah.`)
+              const next = event.target.files?.[0] ?? null
+              // Logo tidak ikut dikecilkan di browser: konversi ke JPEG membuang
+              // transparansi. Yang di atas plafon ditolak sebelum dikirim supaya
+              // request tidak pernah menembus batas body Server Action.
+              if (next && next.size > MAX_IMAGE_BYTES) {
+                toast.error(`Logo maksimal ${MAX_IMAGE_LABEL} — kompres dulu agar transparansinya tetap utuh`)
+                event.target.value = ""
+                setFile(null)
+                return
+              }
+              setFile(next)
+              if (next) toast.info(`${next.name} siap diunggah.`)
             }}
           />
           <label

@@ -55,7 +55,7 @@ publiknya sudah aktif di `http://localhost:3000/bandung-ride`.
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test` | Vitest (harga, jadwal, tanggal, rekonsiliasi pembayaran, tanda tangan Midtrans, template WhatsApp, mesin status pesanan, checklist handover, denda & deposit) |
-| `npm run test:e2e` | Playwright: alur booking publik + penjaga halaman (lihat "Tes end-to-end") |
+| `npm run test:e2e` | Playwright: alur booking publik, penjaga halaman, dan control center platform (lihat "Tes end-to-end") |
 | `npm run db:migrate` | buat migrasi baru saat `schema.prisma` berubah |
 | `npm run db:deploy` | terapkan migrasi ke database target |
 | `npm run db:seed` | isi data demo (idempoten, menghapus baris demo lama) |
@@ -607,9 +607,40 @@ staf + undangan email.
   hanya dicetak ke log dan UI menandainya sebagai "belum terkirim".
   Staf non-admin melihat halaman pengaturan dalam mode baca-saja.
 
+## Batas ukuran berkas
+
+Gambar dan dokumen ikut terkirim di dalam request Server Action, jadi batas
+sebenarnya bukan kuota Vercel Blob melainkan plafon body framework
+(`experimental.serverActions.bodySizeLimit = "4mb"` di `next.config.ts`). Permintaan
+di atas plafon ditolak framework sebelum kode kita jalan, dan yang muncul di layar
+pemakai cuma halaman error tanpa penjelasan. Angkanya ada di satu tempat,
+`src/lib/upload-limits.ts`:
+
+| Konstanta | Nilai | Menjaga |
+| --- | --- | --- |
+| `ACTION_BODY_LIMIT_BYTES` | 4 MB | plafon framework; ada tes yang memaksa nilainya tetap sama dengan `next.config.ts` |
+| `MAX_DOC_BYTES` = `MAX_IMAGE_BYTES` | 1,5 MB per berkas | `uploadImage()` dan `uploadPrivateFile()` di `storage.ts` |
+| `UPLOAD_BODY_BUDGET_BYTES` | 3 MB per request | bagian berkas saja; ±1 MB sisanya untuk field teks dan overhead multipart |
+
+Tiga lapis penjaga supaya yang dilihat pemakai adalah pesan, bukan halaman error:
+
+1. **Dikecilkan di browser.** `shrinkDoc()` (`src/lib/shrink-doc.ts`) menggambar
+   ulang lewat canvas sampai di bawah jatah. Jatahnya ikut mengecil seiring banyaknya
+   berkas dalam satu request — `perFileBudget(n)`: 1 berkas 1,5 MB, 3 berkas 1 MB,
+   6 berkas 512 KB, 8 berkas 384 KB.
+2. **Ditolak di klien sebelum kirim.** Input file memeriksa plafon dan
+   `uploadBudgetError()` lalu menampilkan toast, jadi request sia-sia tidak dikirim.
+3. **Dijaga di server.** `uploadImage()` melempar `StorageError`, dan
+   `uploadVehiclePhotosAction` / `saveHandoverAction` menjawab `VALIDATION` bila
+   total berkas masih melewati jatah setelah kompresi.
+
+Satu pengecualian yang disengaja: logo rental (`logo-form.tsx`) tidak dikonversi di
+browser karena `shrinkDoc()` selalu keluar sebagai JPEG dan transparansi PNG hilang.
+Logo di atas 1,5 MB ditolak dengan pesan supaya dikompres lebih dulu.
+
 ## Tes end-to-end (Playwright)
 
-`npm run test:e2e` menjalankan enam belas tes di `e2e/` pada satu worker Chromium.
+`npm run test:e2e` menjalankan dua puluh tes di `e2e/` pada satu worker Chromium.
 Yang perlu diketahui kalau mengubahnya:
 
 - **`login-flow.spec.ts` memakai sandi seed.** Nilainya harus sama dengan
@@ -617,6 +648,15 @@ Yang perlu diketahui kalau mengubahnya:
   memakai sandi lain, jalankan `E2E_DEMO_PASSWORD="sandi" npm run test:e2e`.
   Tes hanya mengirim 3–4 percobaan sehingga masih di bawah batas `login`
   (10/5 menit) — jangan ditambahkan percobaan sandi salah berulang-ulang.
+- **`platform-admin.spec.ts` butuh akses platform.** Sebelum suite, jalankan
+  `npm run account:platform-admin -- demo@flexrent.local on`; tanpa itu semua tes
+  control center mendarat di `/dashboard` dan gagal. Alurnya sengaja berurutan
+  (`mode: "serial"`) karena menyentuh data bersama: tenant disuspend lalu
+  diaktifkan kembali (dibuktikan dengan `/{slug}` 404 → 200), dan form paket
+  dikirim dengan nilai yang sedang terpakai supaya tidak ada harga yang berubah.
+  Suite ini juga mengirim beberapa kali masuk, jadi satu bucket `login` dipakai
+  bersama `login-flow` — helper `masuk()` menunggu 65 detik lalu mencoba lagi bila
+  server menjawab "Terlalu sering mengirim", bukan menggagalkan tes.
 - **Tidak ada ID yang dihafal.** Tenant diambil dari `/sitemap.xml`, lalu kendaraan
   pertama dari katalog bertanggal diklik seperti pengunjung biasa. Ganti seed, tes
   tetap jalan; kalau sitemap kosong, tes gagal dengan pesan "jalankan

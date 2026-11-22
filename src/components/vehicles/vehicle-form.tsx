@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select"
 import { formatRupiah } from "@/lib/format"
 import { MAX_VEHICLE_PHOTOS } from "@/lib/validators/vehicle"
+import { shrinkDoc } from "@/lib/shrink-doc"
+import { perFileBudget } from "@/lib/upload-limits"
 import { saveVehicleAction } from "@/server/actions/vehicles"
 import type { ActionResult } from "@/lib/result"
 import { cn } from "@/lib/utils"
@@ -204,9 +206,16 @@ export function VehicleForm({
     for (const [key, value] of Object.entries(values)) {
       formData.set(key, typeof value === "boolean" ? String(value) : String(value ?? ""))
     }
-    for (const photo of pendingPhotos) formData.append("photos", photo.file)
 
     startTransition(async () => {
+      if (pendingPhotos.length > 0) {
+        // Dikecilkan saat kirim, bukan saat dipilih: hanya di sini jumlah seluruh
+        // batch diketahui, sedangkan plafon body Server Action berlaku untuk totalnya.
+        const prepared = await Promise.all(
+          pendingPhotos.map((photo) => shrinkDoc(photo.file, perFileBudget(pendingPhotos.length))),
+        )
+        for (const file of prepared) formData.append("photos", file)
+      }
       const result = await saveVehicleAction(formData)
       if (result.ok) {
         toast.success(vehicleId ? "Perubahan kendaraan disimpan." : "Kendaraan berhasil ditambahkan.")

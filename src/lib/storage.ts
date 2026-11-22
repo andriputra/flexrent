@@ -2,11 +2,9 @@ import { randomUUID } from "node:crypto"
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { del, get, put, type PutBlobResult } from "@vercel/blob"
-import { MAX_DOC_BYTES, MAX_DOC_LABEL } from "@/lib/upload-limits"
+import { MAX_DOC_BYTES, MAX_DOC_LABEL, MAX_IMAGE_BYTES, MAX_IMAGE_LABEL } from "@/lib/upload-limits"
 
 export type StoredFile = { url: string; storageKey: string }
-
-const MAX_BYTES = 4 * 1024 * 1024
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -41,8 +39,8 @@ function extensionFor(file: File): string {
 }
 
 function assertSize(file: File) {
-  if (file.size > MAX_BYTES) {
-    throw new StorageError(`Ukuran foto maksimal ${Math.round(MAX_BYTES / 1024 / 1024)} MB`)
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new StorageError(`Ukuran foto maksimal ${MAX_IMAGE_LABEL}`)
   }
   if (file.size === 0) throw new StorageError("File kosong, pilih foto lain")
 }

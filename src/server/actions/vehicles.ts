@@ -7,6 +7,7 @@ import { getTenantContext, requireWritable } from "@/lib/tenant"
 import { fieldErrorsFromZod, fail, ok, safeAction, type ActionResult } from "@/lib/result"
 import { MAX_VEHICLE_PHOTOS, vehicleInput, vehicleFieldLabels } from "@/lib/validators/vehicle"
 import { StorageError, deleteImages, uploadImage, type StoredFile } from "@/lib/storage"
+import { uploadBudgetError } from "@/lib/upload-limits"
 import { countVehicles, plateAlreadyUsed } from "@/server/queries/vehicles"
 
 const VEHICLE_FIELDS = [
@@ -82,6 +83,11 @@ async function uploadPhotos(
   slug: string,
   files: File[]
 ): Promise<StoredFile[]> {
+  // Batch yang terlalu besar harus ditolak di sini: kalau lolos, request-nya
+  // membengkak melewati plafon body Server Action dan layar pemakai berubah
+  // jadi halaman error tanpa pesan.
+  const overBudget = uploadBudgetError(files)
+  if (overBudget) throw new StorageError(overBudget)
   const stored: StoredFile[] = []
   for (const file of files) {
     stored.push(await uploadImage(file, `vehicles/${slug}`))

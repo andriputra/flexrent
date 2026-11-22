@@ -6,6 +6,7 @@ import { prisma, TX_OPTIONS } from "@/lib/db"
 import { textOf } from "@/lib/form"
 import { MAX_HANDOVER_PHOTOS, PHOTO_POSITIONS } from "@/lib/handover"
 import { StorageError, deleteImages, uploadImage, type StoredFile } from "@/lib/storage"
+import { uploadBudgetError } from "@/lib/upload-limits"
 import { fieldErrorsFromZod, fail, ok, safeAction, type ActionResult } from "@/lib/result"
 import { requireTenant, requireWritable } from "@/lib/tenant"
 import { handoverFieldLabels, handoverInput } from "@/lib/validators/handover"
@@ -99,6 +100,8 @@ export async function saveHandoverAction(formData: FormData): Promise<ActionResu
     if (incoming.length > MAX_HANDOVER_PHOTOS) {
       return fail(`Maksimal ${MAX_HANDOVER_PHOTOS} foto per checklist.`, { code: "VALIDATION" })
     }
+    const overBudget = uploadBudgetError(incoming.map((item) => item.file))
+    if (overBudget) return fail(overBudget, { code: "VALIDATION" })
 
     let stored: StoredFile[] = []
     try {
