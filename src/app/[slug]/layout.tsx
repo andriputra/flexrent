@@ -131,7 +131,18 @@ export default async function TenantPublicLayout({
 
           <div className="border-t border-border/70">
             <div className="page-container flex flex-col gap-2 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <p>© {new Date().getFullYear()} Flexbox Indonesia. Seluruh hak cipta dilindungi.</p>
+              <p>
+                © {new Date().getFullYear()}{" "}
+                <a
+                  href="https://flexbox.co.id"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium link-underline"
+                >
+                  Flexbox Indonesia
+                </a>
+                . Seluruh hak cipta dilindungi.
+              </p>
               <p>Dibuat untuk {tenant.name}</p>
             </div>
           </div>

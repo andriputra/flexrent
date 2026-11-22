@@ -22,6 +22,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </Link>{" "}
           Flexrent.
         </p>
+
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          © {new Date().getFullYear()}{" "}
+          <a
+            href="https://flexbox.co.id"
+            target="_blank"
+            rel="noreferrer"
+            className="link-underline font-medium"
+          >
+            Flexbox Indonesia
+          </a>
+          . Seluruh hak cipta dilindungi.
+        </p>
       </div>
     </Providers>
   )

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Search, Store } from "lucide-react"
+import { Plus, Search, Store } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -23,7 +23,18 @@ export default async function PlatformTenantsPage({ searchParams }: { searchPara
 
   return (
     <>
-      <PageHeader title="Semua tenant" description="Kelola status rental dan lihat kesehatan langganan di satu tempat." />
+      <PageHeader
+        title="Semua tenant"
+        description="Kelola status rental dan lihat kesehatan langganan di satu tempat."
+        actions={
+          <Button asChild>
+            <Link href="/admin/tenants/new">
+              <Plus aria-hidden className="size-4" />
+              Daftarkan tenant baru
+            </Link>
+          </Button>
+        }
+      />
 
       <form className="flex flex-col gap-2 sm:flex-row" method="get">
         <div className="relative min-w-0 flex-1">

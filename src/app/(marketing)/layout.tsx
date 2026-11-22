@@ -64,13 +64,14 @@ export default async function MarketingLayout({ children }: { children: React.Re
           </div>
           <div className="border-t">
             <div className="page-container flex flex-col gap-2 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <p>© {new Date().getFullYear()} Flexrent. Dibuat untuk usaha rental di Indonesia.</p>
               <p>
-                developed by{" "}
+                © {new Date().getFullYear()}{" "}
                 <a href="https://flexbox.co.id" target="_blank" rel="noreferrer" className="font-medium hover:underline">
                   Flexbox Indonesia
                 </a>
+                . Seluruh hak cipta dilindungi.
               </p>
+              <p>Dibuat untuk usaha rental di Indonesia.</p>
             </div>
           </div>
         </footer>

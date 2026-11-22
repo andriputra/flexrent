@@ -8,6 +8,13 @@ const mocks = vi.hoisted(() => ({
   tenantUpdate: vi.fn(),
   planUpdate: vi.fn(),
   auditCreate: vi.fn(),
+  userFindUnique: vi.fn(),
+  userCreate: vi.fn(),
+  tenantCreate: vi.fn(),
+  subscriptionCreate: vi.fn(),
+  uniqueTenantSlug: vi.fn(),
+  hashPassword: vi.fn(),
+  generateHandoverPassword: vi.fn(),
 }))
 
 vi.mock("@/lib/platform", () => ({
@@ -15,14 +22,31 @@ vi.mock("@/lib/platform", () => ({
   createAuditLog: vi.fn(),
 }))
 vi.mock("next/cache", () => ({ revalidatePath: (path: string, scope?: string) => mocks.revalidatePath(path, scope) }))
+vi.mock("@/lib/password", () => ({
+  hashPassword: (value: string) => mocks.hashPassword(value),
+  generateHandoverPassword: () => mocks.generateHandoverPassword(),
+}))
+vi.mock("@/server/tenant-provisioning", () => ({
+  TRIAL_DAYS: 14,
+  uniqueTenantSlug: (base: string) => mocks.uniqueTenantSlug(base),
+}))
 vi.mock("@/lib/db", () => ({
+  TX_OPTIONS: { isolationLevel: "ReadCommitted" },
   prisma: {
     tenant: { findUnique: (args: unknown) => mocks.tenantFindUnique(args) },
     plan: { findUnique: (args: unknown) => mocks.planFindUnique(args) },
+    user: {
+      findUnique: (args: unknown) => mocks.userFindUnique(args),
+      create: (args: unknown) => mocks.userCreate(args),
+    },
     $transaction: (fn: (tx: unknown) => Promise<unknown>) =>
       fn({
-        tenant: { update: (args: unknown) => mocks.tenantUpdate(args) },
+        tenant: {
+          update: (args: unknown) => mocks.tenantUpdate(args),
+          create: (args: unknown) => mocks.tenantCreate(args),
+        },
         plan: { update: (args: unknown) => mocks.planUpdate(args) },
+        subscription: { create: (args: unknown) => mocks.subscriptionCreate(args) },
         auditLog: { create: (args: unknown) => mocks.auditCreate(args) },
       }),
   },
@@ -36,6 +60,9 @@ async function actions() {
 beforeEach(() => {
   for (const mock of Object.values(mocks)) mock.mockReset()
   mocks.requirePlatformAdmin.mockResolvedValue({ user: { id: "super" } })
+  mocks.uniqueTenantSlug.mockImplementation(async (base: string) => base)
+  mocks.hashPassword.mockResolvedValue("scrypt$fake")
+  mocks.generateHandoverPassword.mockReturnValue("TESTI-NG99-K7QF")
 })
 
 describe("setPlatformTenantActiveAction", () => {
@@ -121,5 +148,92 @@ describe("updatePlatformPlanAction", () => {
       data: { priceMonthly: 0, priceYearly: null, maxVehicles: 3, maxStaff: 1, isPublic: false },
     })
     expect(mocks.auditCreate.mock.calls[0][0].data).toMatchObject({ action: "PLAN_UPDATED", entityId: "p1" })
+  })
+})
+
+describe("createTenantByPlatformAction", () => {
+  function body(overrides: Record<string, string> = {}) {
+    const form = new FormData()
+    const values = {
+      name: "Sewa Jogja",
+      slugInput: "sewa-jogja",
+      city: "Yogyakarta",
+      phone: "081234567890",
+      address: "",
+      email: "",
+      ownerName: "Rizky Ananda",
+      ownerEmail: "pemilik@sewajogja.id",
+      planCode: "STARTER",
+      withTrial: "true",
+      ...overrides,
+    }
+    for (const [key, value] of Object.entries(values)) form.set(key, value)
+    return form
+  }
+
+  function okPlan() {
+    mocks.planFindUnique.mockResolvedValue({ id: "p1", name: "Starter" })
+    mocks.tenantCreate.mockResolvedValue({ id: "t9", name: "Sewa Jogja", slug: "sewa-jogja" })
+  }
+
+  it("menolak email pemilik yang cacat tanpa menulis apa pun", async () => {
+    const { createTenantByPlatformAction } = await actions()
+    const result = await createTenantByPlatformAction(body({ ownerEmail: "bukan-email" }))
+    expect(result).toMatchObject({ ok: false, code: "VALIDATION" })
+    expect(mocks.userCreate).not.toHaveBeenCalled()
+    expect(mocks.tenantCreate).not.toHaveBeenCalled()
+  })
+
+  it("membuatkan akun pemilik baru dan mengembalikan sandi awalnya sekali", async () => {
+    const { createTenantByPlatformAction } = await actions()
+    okPlan()
+    mocks.userFindUnique.mockResolvedValue(null)
+    mocks.userCreate.mockResolvedValue({ id: "u9" })
+
+    const result = await createTenantByPlatformAction(body())
+    expect(result).toMatchObject({
+      ok: true,
+      data: { tenantId: "t9", slug: "sewa-jogja", accountCreated: true, initialPassword: "TESTI-NG99-K7QF" },
+    })
+    expect(mocks.hashPassword).toHaveBeenCalledWith("TESTI-NG99-K7QF")
+    expect(mocks.tenantCreate.mock.calls[0][0].data.memberships).toEqual({
+      create: { userId: "u9", role: "OWNER", isActive: true },
+    })
+    expect(mocks.subscriptionCreate.mock.calls[0][0].data).toMatchObject({ tenantId: "t9", planId: "p1", status: "TRIALING" })
+    expect(mocks.auditCreate.mock.calls[0][0].data).toMatchObject({
+      actorId: "super",
+      tenantId: "t9",
+      action: "TENANT_CREATED",
+      metadata: { slug: "sewa-jogja", planCode: "STARTER", ownerEmail: "pemilik@sewajogja.id", accountCreated: true },
+    })
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/sewa-jogja", "layout")
+  })
+
+  it("memakai akun pemilik yang sudah ada tanpa mengubah sandinya", async () => {
+    const { createTenantByPlatformAction } = await actions()
+    okPlan()
+    mocks.userFindUnique.mockResolvedValue({ id: "u1" })
+
+    const result = await createTenantByPlatformAction(body({ ownerEmail: "Pemilik@SewaJogja.id" }))
+    expect(result).toMatchObject({ ok: true, data: { accountCreated: false, initialPassword: null } })
+    expect(mocks.userCreate).not.toHaveBeenCalled()
+    // Email dinormalisasi ke huruf kecil sebelum dicari, supaya "Pemilik@..." tidak membuat akun kembar.
+    expect(mocks.userFindUnique.mock.calls[0][0]).toMatchObject({ where: { email: "pemilik@sewajogja.id" } })
+    expect(mocks.tenantCreate.mock.calls[0][0].data.memberships).toEqual({
+      create: { userId: "u1", role: "OWNER", isActive: true },
+    })
+  })
+
+  it("langsung menagih penuh saat masa uji dimatikan", async () => {
+    const { createTenantByPlatformAction } = await actions()
+    okPlan()
+    mocks.userFindUnique.mockResolvedValue({ id: "u1" })
+
+    const result = await createTenantByPlatformAction(body({ withTrial: "false" }))
+    expect(result).toMatchObject({ ok: true, data: { trialEndsAt: null } })
+    expect(mocks.subscriptionCreate.mock.calls[0][0].data).toMatchObject({
+      status: "ACTIVE",
+      trialEndsAt: null,
+    })
   })
 })

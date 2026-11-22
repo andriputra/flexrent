@@ -4,7 +4,8 @@ import { normalizePhone } from "@/lib/format"
 import { WEEK_DAYS } from "@/lib/opening-hours"
 import { boolField, optionalText, timeField } from "./common"
 
-const profileShape = {
+/** Isian identitas rental yang sama dipakai wizard self-serve dan form operator. */
+export const tenantProfileShape = {
   name: z
     .string()
     .trim()
@@ -24,7 +25,7 @@ const profileShape = {
 }
 
 /** Nama alamat publik divalidasi setelah slug hasil olahan dibentuk. */
-function refineSlug(value: { name: string; slugInput: string }, ctx: z.RefinementCtx) {
+export function refineTenantSlug(value: { name: string; slugInput: string }, ctx: z.RefinementCtx) {
   const slug = slugify(value.slugInput || value.name)
   if (!isValidSlug(slug)) {
     ctx.addIssue({
@@ -41,14 +42,14 @@ function refineSlug(value: { name: string; slugInput: string }, ctx: z.Refinemen
   }
 }
 
-export const tenantOnboardingInput = z.object(profileShape).superRefine(refineSlug)
+export const tenantOnboardingInput = z.object(tenantProfileShape).superRefine(refineTenantSlug)
 
 export type TenantOnboardingInput = z.infer<typeof tenantOnboardingInput>
 
 /** Formulir pengaturan: sama seperti onboarding plus tagline halaman publik. */
 export const tenantProfileInput = z
-  .object({ ...profileShape, tagline: optionalText("Tagline", 120) })
-  .superRefine(refineSlug)
+  .object({ ...tenantProfileShape, tagline: optionalText("Tagline", 120) })
+  .superRefine(refineTenantSlug)
 
 export type TenantProfileInput = z.infer<typeof tenantProfileInput>
 

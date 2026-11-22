@@ -1,12 +1,12 @@
-(node:8820) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(node:5068) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:2124) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(node:1200) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:1304) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(node:8500) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:3216) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(node:1384) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
-   ▲ Next.js 15.5.29
+   ▲ Next.js 15.5.29 (Turbopack)
    - Local:        http://localhost:3050
    - Network:      http://100.68.78.44:3050
    - Environments: .env
@@ -14,622 +14,77 @@
      · serverActions
 
  ✓ Starting...
- ✓ Ready in 20.9s
- ○ Compiling /[slug] ...
- ✓ Compiled /[slug] in 37.6s (1364 modules)
-(node:6268) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+ ✓ Ready in 25.4s
+ ○ Compiling /admin/tenants ...
+(node:10092) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 1505ms (408 modules)
- GET /bandung-ride 200 in 10934ms
+ ✓ Compiled /admin/tenants in 39s
+ GET /admin/tenants 307 in 41836ms
+ ○ Compiling /admin/tenants/new ...
+ ✓ Compiled /admin/tenants/new in 1026ms
+ GET /admin/tenants/new 307 in 1411ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 861ms
+ GET /login 200 in 1180ms
+ GET /login 307 in 456ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 5.3s
+ GET /dashboard 200 in 9260ms
  ○ Compiling /favicon.ico ...
- ✓ Compiled /favicon.ico in 1072ms (942 modules)
- GET /favicon.ico 200 in 1606ms
- ✓ Compiled in 1564ms (1350 modules)
-(node:10472) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+ ✓ Compiled /favicon.ico in 1728ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 2226ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 743ms
+(node:15008) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 837ms
-(node:3148) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+ GET /api/auth/session 200 in 2508ms
+ GET /admin/tenants/new 200 in 1147ms
+ POST /admin/tenants/new 200 in 339ms
+ POST /admin/tenants/new 200 in 1330ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 1407ms
+(node:9572) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1942ms
- ✓ Compiled in 1606ms (408 modules)
-(node:8964) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+ GET /uji-operator-sewa 200 in 3688ms
+ ✓ Compiled in 1241ms
+ GET /api/auth/csrf 200 in 444ms
+(node:11216) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 773ms
- ✓ Compiled in 2.1s (1345 modules)
-(node:6304) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+ POST /api/auth/signout 302 in 374ms
+ GET /api/auth/session 200 in 345ms
+ GET /login 200 in 769ms
+ POST /login 200 in 790ms
+ GET /dashboard 200 in 295ms
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 853ms
+ GET /onboarding 200 in 1191ms
+ GET /onboarding 200 in 331ms
+ GET /api/auth/session 200 in 389ms
+(node:4800) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1248ms
-(node:8808) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1823ms
- ✓ Compiled in 1663ms (408 modules)
-(node:5540) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 6762ms
- ✓ Compiled in 2.5s (408 modules)
-(node:3828) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 3771ms
- ✓ Compiled in 2.2s (1345 modules)
-(node:14448) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 720ms
- ✓ Compiled in 9.6s (1345 modules)
-(node:10752) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 6585ms
- ✓ Compiled in 4.3s (1345 modules)
- ✓ Compiled in 361ms (408 modules)
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ✓ Compiled in 4.3s (408 modules)
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
-(node:4564) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- ⨯ ReferenceError: cn is not defined
-    at eval (src\components\public\vehicle-card.tsx:116:26)
-    at Array.map (<anonymous>)
-    at VehicleCard (src\components\public\vehicle-card.tsx:113:31)
-  114 |             <li
-  115 |               key={item.text}
-> 116 |               className={cn(
-      |                          ^
-  117 |                 "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
-  118 |                 item.secondary && "hidden sm:inline-flex"
-  119 |               )} {
-  digest: '2217679604'
-}
- GET /bandung-ride 200 in 7914ms
- ✓ Compiled in 5.5s (1345 modules)
- GET /bandung-ride 200 in 7617ms
- GET /bandung-ride 200 in 7625ms
- ✓ Compiled in 7.3s (1345 modules)
-(node:3312) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 3.2s (408 modules)
- ✓ Compiled in 3.8s (408 modules)
- GET /bandung-ride 200 in 17819ms
- GET /bandung-ride 200 in 19411ms
- GET /bandung-ride 200 in 16317ms
- GET /bandung-ride 200 in 12385ms
- ✓ Compiled in 16.9s (1345 modules)
-(node:13420) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 5.1s (408 modules)
- ✓ Compiled in 3.3s (408 modules)
- ✓ Compiled in 2.8s (408 modules)
- ✓ Compiled in 3.3s (408 modules)
-(node:2396) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 2.6s (408 modules)
- ✓ Compiled in 5s (408 modules)
- GET /bandung-ride 200 in 23576ms
- ✓ Compiled in 3.3s (408 modules)
-(node:8976) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 23149ms
- ✓ Compiled in 5s (408 modules)
- GET /bandung-ride 200 in 23415ms
- ✓ Compiled in 3s (408 modules)
- GET /bandung-ride 200 in 22750ms
- ✓ Compiled in 2.4s (408 modules)
- GET /bandung-ride 200 in 21398ms
- ✓ Compiled in 2.4s (408 modules)
-(node:13744) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 19342ms
- ✓ Compiled in 2.7s (408 modules)
- GET /bandung-ride 200 in 18717ms
- ✓ Compiled in 3s (408 modules)
- ✓ Compiled in 1854ms (408 modules)
-(node:992) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 16799ms
- ✓ Compiled in 2.5s (408 modules)
- GET /bandung-ride 200 in 23298ms
- ✓ Compiled in 9.7s (408 modules)
- GET /bandung-ride 200 in 23767ms
- ✓ Compiled in 2.8s (408 modules)
-(node:1036) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 23751ms
- ✓ Compiled in 2.6s (408 modules)
- GET /bandung-ride 200 in 24065ms
- ✓ Compiled in 2.7s (408 modules)
-(node:8392) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 2.3s (408 modules)
- GET /bandung-ride 200 in 23702ms
- ✓ Compiled in 2.3s (408 modules)
- GET /bandung-ride 200 in 24188ms
- ✓ Compiled in 1366ms (408 modules)
- GET /bandung-ride 200 in 14475ms
- ✓ Compiled in 399ms (408 modules)
- GET /bandung-ride 200 in 12003ms
- ✓ Compiled in 453ms (408 modules)
- GET /bandung-ride 200 in 9558ms
- GET /bandung-ride 200 in 6421ms
- GET /bandung-ride 200 in 4000ms
- ✓ Compiled in 391ms (408 modules)
- ✓ Compiled in 410ms (408 modules)
-(node:13952) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 695ms (408 modules)
- ✓ Compiled in 728ms (408 modules)
- ✓ Compiled in 887ms (408 modules)
- GET /bandung-ride 200 in 2679ms
-(node:2056) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 714ms (408 modules)
- ✓ Compiled in 3.4s (408 modules)
- ✓ Compiled in 2.8s (408 modules)
- GET /bandung-ride 200 in 10032ms
- ✓ Compiled in 2.1s (408 modules)
-(node:7988) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 12111ms
- ✓ Compiled in 2.6s (408 modules)
- ✓ Compiled in 6.1s (408 modules)
- GET /bandung-ride 200 in 20348ms
- ✓ Compiled in 2.7s (408 modules)
- GET /bandung-ride 200 in 19584ms
- ✓ Compiled in 617ms (408 modules)
-(node:7400) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 16365ms
- ✓ Compiled in 1051ms (408 modules)
- GET /bandung-ride 200 in 14448ms
- GET /bandung-ride 200 in 11993ms
- ✓ Compiled in 636ms (408 modules)
- GET /bandung-ride 200 in 6655ms
- ✓ Compiled in 772ms (408 modules)
- GET /bandung-ride 200 in 3104ms
-(node:12964) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- ✓ Compiled in 822ms (408 modules)
- ✓ Compiled in 430ms (408 modules)
- GET /bandung-ride 200 in 2129ms
- ✓ Compiled in 468ms (408 modules)
- GET /bandung-ride 200 in 1486ms
- GET /bandung-ride 200 in 875ms
-(node:960) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 840ms
- GET /bandung-ride 200 in 1271ms
- GET /bandung-ride 200 in 1092ms
- GET /bandung-ride 200 in 565ms
-(node:8572) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 395ms
- GET /bandung-ride 200 in 983ms
- GET /bandung-ride 200 in 929ms
- GET /bandung-ride 200 in 873ms
-(node:9708) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1076ms
- GET /bandung-ride 200 in 1006ms
- GET /bandung-ride 200 in 706ms
- GET /bandung-ride 200 in 413ms
- ✓ Compiled in 2.1s (1345 modules)
-(node:3692) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 799ms
-(node:7096) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1802ms
-(node:3776) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 867ms
-(node:7336) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 939ms
-(node:7400) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 815ms
-(node:9224) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1200ms
-(node:5300) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 861ms
-(node:11092) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 979ms
-(node:5336) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1272ms
-(node:10808) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 2520ms
- ✓ Compiled in 4.2s (408 modules)
-(node:10928) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 1684ms
- GET /bandung-ride 200 in 1211ms
- GET /bandung-ride 200 in 778ms
- ✓ Compiled in 3.1s (408 modules)
-(node:9836) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
- GET /bandung-ride 200 in 6662ms
- GET /bandung-ride 200 in 5516ms
- GET /bandung-ride 200 in 3871ms
- ✓ Compiled in 6.6s (1345 modules)
- GET /bandung-ride 200 in 1839ms
- GET /bandung-ride 200 in 940ms
- GET /bandung-ride 200 in 397ms
-(node:11132) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
-(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled in 749ms
+ ✓ Compiled /onboarding in 126ms
+ GET /onboarding 200 in 914ms
+ GET /onboarding 200 in 293ms
+ GET /onboarding 200 in 301ms
+ ✓ Compiled in 428ms
+ ✓ Compiled /onboarding in 95ms
+ GET /onboarding 200 in 735ms
+ GET /onboarding 200 in 350ms
+ GET /onboarding 200 in 334ms
+ ✓ Compiled /dashboard in 147ms
+ GET /dashboard 307 in 1555ms
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 727ms
+ GET /admin 200 in 2304ms
+ GET /admin/tenants/new 200 in 2115ms
+ GET /admin/tenants 200 in 1185ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }

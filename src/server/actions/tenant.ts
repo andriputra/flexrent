@@ -7,24 +7,9 @@ import { auth } from "@/lib/auth"
 import { ipRateRejection } from "@/lib/anti-abuse"
 import { ACTIVE_TENANT_COOKIE } from "@/lib/tenant"
 import { slugify } from "@/lib/slug"
+import { TRIAL_DAYS, uniqueTenantSlug } from "@/server/tenant-provisioning"
 import { fieldErrorsFromZod, fail, ok, type ActionResult } from "@/lib/result"
 import { tenantOnboardingInput, tenantFieldLabels } from "@/lib/validators/tenant"
-
-const TRIAL_DAYS = 14
-
-/** Nama slug unik: versi dasar, lalu -2, -3, dst sampai panjang 40. */
-async function uniqueSlug(base: string): Promise<string> {
-  if (base.length === 0) return ""
-  let candidate = base
-  let suffix = 1
-  while (suffix < 50) {
-    const taken = await prisma.tenant.findUnique({ where: { slug: candidate }, select: { id: true } })
-    if (!taken) return candidate
-    suffix += 1
-    candidate = `${base}-${suffix}`.slice(0, 40)
-  }
-  return `${base}-${Date.now()}`.slice(0, 40)
-}
 
 export async function createTenantAction(
   values: Record<string, string>
@@ -53,7 +38,7 @@ export async function createTenantAction(
 
   // Schema sudah menjamin slug valid dan tidakreserved (lihat tenantOnboardingInput).
   const { name, slugInput, city, phone, address, email } = parsed.data
-  const slug = await uniqueSlug(slugify(slugInput || name))
+  const slug = await uniqueTenantSlug(slugify(slugInput || name))
 
   const starter = await prisma.plan.findUnique({ where: { code: "STARTER" } })
   if (!starter) return fail("Paket Starter belum tersedia. Hubungi dukungan Flexrent.")

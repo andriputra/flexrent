@@ -34,6 +34,17 @@ export function passwordWeakness(password: string): string | null {
   return null
 }
 
+// Sandi awal untuk akun yang dibuatkan operator: hanya dibaca sekali lalu
+// diteruskan lewat WA/telepon, jadi alfabetnya tanpa karakter yang mudah
+// tertukar (0/O, 1/I/L) dan dikelompokkan per empat karakter.
+const HANDOVER_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+const HANDOVER_LENGTH = 12
+
+export function generateHandoverPassword(): string {
+  const chars = Array.from(randomBytes(HANDOVER_LENGTH), (byte) => HANDOVER_ALPHABET[byte % HANDOVER_ALPHABET.length])
+  return chars.join("").replace(/(.{4})(?=.)/g, "$1-")
+}
+
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16)
   const hash = await derive(password, salt, COST, BLOCK_SIZE, PARALLELISM)

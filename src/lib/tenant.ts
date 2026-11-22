@@ -95,12 +95,16 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
   }
 })
 
-/** Untuk halaman: selalu punya tenant, kalau tidak diarahkan ke login/onboarding. */
+/** Untuk halaman: selalu punya tenant, kalau tidak diarahkan ke wizard onboarding. */
 export async function requireTenant(): Promise<TenantContext> {
-  if (!(await getSessionUser())) redirect("/login")
+  const user = await getSessionUser()
+  if (!user) redirect("/login")
   const context = await getTenantContext()
-  if (!context) redirect("/onboarding")
-  return context
+  if (context) return context
+  // Operator platform tidak punya rental sendiri: tujuan yang benar adalah konsol,
+  // bukan wizard "buat rental saya" yang dipakai klien.
+  const operator = await prisma.user.findUnique({ where: { id: user.id }, select: { isPlatformAdmin: true } })
+  redirect(operator?.isPlatformAdmin ? "/admin" : "/onboarding")
 }
 
 export function requireWritable(context: TenantContext): string | null {
