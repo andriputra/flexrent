@@ -1,0 +1,48 @@
+(node:8820) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2124) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1304) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3216) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+   ▲ Next.js 15.5.29
+   - Local:        http://localhost:3050
+   - Network:      http://100.68.78.44:3050
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 20.9s
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 37.6s (1364 modules)
+(node:6268) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled in 1505ms (408 modules)
+ GET /bandung-ride 200 in 10934ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1072ms (942 modules)
+ GET /favicon.ico 200 in 1606ms
+ ✓ Compiled in 1564ms (1350 modules)
+(node:10472) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 837ms
+(node:3148) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1942ms
+ ✓ Compiled in 1606ms (408 modules)
+(node:8964) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 773ms
+ ✓ Compiled in 2.1s (1345 modules)
+(node:6304) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1248ms
+(node:8808) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1823ms
+ ✓ Compiled in 1663ms (408 modules)
+(node:5540) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 6762ms

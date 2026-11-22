@@ -1,8 +1,9 @@
-import { Suspense } from "react"
+import { Fragment, Suspense } from "react"
 import type { CSSProperties } from "react"
 import type { Metadata } from "next"
 import type { Transmission, VehicleType } from "@prisma/client"
 import { SearchX } from "lucide-react"
+import { cn } from "cn"
 import { EmptyState } from "@/components/shared/layout-parts"
 import { AvailabilitySearch } from "@/components/public/availability-search"
 import { CatalogFilters } from "@/components/public/catalog-filters"
@@ -19,6 +20,30 @@ const TRANSMISI_VALUES = { matic: "MATIC", manual: "MANUAL" } as const
 
 function order(index: number) {
   return { "--i": index } as CSSProperties
+}
+
+type TitleSegment = { text: string; accent?: boolean }
+
+/** Judul hero dinaikkan per kata, persis pola halaman utama Flexrent. */
+function HeroTitle({ segments }: { segments: TitleSegment[] }) {
+  const words = segments.flatMap((segment) =>
+    segment.text.split(" ").map((text) => ({ text, accent: segment.accent }))
+  )
+  return (
+    <h1 className="mt-6 font-display max-w-[20ch] text-[2.1rem] leading-[1.08] font-bold tracking-tight sm:text-[2.5rem] lg:text-[2.8rem]">
+      {words.map((word, index) => (
+        <Fragment key={`${word.text}-${index}`}>
+          {index === 0 ? null : " "}
+          <span
+            style={order(index)}
+            className={cn("anim-rise inline-block", word.accent && "text-accent")}
+          >
+            {word.text}
+          </span>
+        </Fragment>
+      ))}
+    </h1>
+  )
 }
 
 export async function generateMetadata({
@@ -62,21 +87,38 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
       ? `${formatDateId(startsAt, "EEE, d MMM")} sampai ${formatDateId(endsAt, "EEE, d MMM")}`
       : null
 
+  // Judul dibatasi 20ch per baris; tagline boleh 120 karakter (lihat validators/tenant),
+  // jadi yang panjang tidak dijadikan baris kedua — meta description masih memakainya.
+  const taglineAsTitle = tenant.tagline && tenant.tagline.length <= 48 ? tenant.tagline : null
+  const titleSegments: TitleSegment[] = taglineAsTitle
+    ? [{ text: `Sewa motor & mobil di ${tenant.city}` }, { text: taglineAsTitle, accent: true }]
+    : [{ text: "Sewa motor & mobil" }, { text: `di ${tenant.city}.`, accent: true }]
+
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-background">
+      <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="anim-drift absolute -top-56 right-[-14%] size-[32rem] rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.16),transparent_62%)] blur-[70px]" />
-          <div className="anim-drift absolute -bottom-64 left-[-16%] size-[28rem] rounded-full bg-[radial-gradient(circle,rgb(37_99_235/0.12),transparent_62%)] blur-[70px] [--d:-8s]" />
-          <div className="bg-grid absolute inset-0 opacity-80 [mask-image:radial-gradient(70%_70%_at_50%_0%,black,transparent_78%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+          <div className="anim-drift absolute -top-56 right-[-14%] size-[44rem] rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.24),transparent_62%)] blur-[70px]" />
+          <div className="anim-drift absolute bottom-[-30%] left-[-18%] size-[38rem] rounded-full bg-[radial-gradient(circle,rgb(37_99_235/0.22),transparent_62%)] blur-[80px] [--d:-9s]" />
+          <div className="bg-ink-grid absolute inset-0 opacity-80 [mask-image:radial-gradient(75%_65%_at_50%_0%,black,transparent_78%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </div>
 
-        <div className="page-container space-y-3 pt-20 pb-24 sm:pt-28 sm:pb-32">
-          <h1 className="anim-rise font-display max-w-[20ch] text-[1.85rem] leading-[1.12] font-bold tracking-tight sm:text-[2.3rem]">
-            {tenant.tagline ?? `Sewa motor & mobil di ${tenant.city}`}
-          </h1>
-          <p className="anim-rise max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base [--d:120ms]">
+        <div className="page-container pt-20 pb-28 sm:pt-24 sm:pb-32">
+          <span className="anim-rise inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.07] px-3.5 py-1.5 text-xs font-medium text-ink-foreground/90 backdrop-blur">
+            <span aria-hidden className="relative flex size-2 items-center justify-center">
+              <span className="anim-ping absolute inset-0 rounded-full bg-accent" />
+              <span className="size-1.5 rounded-full bg-accent" />
+            </span>
+            {tenant.acceptingBookings ? "Menerima pesanan" : "Sedang tutup"} · {tenant.city}
+          </span>
+
+          <HeroTitle segments={titleSegments} />
+
+          <p
+            style={{ "--d": "480ms" } as CSSProperties}
+            className="anim-rise mt-6 max-w-xl text-[0.98rem] leading-relaxed text-ink-muted sm:text-base"
+          >
             Pilih tanggal, lihat kendaraan yang benar-benar bebas pada rentang itu, lalu pesan.
             {tenant.address ? ` Kantor kami di ${tenant.address}.` : ""}
           </p>

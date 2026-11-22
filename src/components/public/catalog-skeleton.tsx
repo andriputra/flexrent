@@ -7,10 +7,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function CatalogSkeleton() {
   return (
     <>
-      <div className="bg-background">
-        <div className="page-container space-y-3 pt-20 pb-24 sm:pt-28 sm:pb-32">
-          <Skeleton className="h-9 w-72 max-w-full sm:h-11" />
-          <Skeleton className="h-4 w-full max-w-xl" />
+      <div className="overflow-hidden bg-ink">
+        <div className="page-container pt-20 pb-28 sm:pt-24 sm:pb-32">
+          <div className="h-7 w-52 max-w-full animate-pulse rounded-full bg-white/10" />
+          <div className="mt-6 space-y-2.5">
+            <div className="h-9 w-[18ch] max-w-full animate-pulse rounded-lg bg-white/10 sm:h-11" />
+            <div className="h-9 w-[13ch] max-w-full animate-pulse rounded-lg bg-white/10 sm:h-11" />
+          </div>
+          <div className="mt-6 h-4 w-full max-w-xl animate-pulse rounded bg-white/10" />
         </div>
       </div>
 
