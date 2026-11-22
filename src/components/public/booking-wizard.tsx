@@ -1,10 +1,31 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import type { ReactNode } from "react"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, FileText, Loader2, Upload, X } from "lucide-react"
+import {
+  AlertTriangle,
+  CalendarDays,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardCheck,
+  Clock,
+  CreditCard,
+  FileText,
+  Loader2,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Receipt,
+  ShieldCheck,
+  Upload,
+  UserRound,
+  X,
+} from "lucide-react"
 import { Stepper } from "@/components/shared/stepper"
+import { SectionHeading } from "@/components/shared/layout-parts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -179,22 +200,28 @@ export function BookingWizard({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-pop sm:p-6">
       <Stepper steps={STEPS} current={step} />
 
       {errors.startDay || errors.returnDay ? (
-        <p role="alert" className="flex items-start gap-2 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+        <p
+          role="alert"
+          className="anim-fade mt-4 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+        >
           <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" />
           {errors.startDay ?? errors.returnDay}
         </p>
       ) : null}
 
-      {step === 0 ? <DateStep values={values} set={set} errors={errors} hasDriver={vehicle.hasDriver} /> : null}
-      {step === 1 ? <IdentityStep values={values} set={set} docs={docs} setDocs={setDocs} errors={errors} /> : null}
-      {step === 2 ? <PaymentStep quote={quote} values={values} tenantName={tenantName} /> : null}
-      {step === 3 ? (
-        <ConfirmStep values={values} quote={quote} docs={docs} tenantName={tenantName} terms={terms} set={set} errors={errors} />
-      ) : null}
+      {/* Kunci pada langkah supaya animasi masuk diputar ulang tiap ganti langkah. */}
+      <div key={step} className="anim-rise mt-4 sm:mt-5">
+        {step === 0 ? <DateStep values={values} set={set} errors={errors} hasDriver={vehicle.hasDriver} /> : null}
+        {step === 1 ? <IdentityStep values={values} set={set} docs={docs} setDocs={setDocs} errors={errors} /> : null}
+        {step === 2 ? <PaymentStep quote={quote} values={values} tenantName={tenantName} /> : null}
+        {step === 3 ? (
+          <ConfirmStep values={values} quote={quote} docs={docs} tenantName={tenantName} terms={terms} set={set} errors={errors} />
+        ) : null}
+      </div>
 
       {/* Jebakan bot: manusia tidak pernah melihat atau mengisi input ini. */}
       <input
@@ -207,18 +234,30 @@ export function BookingWizard({
         className="hidden"
       />
 
-      <div className="flex items-center justify-between gap-3 border-t pt-4">
-        <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0 || pending}>
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
+        <Button
+          variant="ghost"
+          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={step === 0 || pending}
+          className="h-10 rounded-full px-4 transition-transform duration-300 hover:-translate-x-0.5 motion-reduce:transition-none"
+        >
           <ChevronLeft aria-hidden />
           Sebelumnya
         </Button>
         {step < STEPS.length - 1 ? (
-          <Button onClick={goNext} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            onClick={goNext}
+            className="h-10 rounded-full bg-primary px-5 text-[0.9rem] font-semibold text-primary-foreground shadow-[0_16px_32px_-18px_var(--primary)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          >
             Lanjut
-            <ChevronRight aria-hidden />
+            <ChevronRight aria-hidden data-icon="inline-end" />
           </Button>
         ) : (
-          <Button onClick={submit} disabled={pending} className="bg-accent text-accent-foreground hover:bg-accent-hover">
+          <Button
+            onClick={submit}
+            disabled={pending}
+            className="h-10 rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          >
             {pending ? <Loader2 aria-hidden className="animate-spin" /> : <Check aria-hidden />}
             Pesan sekarang
           </Button>
@@ -230,19 +269,28 @@ export function BookingWizard({
 
 function Segmented({
   label,
+  icon,
   value,
   options,
   onChange,
 }: {
   label: string
+  icon?: ReactNode
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-sm leading-5 font-medium">{label}</p>
-      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={label}>
+      <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        {icon}
+        {label}
+      </p>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="inline-flex w-full gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
+      >
         {options.map((option) => (
           <button
             key={option.value}
@@ -250,10 +298,11 @@ function Segmented({
             role="radio"
             aria-checked={value === option.value}
             onClick={() => onChange(option.value)}
-            className={[
-              "rounded-xl border px-2 py-1.5 text-sm transition-colors motion-reduce:transition-none",
-              value === option.value ? "border-accent bg-accent/15 font-medium" : "hover:bg-muted",
-            ].join(" ")}
+            className={
+              value === option.value
+                ? "flex-1 rounded-full bg-primary px-2 py-1.5 text-[0.82rem] font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200 sm:px-3 sm:text-sm"
+                : "flex-1 rounded-full px-2 py-1.5 text-[0.82rem] font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:px-3 sm:text-sm"
+            }
           >
             {option.label}
           </button>
@@ -289,17 +338,26 @@ function DateStep({
   return (
     <section className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor="start-day">Tanggal ambil</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="start-day" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <CalendarDays aria-hidden className="size-3.5" />
+            Tanggal ambil
+          </Label>
           <Input id="start-day" type="date" min={today} value={values.startDay} onChange={(e) => set("startDay", e.target.value)} />
           <FieldError message={errors.startDay} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="start-time">Jam ambil</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="start-time" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Clock aria-hidden className="size-3.5" />
+            Jam ambil
+          </Label>
           <Input id="start-time" type="time" value={values.startTime} onChange={(e) => set("startTime", e.target.value)} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="return-day">Tanggal kembali</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="return-day" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <CalendarDays aria-hidden className="size-3.5" />
+            Tanggal kembali
+          </Label>
           <Input
             id="return-day"
             type="date"
@@ -309,19 +367,29 @@ function DateStep({
           />
           <FieldError message={errors.returnDay} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="return-time">Jam kembali</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="return-time" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Clock aria-hidden className="size-3.5" />
+            Jam kembali
+          </Label>
           <Input id="return-time" type="time" value={values.returnTime} onChange={(e) => set("returnTime", e.target.value)} />
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground tabular-nums">
-        Durasi {days} hari — dihitung otomatis dari tanggal dan jam ambil sampai tanggal dan jam kembali.
-      </p>
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-muted/25 px-3 py-2.5">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/35 bg-accent/12 px-2.5 py-1 text-xs font-semibold tabular-nums">
+          <CalendarDays aria-hidden className="size-3.5" />
+          {days} hari
+        </span>
+        <p className="min-w-0 flex-1 text-xs leading-5 text-muted-foreground">
+          Durasi dihitung otomatis dari tanggal dan jam ambil sampai tanggal dan jam kembali.
+        </p>
+      </div>
 
       {hasDriver ? (
         <Segmented
           label="Layanan sopir"
+          icon={<UserRound aria-hidden className="size-3.5" />}
           value={values.withDriver ? "ya" : "tidak"}
           options={[
             { value: "tidak", label: "Tanpa sopir" },
@@ -333,6 +401,7 @@ function DateStep({
 
       <Segmented
         label="Cara pengambilan"
+        icon={<MapPin aria-hidden className="size-3.5" />}
         value={values.deliveryMode}
         options={[
           { value: "SELF_PICKUP", label: "Ambil di kantor" },
@@ -342,9 +411,12 @@ function DateStep({
       />
 
       {values.deliveryMode === "DELIVERY" ? (
-        <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
-          <div className="space-y-1">
-            <Label htmlFor="delivery-area">Area antar (opsional)</Label>
+        <div className="anim-rise space-y-3 rounded-xl border border-border/60 bg-muted/25 p-3.5">
+          <div className="space-y-1.5">
+            <Label htmlFor="delivery-area" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <MapPin aria-hidden className="size-3.5" />
+              Area antar (opsional)
+            </Label>
             <Input
               id="delivery-area"
               value={values.deliveryArea}
@@ -352,7 +424,7 @@ function DateStep({
               placeholder="mis. Dago, Bandung"
             />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor="delivery-address">Alamat tujuan</Label>
             <Textarea
               id="delivery-address"
@@ -363,7 +435,7 @@ function DateStep({
             />
             <FieldError message={errors.deliveryAddress} />
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs leading-5 text-muted-foreground">
             Biaya antar-jemput dikonfirmasi staf lewat WhatsApp sebelum kendaraan berangkat.
           </p>
         </div>
@@ -386,12 +458,17 @@ function DocInput({
   error?: string
 }) {
   return (
-    <div className="space-y-1">
-      <Label htmlFor={id}>{label}</Label>
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        <FileText aria-hidden className="size-3.5" />
+        {label}
+      </Label>
       {file ? (
-        <div className="flex items-center justify-between gap-2 rounded-xl border bg-muted/30 px-3 py-2">
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-success/30 bg-success/8 px-3 py-2">
           <span className="flex min-w-0 items-center gap-2 text-sm">
-            <FileText aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-card text-success shadow-card">
+              <Check aria-hidden className="size-4" />
+            </span>
             <span className="truncate">{file.name}</span>
             <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
               {Math.round(file.size / 1024)} KB
@@ -404,9 +481,11 @@ function DocInput({
       ) : (
         <label
           htmlFor={id}
-          className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed px-3 py-3 text-sm text-muted-foreground hover:bg-muted/40"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-border px-3 py-3.5 text-sm text-muted-foreground transition-colors duration-300 hover:border-accent/50 hover:bg-muted/40 hover:text-foreground motion-reduce:transition-none"
         >
-          <Upload aria-hidden className="size-4" />
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/60">
+            <Upload aria-hidden className="size-4" />
+          </span>
           {DOC_HINT}
         </label>
       )}
@@ -447,13 +526,19 @@ function IdentityStep({
   return (
     <section className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor="name">Nama lengkap</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="name" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <UserRound aria-hidden className="size-3.5" />
+            Nama lengkap
+          </Label>
           <Input id="name" value={values.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" />
           <FieldError message={errors.name} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="phone">Nomor WhatsApp aktif</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="phone" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <MessageCircle aria-hidden className="size-3.5" />
+            Nomor WhatsApp aktif
+          </Label>
           <Input
             id="phone"
             inputMode="tel"
@@ -464,13 +549,19 @@ function IdentityStep({
           />
           <FieldError message={errors.phone} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="email">Email (opsional)</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Mail aria-hidden className="size-3.5" />
+            Email (opsional)
+          </Label>
           <Input id="email" type="email" value={values.email} onChange={(e) => set("email", e.target.value)} />
           <FieldError message={errors.email} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="idNumber">Nomor KTP (opsional)</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="idNumber" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <CreditCard aria-hidden className="size-3.5" />
+            Nomor KTP (opsional)
+          </Label>
           <Input
             id="idNumber"
             inputMode="numeric"
@@ -492,12 +583,13 @@ function IdentityStep({
           onSelect={(file) => setDocs({ ...docs, sim: file })}
         />
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="flex items-start gap-2 text-xs leading-5 text-muted-foreground">
+        <ShieldCheck aria-hidden className="mt-0.5 size-3.5 shrink-0 text-primary" />
         Dokumen boleh diunggah nanti saat serah terima. File disimpan di ruang privat dan hanya dibuka staf rental
         lewat tautan singkat.
       </p>
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <Label htmlFor="notes">Catatan untuk staf</Label>
         <Textarea
           id="notes"
@@ -547,9 +639,9 @@ function QuoteLines({ quote }: { quote: ReturnType<typeof useVehicleQuote> }) {
         <span className="text-muted-foreground">Deposit (kembali setelah kendaraan lunas)</span>
         <span className="tabular-nums">{formatRupiah(data.depositAmount)}</span>
       </li>
-      <li className="mt-1 flex items-baseline justify-between gap-3 border-t pt-2 font-semibold">
+      <li className="mt-1.5 flex items-baseline justify-between gap-3 border-t border-border/60 pt-2.5 font-semibold">
         <span>Total bayar</span>
-        <span className="text-lg tabular-nums">{formatRupiah(data.totalAmount)}</span>
+        <span className="text-[1.15rem] leading-6 tabular-nums">{formatRupiah(data.totalAmount)}</span>
       </li>
     </ul>
   )
@@ -566,13 +658,15 @@ function PaymentStep({
 }) {
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border bg-card p-4">
-        <h2 className="mb-3 text-base font-semibold">Rincian biaya</h2>
+      <div className="rounded-xl border border-border/60 bg-muted/25 p-3.5 sm:p-4">
+        <SectionHeading icon={<Receipt aria-hidden />}>Rincian biaya</SectionHeading>
         <QuoteLines quote={quote} />
       </div>
 
-      <div className="space-y-2 rounded-2xl border bg-muted/30 p-4 text-sm">
-        <p className="font-medium">Cara pembayaran</p>
+      <div className="space-y-2 rounded-xl border border-border/60 bg-muted/25 p-3.5 text-sm sm:p-4">
+        <SectionHeading icon={<CreditCard aria-hidden />} className="mb-1">
+          Cara pembayaran
+        </SectionHeading>
         <p className="text-muted-foreground">
           Setelah pesanan dikirim, staf {tenantName} menghubungi nomor WhatsApp Anda untuk konfirmasi stok dan
           memberitahu rekening atau QRIS pembayaran. Pesanan berstatus menunggu pembayaran selama 2 jam.
@@ -626,37 +720,37 @@ function ConfirmStep({
 
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border bg-card p-4">
-        <h2 className="mb-3 text-base font-semibold">Periksa pesanan</h2>
-        <dl className="divide-y">
+      <div className="rounded-xl border border-border/60 bg-muted/25 p-3.5 sm:p-4">
+        <SectionHeading icon={<ClipboardCheck aria-hidden />}>Periksa pesanan</SectionHeading>
+        <dl className="divide-y divide-border/50">
           {rows.map((row) => (
             <div key={row.label} className="flex items-start justify-between gap-4 py-2 text-sm">
               <dt className="text-muted-foreground">{row.label}</dt>
-              <dd className="max-w-[60%] text-right">{row.value}</dd>
+              <dd className="max-w-[60%] text-right font-medium">{row.value}</dd>
             </div>
           ))}
         </dl>
-        <div className="mt-3 border-t pt-3">
+        <div className="mt-3 border-t border-border/50 pt-3">
           <QuoteLines quote={quote} />
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-card p-4">
-        <h2 className="mb-2 text-base font-semibold">Syarat sewa {tenantName}</h2>
-        <ul className="space-y-1.5 text-sm text-muted-foreground">
+      <div className="rounded-xl border border-border/60 bg-muted/25 p-3.5 sm:p-4">
+        <SectionHeading icon={<ShieldCheck aria-hidden />}>Syarat sewa {tenantName}</SectionHeading>
+        <ul className="grid gap-1.5 text-sm text-muted-foreground sm:grid-cols-2">
           {terms.map((term) => (
             <li key={term} className="flex gap-2">
-              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
+              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" />
               <span>{term}</span>
             </li>
           ))}
         </ul>
-        <label className="mt-3 flex items-start gap-2 text-sm">
+        <label className="mt-3.5 flex cursor-pointer items-start gap-2.5 rounded-xl border border-border/60 bg-card p-3 text-sm transition-colors duration-300 hover:border-accent/40 motion-reduce:transition-none">
           <input
             type="checkbox"
             checked={values.agree}
             onChange={(event) => set("agree", event.target.checked)}
-            className="mt-0.5 size-4 rounded border-input"
+            className="mt-0.5 size-4 shrink-0 rounded border-input accent-[var(--accent)]"
           />
           <span>Saya menyetujui syarat sewa di atas dan data yang saya isi benar.</span>
         </label>

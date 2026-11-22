@@ -63,6 +63,100 @@ export function EmptyState({
   )
 }
 
+/** Kartu isi untuk halaman publik: permukaan kartu + garis tepi lembut. */
+export function PublicPanel({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <section
+      className={cn(
+        "rounded-2xl border border-border/70 bg-card p-4 shadow-card sm:p-5",
+        className
+      )}
+    >
+      {children}
+    </section>
+  )
+}
+
+export function SectionHeading({
+  icon,
+  children,
+  description,
+  action,
+  className,
+}: {
+  icon?: ReactNode
+  children: ReactNode
+  description?: ReactNode
+  action?: ReactNode
+  className?: string
+}) {
+  return (
+    <div className={cn("mb-3 flex items-start gap-2.5", className)}>
+      {icon ? (
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary [&_svg]:size-4">
+          {icon}
+        </span>
+      ) : null}
+      <div className="min-w-0 flex-1 space-y-0.5">
+        <h2 className="text-base leading-6 font-semibold tracking-tight">{children}</h2>
+        {description ? (
+          <p className="text-sm leading-5 text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      {action}
+    </div>
+  )
+}
+
+/** Banner informasi berwarna — dipakai untuk status pesanan dan peringatan rental. */
+export function Notice({
+  icon,
+  tone = "muted",
+  children,
+  className,
+}: {
+  icon?: ReactNode
+  tone?: "muted" | "warning" | "info" | "danger"
+  children: ReactNode
+  className?: string
+}) {
+  const tones = {
+    muted: "border-border/70 bg-muted/50",
+    warning: "border-warning/30 bg-warning/10",
+    info: "border-info/30 bg-info/10",
+    danger: "border-destructive/30 bg-destructive/10 text-destructive",
+  } as const
+  const iconTone = {
+    muted: "text-muted-foreground",
+    warning: "text-warning",
+    info: "text-info",
+    danger: "text-destructive",
+  } as const
+
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-2.5 rounded-2xl border p-3.5 text-sm leading-6",
+        tones[tone],
+        className
+      )}
+    >
+      {icon ? (
+        <span className={cn("mt-0.5 shrink-0 [&_svg]:size-4", iconTone[tone])} aria-hidden>
+          {icon}
+        </span>
+      ) : null}
+      <div className="min-w-0 flex-1 space-y-1.5">{children}</div>
+    </div>
+  )
+}
+
 export function StatCard({
   label,
   value,

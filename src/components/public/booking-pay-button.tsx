@@ -31,7 +31,11 @@ export function BookingPayButton({
     <div className="space-y-2">
       <Button
         variant={variant === "outline" ? "outline" : "default"}
-        className={variant === "outline" ? "w-full" : "w-full bg-accent text-accent-foreground hover:bg-accent-hover"}
+        className={
+          variant === "outline"
+            ? "h-10 w-full rounded-full transition-transform duration-300 hover:-translate-y-0.5 motion-reduce:transition-none"
+            : "h-10 w-full rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+        }
         disabled={pending}
         onClick={() =>
           startTransition(async () => {

@@ -1,4 +1,6 @@
+import { CalendarDays } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { PublicPanel, SectionHeading } from "@/components/shared/layout-parts"
 import { VehicleAvailabilityCalendar } from "@/components/vehicles/availability-calendar"
 import { addDays } from "@/lib/datetime"
 import { getPublicCalendarIntervals } from "@/server/queries/public"
@@ -14,25 +16,29 @@ export async function VehicleAvailabilitySection({
   const intervals = await getPublicCalendarIntervals(tenantId, vehicleId, now, addDays(now, 92))
 
   return (
-    <section className="rounded-2xl border bg-card p-4 sm:p-5">
-      <h2 className="mb-1 text-base font-semibold">Kalender ketersediaan</h2>
-      <p className="mb-4 text-sm text-muted-foreground">
-        Tiga bulan ke depan. Tanggal terpesan tidak bisa dipilih.
-      </p>
+    <PublicPanel className="reveal">
+      <SectionHeading icon={<CalendarDays aria-hidden />} description="Tiga bulan ke depan. Tanggal terpesan tidak bisa dipilih.">
+        Kalender ketersediaan
+      </SectionHeading>
       <VehicleAvailabilityCalendar intervals={intervals} />
-    </section>
+    </PublicPanel>
   )
 }
 
 export function VehicleAvailabilitySkeleton() {
   return (
-    <section className="rounded-2xl border bg-card p-4 sm:p-5">
-      <Skeleton className="mb-2 h-5 w-44" />
-      <Skeleton className="mb-4 h-4 w-full max-w-md" />
+    <PublicPanel>
+      <div className="mb-4 flex items-center gap-2.5">
+        <Skeleton className="size-8 rounded-xl" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-5 w-44" />
+          <Skeleton className="h-3.5 w-56" />
+        </div>
+      </div>
       <div className="space-y-3">
         <Skeleton className="h-52 w-full rounded-xl" />
         <Skeleton className="h-52 w-full rounded-xl" />
       </div>
-    </section>
+    </PublicPanel>
   )
 }

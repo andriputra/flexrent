@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { KeyRound } from "lucide-react"
+import { KeyRound, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,7 +24,7 @@ export function BookingLookupForm({
 
   return (
     <form
-      className="space-y-4 rounded-2xl border bg-card p-4 shadow-card sm:p-5"
+      className="reveal space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-pop sm:p-5"
       onSubmit={(event) => {
         event.preventDefault()
         const cleanCode = code.trim().toUpperCase()
@@ -37,19 +37,26 @@ export function BookingLookupForm({
         router.push(`/${slug}/booking/${encodeURIComponent(cleanCode)}?phone=${encodeURIComponent(cleanPhone)}`)
       }}
     >
-      <div className="space-y-1">
-        <Label htmlFor="code">Kode booking</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="code" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <KeyRound aria-hidden className="size-3.5" />
+          Kode booking
+        </Label>
         <Input
           id="code"
           value={code}
           onChange={(event) => setCode(event.target.value.toUpperCase())}
           autoComplete="off"
           placeholder="BR-2611-0007"
+          className="font-medium tracking-wide tabular-nums"
           required
         />
       </div>
-      <div className="space-y-1">
-        <Label htmlFor="phone">Nomor WhatsApp saat memesan</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="phone" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <Phone aria-hidden className="size-3.5" />
+          Nomor WhatsApp saat memesan
+        </Label>
         <Input
           id="phone"
           value={phone}
@@ -57,6 +64,7 @@ export function BookingLookupForm({
           inputMode="tel"
           autoComplete="tel"
           placeholder="081234567890"
+          className="tabular-nums"
           required
         />
       </div>
@@ -65,7 +73,10 @@ export function BookingLookupForm({
           {error}
         </p>
       ) : null}
-      <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent-hover">
+      <Button
+        type="submit"
+        className="h-10 w-full rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      >
         <KeyRound aria-hidden />
         Cari pesanan saya
       </Button>

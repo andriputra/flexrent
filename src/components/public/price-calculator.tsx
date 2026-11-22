@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { ArrowRight, CalendarDays, Clock, Loader2, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,10 +44,16 @@ export function PriceCalculator({
   const wizardHref = `/${slug}/pesan/${vehicleId}?ambil=${startDay}&kembali=${returnDay}&jamAmbil=${startTime}&jamKembali=${returnTime}&sopir=${withDriver ? 1 : 0}`
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
-          <Label htmlFor="calc-start">Tanggal ambil</Label>
+    <div className="space-y-3.5">
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="calc-start"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <CalendarDays aria-hidden className="size-3.5" />
+            Tanggal ambil
+          </Label>
           <Input
             id="calc-start"
             type="date"
@@ -56,12 +62,21 @@ export function PriceCalculator({
             onChange={(event) => setStartDay(event.target.value)}
           />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="calc-start-time">Jam</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="calc-start-time" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Clock aria-hidden className="size-3.5" />
+            Jam
+          </Label>
           <Input id="calc-start-time" type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="calc-end">Tanggal kembali</Label>
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="calc-end"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <CalendarDays aria-hidden className="size-3.5" />
+            Tanggal kembali
+          </Label>
           <Input
             id="calc-end"
             type="date"
@@ -72,16 +87,26 @@ export function PriceCalculator({
             }}
           />
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="calc-end-time">Jam</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="calc-end-time" className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Clock aria-hidden className="size-3.5" />
+            Jam
+          </Label>
           <Input id="calc-end-time" type="time" value={returnTime} onChange={(event) => setReturnTime(event.target.value)} />
         </div>
       </div>
 
       {hasDriver ? (
         <fieldset className="space-y-1.5">
-          <legend className="text-sm leading-5 font-medium">Layanan sopir</legend>
-          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Layanan sopir">
+          <legend className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <UserRound aria-hidden className="size-3.5" />
+            Layanan sopir
+          </legend>
+          <div
+            role="radiogroup"
+            aria-label="Layanan sopir"
+            className="inline-flex w-full gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
+          >
             {[
               { label: "Tanpa sopir", value: false },
               { label: "Dengan sopir", value: true },
@@ -92,12 +117,11 @@ export function PriceCalculator({
                 role="radio"
                 aria-checked={withDriver === option.value}
                 onClick={() => setWithDriver(option.value)}
-                className={[
-                  "rounded-xl border px-2 py-1.5 text-sm transition-colors motion-reduce:transition-none",
+                className={
                   withDriver === option.value
-                    ? "border-accent bg-accent/15 font-medium"
-                    : "hover:bg-muted",
-                ].join(" ")}
+                    ? "flex-1 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200"
+                    : "flex-1 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+                }
               >
                 {option.label}
               </button>
@@ -112,7 +136,7 @@ export function PriceCalculator({
         </p>
       ) : null}
 
-      <ul className="space-y-1 rounded-xl border bg-muted/30 p-3 text-sm">
+      <ul className="space-y-1 rounded-xl border border-border/60 bg-muted/30 p-3 text-sm">
         {quote ? (
           <>
             <Row label={`Sewa ${quote.rental.scheme}`} value={formatRupiah(quote.rentalAmount)} />
@@ -121,9 +145,9 @@ export function PriceCalculator({
               <span>Deposit (kembali bila lancar)</span>
               <span className="tabular-nums">{formatRupiah(quote.depositAmount)}</span>
             </li>
-            <li className="mt-1 flex items-baseline justify-between border-t pt-2 font-semibold">
+            <li className="mt-1.5 flex items-baseline justify-between gap-3 border-t border-border/60 pt-2.5 font-semibold">
               <span>Total bayar</span>
-              <span className="text-lg tabular-nums">{formatRupiah(quote.totalAmount)}</span>
+              <span className="text-[1.15rem] leading-6 tabular-nums">{formatRupiah(quote.totalAmount)}</span>
             </li>
           </>
         ) : (
@@ -134,10 +158,16 @@ export function PriceCalculator({
         )}
       </ul>
 
-      <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent-hover">
-        <Link href={wizardHref}>Lanjut isi data penyewaan</Link>
+      <Button
+        asChild
+        className="h-10 w-full rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      >
+        <Link href={wizardHref}>
+          Lanjut isi data penyewaan
+          <ArrowRight aria-hidden data-icon="inline-end" />
+        </Link>
       </Button>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs leading-5 text-muted-foreground">
         Harga dihitung otomatis dari tarif harian, mingguan, dan bulanan — kombinasi termurah yang dipakai.
       </p>
     </div>
