@@ -164,9 +164,9 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
               }
             />
           ) : (
-            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
               {rows.map((vehicle, index) => (
-                <li key={vehicle.id} className="reveal" style={order(index % 3)}>
+                <li key={vehicle.id} className="reveal" style={order(index % 2)}>
                   <VehicleCard
                     vehicle={vehicle}
                     slug={tenant.slug}

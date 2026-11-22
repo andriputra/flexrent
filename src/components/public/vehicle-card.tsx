@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Bike, Car, Fuel, Gauge, UserRound, Users } from "lucide-react"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { VehicleTypeBadge } from "@/components/shared/status-badge"
 import { formatRupiah } from "@/lib/format"
@@ -7,26 +8,28 @@ import type { listCatalogVehicles } from "@/server/queries/public"
 
 type CardVehicle = Awaited<ReturnType<typeof listCatalogVehicles>>["rows"][number]
 
-function specItems(vehicle: CardVehicle): { icon: React.ReactNode; text: string }[] {
-  const items = [
+function specItems(vehicle: CardVehicle): { icon: React.ReactNode; text: string; secondary?: boolean }[] {
+  const items: { icon: React.ReactNode; text: string; secondary?: boolean }[] = [
     {
-      icon: <Car aria-hidden className="size-3.5" />,
+      icon: <Car aria-hidden className="size-3 sm:size-3.5" />,
       text: vehicle.transmission === "MATIC" ? "Matic" : "Manual",
     },
   ]
   if (vehicle.type === "MOTOR") {
     items.push({
-      icon: <Gauge aria-hidden className="size-3.5" />,
+      icon: <Gauge aria-hidden className="size-3 sm:size-3.5" />,
       text: vehicle.engineCc ? `${vehicle.engineCc} CC` : "Motor",
     })
   } else {
     items.push({
-      icon: <Users aria-hidden className="size-3.5" />,
+      icon: <Users aria-hidden className="size-3 sm:size-3.5" />,
       text: vehicle.seats ? `${vehicle.seats} kursi` : "Mobil",
     })
   }
+  // Dua spesifikasi terakhir disembunyikan di layar sempit: kartu tampil dua kolom
+  // dan chip selebihnya tidak muat tanpa memotong nama kendaraan.
   items.push({
-    icon: <Fuel aria-hidden className="size-3.5" />,
+    icon: <Fuel aria-hidden className="size-3 sm:size-3.5" />,
     text:
       vehicle.fuelType === "PETROL"
         ? "Bensin"
@@ -35,11 +38,13 @@ function specItems(vehicle: CardVehicle): { icon: React.ReactNode; text: string 
           : vehicle.fuelType === "HYBRID"
             ? "Hybrid"
             : "Listrik",
+    secondary: true,
   })
   if (vehicle.hasDriver) {
     items.push({
-      icon: <UserRound aria-hidden className="size-3.5" />,
+      icon: <UserRound aria-hidden className="size-3 sm:size-3.5" />,
       text: "Bisa dengan sopir",
+      secondary: true,
     })
   }
   return items
@@ -86,30 +91,33 @@ export function VehicleCard({
               className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-foreground/[0.07] to-transparent"
             />
             <div className="absolute inset-0 flex items-center justify-center p-4">
-              <span className="flex size-16 items-center justify-center rounded-2xl border border-border/70 bg-card/85 text-primary shadow-pop ring-1 ring-inset ring-background/70 backdrop-blur-sm transition-all duration-500 group-hover/card:-translate-y-1 group-hover/card:text-accent-hover motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0">
-                <PlaceholderIcon aria-hidden className="size-7" />
+              <span className="flex size-11 items-center justify-center rounded-2xl border border-border/70 bg-card/85 text-primary shadow-pop ring-1 ring-inset ring-background/70 backdrop-blur-sm transition-all duration-500 group-hover/card:-translate-y-1 group-hover/card:text-accent-hover motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0 sm:size-16">
+                <PlaceholderIcon aria-hidden className="size-5 sm:size-7" />
               </span>
             </div>
           </>
         )}
-        <VehicleTypeBadge type={vehicle.type} className="absolute top-3 left-3 shadow-card" />
+        <VehicleTypeBadge type={vehicle.type} className="absolute top-2 left-2 shadow-card sm:top-3 sm:left-3" />
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-1 flex-col gap-2.5 p-3 sm:gap-3 sm:p-4">
         <div className="space-y-0.5">
-          <h3 className="font-display leading-6 font-semibold tracking-tight">
+          <h3 className="font-display text-[0.9rem] leading-5 font-semibold tracking-tight sm:text-base sm:leading-6">
             {vehicle.brand} {vehicle.model}
           </h3>
-          <p className="text-sm text-muted-foreground tabular-nums">
+          <p className="text-xs text-muted-foreground tabular-nums sm:text-sm">
             {vehicle.year} · {vehicle.plate}
           </p>
         </div>
 
-        <ul className="flex flex-wrap gap-1.5">
+        <ul className="flex flex-wrap gap-1 sm:gap-1.5">
           {specItems(vehicle).map((item) => (
             <li
               key={item.text}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground"
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.68rem] text-muted-foreground sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs",
+                item.secondary && "hidden sm:inline-flex"
+              )}
             >
               {item.icon}
               {item.text}
@@ -117,16 +125,16 @@ export function VehicleCard({
           ))}
         </ul>
 
-        <div className="mt-auto space-y-3 border-t border-border/60 pt-3.5">
+        <div className="mt-auto space-y-2 border-t border-border/60 pt-2.5 sm:space-y-3 sm:pt-3.5">
           <div className="space-y-0.5">
             <p className="flex items-baseline gap-1">
-              <span className="text-[1.3rem] leading-7 font-extrabold tracking-tight tabular-nums">
+              <span className="text-[1.05rem] leading-6 font-extrabold tracking-tight tabular-nums sm:text-[1.3rem] sm:leading-7">
                 {formatRupiah(vehicle.priceDaily)}
               </span>
-              <span className="text-xs font-medium text-muted-foreground">/hari</span>
+              <span className="text-[0.68rem] font-medium text-muted-foreground sm:text-xs">/hari</span>
             </p>
             {alternates.length ? (
-              <p className="text-xs text-muted-foreground tabular-nums">
+              <p className="text-[0.68rem] text-muted-foreground tabular-nums sm:text-xs">
                 {alternates.map((value) => formatRupiah(value)).join(" · ")}
               </p>
             ) : null}
@@ -134,7 +142,7 @@ export function VehicleCard({
 
           <Button
             asChild
-            className="h-9 w-full rounded-full bg-accent text-[0.85rem] font-semibold text-accent-foreground shadow-[0_14px_28px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            className="h-8 w-full rounded-full bg-accent text-[0.78rem] font-semibold text-accent-foreground shadow-[0_14px_28px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:h-9 sm:text-[0.85rem]"
           >
             <Link href={href}>Pesan</Link>
           </Button>
