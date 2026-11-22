@@ -128,6 +128,13 @@ export default async function TenantPublicLayout({
               </p>
             </div>
           </div>
+
+          <div className="border-t border-border/70">
+            <div className="page-container flex flex-col gap-2 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <p>© {new Date().getFullYear()} Flexbox Indonesia. Seluruh hak cipta dilindungi.</p>
+              <p>Dibuat untuk {tenant.name}</p>
+            </div>
+          </div>
         </footer>
 
         <WhatsAppFloat phone={tenant.phone} name={tenant.name} />

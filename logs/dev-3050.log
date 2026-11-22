@@ -621,3 +621,15 @@
  GET /bandung-ride 200 in 1684ms
  GET /bandung-ride 200 in 1211ms
  GET /bandung-ride 200 in 778ms
+ ✓ Compiled in 3.1s (408 modules)
+(node:9836) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 6662ms
+ GET /bandung-ride 200 in 5516ms
+ GET /bandung-ride 200 in 3871ms
+ ✓ Compiled in 6.6s (1345 modules)
+ GET /bandung-ride 200 in 1839ms
+ GET /bandung-ride 200 in 940ms
+ GET /bandung-ride 200 in 397ms
+(node:11132) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
