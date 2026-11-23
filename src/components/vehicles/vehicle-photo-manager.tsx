@@ -252,7 +252,6 @@ const buttonVariantsLink =
 function UploadProgress({ progress }: { progress: Progress }) {
   const mengirim = progress.stage === "kirim"
   const pct = Math.round((progress.done / Math.max(1, progress.total)) * 100)
-  const raw = progress.rows.reduce((sum, row) => sum + row.from, 0)
   const prepared = progress.rows.reduce((sum, row) => sum + row.to, 0)
 
   return (
@@ -286,26 +285,20 @@ function UploadProgress({ progress }: { progress: Progress }) {
 
       {progress.rows.length > 0 ? (
         <ul className="space-y-0.5">
-          {progress.rows.map((row) => (
+          {progress.rows.map((row, index) => (
             <li
-              key={row.name}
+              key={`${index}-${row.name}`}
               className="flex items-baseline justify-between gap-2 text-[0.72rem] text-muted-foreground"
             >
               <span className="truncate">{row.name}</span>
               <span className="shrink-0 tabular-nums">
-                <span className="opacity-60">{formatBytes(row.from)}</span>
+                <span className="line-through">{formatBytes(row.from)}</span>
                 {" → "}
                 <span className="text-success">{formatBytes(row.to)}</span>
               </span>
             </li>
           ))}
         </ul>
-      ) : null}
-
-      {mengirim && prepared < raw ? (
-        <p className="text-[0.72rem] text-muted-foreground">
-          Berat berkas ditekan dari {formatBytes(raw)} menjadi {formatBytes(prepared)}.
-        </p>
       ) : null}
     </div>
   )

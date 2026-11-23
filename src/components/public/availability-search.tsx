@@ -46,7 +46,7 @@ export function AvailabilitySearch({
   return (
     <form
       onSubmit={submit}
-      className="reveal relative space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-pop ring-1 ring-accent/15 sm:p-5"
+      className="reveal relative space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-pop ring-1 ring-accent/15 sm:p-5"
     >
       <span
         aria-hidden
@@ -57,8 +57,8 @@ export function AvailabilitySearch({
         className="pointer-events-none absolute -top-20 -right-16 size-44 rounded-full bg-[radial-gradient(circle,rgb(245_158_11/0.16),transparent_70%)] blur-2xl"
       />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1.5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,17rem)_minmax(0,17rem)_auto_1fr] lg:items-end">
+        <div className="space-y-1.5 sm:max-w-[17rem]">
           <Label
             htmlFor="ambil"
             className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
@@ -74,7 +74,7 @@ export function AvailabilitySearch({
             onChange={(event) => setAmbil(event.target.value)}
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 sm:max-w-[17rem]">
           <Label
             htmlFor="kembali"
             className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
@@ -90,34 +90,42 @@ export function AvailabilitySearch({
             onChange={(event) => setKembali(event.target.value)}
           />
         </div>
-      </div>
 
-      <div className="flex flex-wrap items-center gap-2.5">
-        <span className="text-xs font-medium text-muted-foreground">Jenis</span>
-        <div
-          role="group"
-          aria-label="Jenis kendaraan"
-          className="inline-flex gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
-        >
-          {TYPES.map((option) => {
-            const active = jenis === option.value
-            return (
-              <button
-                key={option.label}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setJenis(option.value)}
-                className={
-                  active
-                    ? "rounded-full bg-primary px-3.5 py-1.5 text-sm font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200"
-                    : "rounded-full px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
-                }
-              >
-                {option.label}
-              </button>
-            )
-          })}
+        <div className="space-y-1.5">
+          <span className="block text-xs font-medium text-muted-foreground">Jenis</span>
+          <div
+            role="group"
+            aria-label="Jenis kendaraan"
+            className="inline-flex h-8 items-center gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
+          >
+            {TYPES.map((option) => {
+              const active = jenis === option.value
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setJenis(option.value)}
+                  className={
+                    active
+                      ? "h-6 rounded-full bg-primary px-3 text-xs font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200"
+                      : "h-6 rounded-full px-3 text-xs font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+                  }
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
+
+        <Button
+          type="submit"
+          className="h-10 w-full justify-center rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover sm:w-auto sm:self-end sm:justify-self-end"
+        >
+          <Search aria-hidden />
+          Cek ketersediaan
+        </Button>
       </div>
 
       {rangeInvalid ? (
@@ -129,14 +137,6 @@ export function AvailabilitySearch({
           Isi dua-duanya supaya kami bisa menyaring kendaraan yang sedang terisi.
         </p>
       ) : null}
-
-      <Button
-        type="submit"
-        className="h-10 w-full rounded-full bg-accent px-5 text-[0.9rem] font-semibold text-accent-foreground shadow-[0_16px_34px_-16px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover sm:w-auto"
-      >
-        <Search aria-hidden />
-        Cek ketersediaan
-      </Button>
     </form>
   )
 }

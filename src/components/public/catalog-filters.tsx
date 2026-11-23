@@ -36,12 +36,18 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
   }
 
   return (
-    <div className="reveal relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-card sm:flex-row sm:items-end sm:justify-between">
+    <form
+      className="reveal relative flex flex-wrap items-end gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-card"
+      onSubmit={(event) => {
+        event.preventDefault()
+        apply({ min: digits(min), maks: digits(maks) })
+      }}
+    >
       <span
         aria-hidden
         className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-accent/80 via-accent/30 to-transparent"
       />
-      <div className="space-y-1.5 sm:w-44">
+      <div className="w-full space-y-1.5 sm:flex-1 sm:w-40 sm:max-w-[15rem]">
         <Label htmlFor="transmisi" className="text-xs font-medium text-muted-foreground">
           Transmisi
         </Label>
@@ -51,7 +57,7 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
             apply({ transmisi: value === "all" ? "" : (value as "matic" | "manual") })
           }
         >
-          <SelectTrigger id="transmisi">
+          <SelectTrigger id="transmisi" className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -64,62 +70,55 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
         </Select>
       </div>
 
-      <form
-        className="grid flex-1 gap-3 sm:grid-cols-[minmax(7rem,1fr)_minmax(7rem,1fr)_auto] sm:justify-items-end"
-        onSubmit={(event) => {
-          event.preventDefault()
-          apply({ min: digits(min), maks: digits(maks) })
-        }}
-      >
-        <div className="w-full space-y-1.5 sm:max-w-40">
-          <Label htmlFor="min-harga" className="text-xs font-medium text-muted-foreground">
-            Harga minimal / hari
-          </Label>
-          <Input
-            id="min-harga"
-            inputMode="numeric"
-            placeholder="0"
-            value={min}
-            onChange={(event) => setMin(event.target.value)}
-          />
-        </div>
-        <div className="w-full space-y-1.5 sm:max-w-40">
-          <Label htmlFor="maks-harga" className="text-xs font-medium text-muted-foreground">
-            Harga maksimal / hari
-          </Label>
-          <Input
-            id="maks-harga"
-            inputMode="numeric"
-            placeholder="200000"
-            value={maks}
-            onChange={(event) => setMaks(event.target.value)}
-          />
-        </div>
-        <div className="flex gap-2 self-end">
+      <div className="w-full space-y-1.5 sm:flex-1 sm:w-40 sm:max-w-[15rem]">
+        <Label htmlFor="min-harga" className="text-xs font-medium text-muted-foreground">
+          Harga minimal / hari
+        </Label>
+        <Input
+          id="min-harga"
+          inputMode="numeric"
+          placeholder="0"
+          value={min}
+          onChange={(event) => setMin(event.target.value)}
+        />
+      </div>
+      <div className="w-full space-y-1.5 sm:flex-1 sm:w-40 sm:max-w-[15rem]">
+        <Label htmlFor="maks-harga" className="text-xs font-medium text-muted-foreground">
+          Harga maksimal / hari
+        </Label>
+        <Input
+          id="maks-harga"
+          inputMode="numeric"
+          placeholder="200000"
+          value={maks}
+          onChange={(event) => setMaks(event.target.value)}
+        />
+      </div>
+
+      <div className="flex gap-2 sm:ml-auto">
+        <Button
+          type="submit"
+          variant="outline"
+          className="h-8 rounded-full border-border/70 px-3.5 text-[0.8rem] font-medium transition-colors duration-300 hover:bg-muted"
+        >
+          Terapkan harga
+        </Button>
+        {hasFilter ? (
           <Button
-            type="submit"
-            variant="outline"
-            className="h-8 rounded-full border-border/70 px-3.5 text-[0.8rem] font-medium transition-colors duration-300 hover:bg-muted"
+            type="button"
+            variant="ghost"
+            className="h-8 rounded-full px-3 text-[0.8rem]"
+            onClick={() => {
+              setMin("")
+              setMaks("")
+              apply({ transmisi: "", min: 0, maks: 0, jenis: "" })
+            }}
           >
-            Terapkan harga
+            <RotateCcw aria-hidden />
+            Reset
           </Button>
-          {hasFilter ? (
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-8 rounded-full px-3 text-[0.8rem]"
-              onClick={() => {
-                setMin("")
-                setMaks("")
-                apply({ transmisi: "", min: 0, maks: 0, jenis: "" })
-              }}
-            >
-              <RotateCcw aria-hidden />
-              Reset
-            </Button>
-          ) : null}
-        </div>
-      </form>
-    </div>
+        ) : null}
+      </div>
+    </form>
   )
 }

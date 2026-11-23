@@ -157,3 +157,22 @@ prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
  ✓ Compiled /dashboard/vehicles/[id] in 51.1s
 (node:7588) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 824ms
+(node:6620) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 12405ms
+ ✓ Compiled in 1312ms
+ ✓ Compiled in 296ms
+ ✓ Compiled in 421ms
+(node:9364) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 2881ms
+ ✓ Compiled in 335ms
+ ✓ Compiled in 503ms
+(node:7372) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 2464ms
+(node:9424) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 1338ms
