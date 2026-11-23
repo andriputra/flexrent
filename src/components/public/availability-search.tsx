@@ -1,12 +1,14 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useTransition } from "react"
 import { CalendarDays, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { buildCatalogHref } from "@/components/public/query-nav"
+import { cn } from "@/lib/utils"
+import type { CatalogQuery } from "@/lib/validators/public"
 
 const TYPES = [
   { value: "", label: "Semua" },
@@ -14,39 +16,49 @@ const TYPES = [
   { value: "mobil", label: "Mobil" },
 ] as const
 
-/** Hero pencarian: tanggal ambil, tanggal kembali, jenis kendaraan. */
+type Field = "ambil" | "kembali" | "jenis"
+
+/**
+ * Hero pencarian: tanggal dan jenis langsung menyaring, tombolnya tinggal
+ * mengulang pencarian. Nilainya dibaca dari URL, bukan dari state lokal, supaya
+ * tombol Back dan Forward selalu menampilkan filter yang benar-benar dipakai.
+ */
 export function AvailabilitySearch({
   slug,
-  initial,
+  current,
   today,
 }: {
   slug: string
-  initial: { ambil: string; kembali: string; jenis: string }
+  current: CatalogQuery
   today: string
 }) {
   const router = useRouter()
-  const [ambil, setAmbil] = useState(initial.ambil)
-  const [kembali, setKembali] = useState(initial.kembali)
-  const [jenis, setJenis] = useState(initial.jenis)
+  const [pending, startTransition] = useTransition()
 
-  const datesIncomplete = Boolean(ambil) !== Boolean(kembali)
-  const rangeInvalid = Boolean(ambil) && Boolean(kembali) && kembali <= ambil
+  const datesIncomplete = Boolean(current.ambil) !== Boolean(current.kembali)
+  const rangeInvalid =
+    Boolean(current.ambil) && Boolean(current.kembali) && current.kembali <= current.ambil
 
-  function submit(event: React.FormEvent) {
-    event.preventDefault()
-    router.push(
-      buildCatalogHref(slug, {
-        ambil: rangeInvalid ? "" : ambil,
-        kembali: rangeInvalid ? "" : kembali,
-        jenis: jenis as "motor" | "mobil" | "",
-      })
-    )
+  // Rentang yang separuh atau urutannya salah tetap ikut ke URL supaya kotaknya
+  // tidak mengosongkan diri sendiri; server yang memutuskan untuk mengabaikannya.
+  function apply(next: Partial<Pick<CatalogQuery, Field>>) {
+    const href = buildCatalogHref(slug, { ...current, ...next })
+    // replace, bukan push: mengubah filter bukan membuka halaman baru, dan
+    // satu pencarian tidak boleh memenuhi riwayat sampai sepuluh langkah.
+    startTransition(() => router.replace(href))
   }
 
   return (
     <form
-      onSubmit={submit}
-      className="reveal relative space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-pop ring-1 ring-accent/15 sm:p-5"
+      onSubmit={(event) => {
+        event.preventDefault()
+        apply({})
+      }}
+      aria-busy={pending}
+      className={cn(
+        "reveal relative space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-pop ring-1 ring-accent/15 transition-opacity duration-200 sm:p-5",
+        pending && "opacity-70"
+      )}
     >
       <span
         aria-hidden
@@ -70,8 +82,8 @@ export function AvailabilitySearch({
             id="ambil"
             type="date"
             min={today}
-            value={ambil}
-            onChange={(event) => setAmbil(event.target.value)}
+            value={current.ambil}
+            onChange={(event) => apply({ ambil: event.target.value })}
           />
         </div>
         <div className="space-y-1.5 sm:max-w-[17rem]">
@@ -85,9 +97,9 @@ export function AvailabilitySearch({
           <Input
             id="kembali"
             type="date"
-            min={ambil || today}
-            value={kembali}
-            onChange={(event) => setKembali(event.target.value)}
+            min={current.ambil || today}
+            value={current.kembali}
+            onChange={(event) => apply({ kembali: event.target.value })}
           />
         </div>
 
@@ -99,13 +111,13 @@ export function AvailabilitySearch({
             className="inline-flex h-8 items-center gap-1 rounded-full border border-border/70 bg-muted/50 p-1"
           >
             {TYPES.map((option) => {
-              const active = jenis === option.value
+              const active = current.jenis === option.value
               return (
                 <button
                   key={option.label}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => setJenis(option.value)}
+                  onClick={() => apply({ jenis: option.value })}
                   className={
                     active
                       ? "h-6 rounded-full bg-primary px-3 text-xs font-medium text-primary-foreground shadow-[0_8px_18px_-10px_var(--primary)] transition-colors duration-200"

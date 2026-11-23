@@ -126,11 +126,7 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
       </section>
 
       <div className="page-container -mt-16 space-y-6 pb-16 sm:-mt-20 sm:space-y-8 sm:pb-20">
-        <AvailabilitySearch
-          slug={tenant.slug}
-          today={toDayKey(new Date())}
-          initial={{ ambil: query.ambil, kembali: query.kembali, jenis: query.jenis }}
-        />
+        <AvailabilitySearch slug={tenant.slug} today={toDayKey(new Date())} current={query} />
 
         <CatalogFilters slug={tenant.slug} current={query} />
 

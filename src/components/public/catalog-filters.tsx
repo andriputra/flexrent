@@ -32,7 +32,9 @@ export function CatalogFilters({ slug, current }: { slug: string; current: Catal
   const hasFilter = Boolean(current.transmisi || current.min || current.maks || current.jenis)
 
   function apply(next: Partial<CatalogQuery>) {
-    router.push(buildCatalogHref(slug, { ...current, ...next }))
+    // replace, bukan push: mengubah filter bukan membuka halaman baru,
+    // kalau tidak tombol Back harus diklik berkali-kali untuk keluar.
+    router.replace(buildCatalogHref(slug, { ...current, ...next }))
   }
 
   return (
