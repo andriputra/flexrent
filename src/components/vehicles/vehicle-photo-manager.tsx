@@ -39,8 +39,16 @@ export function VehiclePhotoManager({
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [photos, setPhotos] = useState(initialPhotos)
+  const [syncedPhotos, setSyncedPhotos] = useState(initialPhotos)
   const [progress, setProgress] = useState<Progress | null>(null)
   const { ask, dialog } = useConfirmAction()
+
+  // Foto hasil unggah datang lewat props saat router.refresh() selesai. Tanpa
+  // penyesuaian ini, useState menahan nilai awal dan panel tetap "0 dari 6 foto".
+  if (initialPhotos !== syncedPhotos) {
+    setSyncedPhotos(initialPhotos)
+    setPhotos(initialPhotos)
+  }
 
   function run(
     action: () => Promise<{ ok: boolean; error?: string }>,
@@ -125,7 +133,6 @@ export function VehiclePhotoManager({
   function remove(photoId: string) {
     const formData = new FormData()
     formData.set("photoId", photoId)
-    setPhotos((current) => current.filter((photo) => photo.id !== photoId))
     ask({
       title: "Hapus foto ini?",
       description: "Foto akan dihapus dari penyimpanan dan tidak muncul lagi di halaman publik.",
@@ -133,7 +140,12 @@ export function VehiclePhotoManager({
       destructive: true,
       successMessage: "Foto dihapus.",
       run: () => deleteVehiclePhotoAction(formData),
-      onSuccess: () => router.refresh(),
+      onSuccess: () => {
+        // Baru dibuang dari daftar setelah server mengiyakan: kalau dibuang di
+        // depan dan pengguna membatalkan, fotonya hilang tanpa alasan.
+        setPhotos((current) => current.filter((photo) => photo.id !== photoId))
+        router.refresh()
+      },
     })
   }
 
