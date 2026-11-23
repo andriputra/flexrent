@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/shared/layout-parts"
 import { AvailabilitySearch } from "@/components/public/availability-search"
 import { CatalogFilters } from "@/components/public/catalog-filters"
 import { CatalogSkeleton } from "@/components/public/catalog-skeleton"
+import { TestimonialSection } from "@/components/public/testimonial-section"
 import { VehicleCard } from "@/components/public/vehicle-card"
 import { formatDateId, fromWib, toDayKey } from "@/lib/datetime"
 import { publicMeta } from "@/lib/seo"
@@ -174,6 +175,8 @@ async function CatalogResults({ slug, query }: { slug: string; query: CatalogQue
           )}
         </section>
       </div>
+
+      <TestimonialSection tenantId={tenant.id} slug={tenant.slug} tenantName={tenant.name} />
     </>
   )
 }

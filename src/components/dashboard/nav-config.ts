@@ -5,6 +5,7 @@ import {
   LineChart,
   Receipt,
   Settings,
+  Star,
   Users,
   Wallet,
   Wrench,
@@ -35,6 +36,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/bookings", label: "Booking", icon: CalendarCheck },
       { href: "/dashboard/customers", label: "Pelanggan", icon: Users },
       { href: "/dashboard/maintenance", label: "Perawatan", icon: Wrench },
+      { href: "/dashboard/testimonials", label: "Testimoni", icon: Star },
     ],
   },
   {

@@ -192,3 +192,450 @@ prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
 (node:3196) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
 (Use `node --trace-warnings ...` to show where the warning was created)
  GET /bandung-ride 200 in 54240ms
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ ✓ Compiled in 25.5s
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled in 307.5s
+ ✓ Compiled /_not-found/page in 323.7s
+ GET /bandung-ride 404 in 354995ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 3.8s
+(node:9476) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled in 5.5s
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Can't reach database server at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`.
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+ ⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Can't reach database server at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`.
+    at <unknown> (src\lib\tenant-public.ts:27:38)
+    at async (src\lib\tenant-public.ts:27:18)
+  25 |  */
+  26 | export const getPublicTenant = cache(async (slug: string): Promise<PublicTenant | null> => {
+> 27 |   const tenant = await prisma.tenant.findFirst({
+     |                                      ^
+  28 |     where: { slug, isActive: true },
+  29 |     include: { subscription: true },
+  30 |   }) {
+  code: 'P1001',
+  meta: [Object],
+  clientVersion: '6.19.3',
+  digest: '854801307'
+}
+ ⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Can't reach database server at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-round-pine-az1dslqa-pooler.c-3.ap-southeast-1.aws.neon.tech:5432`.
+    at <unknown> (src\lib\tenant-public.ts:27:38)
+    at async (src\lib\tenant-public.ts:27:18)
+  25 |  */
+  26 | export const getPublicTenant = cache(async (slug: string): Promise<PublicTenant | null> => {
+> 27 |   const tenant = await prisma.tenant.findFirst({
+     |                                      ^
+  28 |     where: { slug, isActive: true },
+  29 |     include: { subscription: true },
+  30 |   }) {
+  code: 'P1001',
+  meta: [Object],
+  clientVersion: '6.19.3',
+  digest: '854801307'
+}
+ ⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+    at <unknown> (src\lib\tenant-public.ts:27:38)
+    at async (src\lib\tenant-public.ts:27:18)
+  25 |  */
+  26 | export const getPublicTenant = cache(async (slug: string): Promise<PublicTenant | null> => {
+> 27 |   const tenant = await prisma.tenant.findFirst({
+     |                                      ^
+  28 |     where: { slug, isActive: true },
+  29 |     include: { subscription: true },
+  30 |   }) {
+  code: 'P2024',
+  meta: [Object],
+  clientVersion: '6.19.3',
+  digest: '3891674395'
+}
+ ⨯ Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst()` invocation in
+D:\Flexbox\Flexbox Rental\flexrent\.next\server\chunks\ssr\[root-of-the-server]__5278ab11._.js:658:156
+
+  655 ;
+  656 ;
+  657 const getPublicTenant = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cache"])(async (slug)=>{
+→ 658     const tenant = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].tenant.findFirst(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+    at <unknown> (src\lib\tenant-public.ts:27:38)
+    at async (src\lib\tenant-public.ts:27:18)
+  25 |  */
+  26 | export const getPublicTenant = cache(async (slug: string): Promise<PublicTenant | null> => {
+> 27 |   const tenant = await prisma.tenant.findFirst({
+     |                                      ^
+  28 |     where: { slug, isActive: true },
+  29 |     include: { subscription: true },
+  30 |   }) {
+  code: 'P2024',
+  meta: [Object],
+  clientVersion: '6.19.3',
+  digest: '3891674395'
+}
+ GET /bandung-ride 200 in 48549ms
+ GET /bandung-ride 200 in 191366ms
+ GET /bandung-ride 200 in 8118ms
+ GET /bandung-ride 200 in 5765ms
+ GET /bandung-ride 200 in 3865ms
+ GET /bandung-ride 200 in 4701ms
+ GET /bandung-ride 200 in 7086ms
+ GET /bandung-ride 200 in 36584ms
+ GET /bandung-ride 200 in 770ms
+ GET /bandung-ride 200 in 616ms
+ GET /bandung-ride 200 in 461ms
+ GET /bandung-ride 200 in 731ms
+ GET /bandung-ride 200 in 473ms
+ GET /bandung-ride 200 in 1053ms
+ GET /bandung-ride 200 in 11805ms
+(node:3412) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET /bandung-ride 200 in 51855ms
+ GET /bandung-ride 200 in 60008ms
+ ✓ Compiled in 322.3s
+ ✓ Compiled /[slug] in 46ms
+ GET /bandung-ride 200 in 22922ms
+ GET /bandung-ride 200 in 1412ms
+ GET /bandung-ride 200 in 3472ms
+ ✓ Compiled in 1900ms
+ ✓ Compiled in 2.5s
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+ ○ Compiling /[slug] ...
+ ✓ Compiled in 347.2s
+ ✓ Compiled /[slug] in 44.2s
+(node:6252) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [total, average, grouped] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     prisma.testimonial.groupBy({ where, by: ["rating"], _count: { _all: true } }),
+  204 |   ])
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [total, average, grouped] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     prisma.testimonial.groupBy({ where, by: ["rating"], _count: { _all: true } }),
+  204 |   ])
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [total, average, grouped] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     prisma.testimonial.groupBy({ where, by: ["rating"], _count: { _all: true } }),
+  204 |   ])
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listPublishedTestimonials (src\server\queries\public.ts:176:29)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:41:30)
+  174 | /** Ulasan yang boleh dibaca pengunjung: hanya yang sudah terbit oleh staf. */
+  175 | export function listPublishedTestimonials(tenantId: string, limit = 12) {
+> 176 |   return prisma.testimonial.findMany({
+      |                             ^
+  177 |     where: { tenantId, status: "PUBLISHED" },
+  178 |     select: testimonialCardSelect,
+  179 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '1088748511'
+}
+ GET /bandung-ride 200 in 110250ms
+ ✓ Compiled in 4.6s
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 2s
+(node:12580) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listPublishedTestimonials (src\server\queries\public.ts:176:29)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:41:30)
+  174 | /** Ulasan yang boleh dibaca pengunjung: hanya yang sudah terbit oleh staf. */
+  175 | export function listPublishedTestimonials(tenantId: string, limit = 12) {
+> 176 |   return prisma.testimonial.findMany({
+      |                             ^
+  177 |     where: { tenantId, status: "PUBLISHED" },
+  178 |     select: testimonialCardSelect,
+  179 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '1088748511'
+}
+ GET /bandung-ride 200 in 34329ms
+ ✓ Compiled in 2.2s
+ ✓ Compiled in 549ms
+ ✓ Compiled in 1042ms
+ ○ Compiling / ...
+ ✓ Compiled / in 49s
+ GET / 200 in 63762ms
+ GET / 200 in 1568ms
+(node:640) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:40:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listPublishedTestimonials (src\server\queries\public.ts:176:29)
+    at TestimonialSection (src\components\public\testimonial-section.tsx:41:30)
+  174 | /** Ulasan yang boleh dibaca pengunjung: hanya yang sudah terbit oleh staf. */
+  175 | export function listPublishedTestimonials(tenantId: string, limit = 12) {
+> 176 |   return prisma.testimonial.findMany({
+      |                             ^
+  177 |     where: { tenantId, status: "PUBLISHED" },
+  178 |     select: testimonialCardSelect,
+  179 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '1088748511'
+}
+ GET /bandung-ride 200 in 96069ms
+ ○ Compiling /[slug]/kendaraan/[vehicleId] ...
+ ✓ Compiled /[slug]/kendaraan/[vehicleId] in 136s
+(node:2180) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listTestimonialsForVehicle (src\server\queries\public.ts:185:29)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:30:31)
+  183 |
+  184 | export function listTestimonialsForVehicle(tenantId: string, vehicleId: string, limit = 6) {
+> 185 |   return prisma.testimonial.findMany({
+      |                             ^
+  186 |     where: { tenantId, status: "PUBLISHED", vehicleId },
+  187 |     select: testimonialCardSelect,
+  188 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '3730405135'
+}
+ GET /bandung-ride/kendaraan/cmwq9q66o000mxxwwh0gsn7it 500 in 156068ms
+ ○ Compiling /dashboard/testimonials ...
+ ✓ Compiled /dashboard/testimonials in 22.1s
+ GET /dashboard/testimonials 307 in 30598ms
+(node:14136) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listTestimonialsForVehicle (src\server\queries\public.ts:185:29)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:30:31)
+  183 |
+  184 | export function listTestimonialsForVehicle(tenantId: string, vehicleId: string, limit = 6) {
+> 185 |   return prisma.testimonial.findMany({
+      |                             ^
+  186 |     where: { tenantId, status: "PUBLISHED", vehicleId },
+  187 |     select: testimonialCardSelect,
+  188 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '3730405135'
+}
+ GET /bandung-ride/kendaraan/cmwq9q66o000mxxwwh0gsn7it 500 in 788ms
+(node:11688) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'count')
+    at getTestimonialSummary (src\server\queries\public.ts:201:24)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:29:26)
+  199 |   const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  200 |   const [count, average, ratings] = await prisma.$transaction([
+> 201 |     prisma.testimonial.count({ where }),
+      |                        ^
+  202 |     prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+  203 |     // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+  204 |     // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+ ⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at listTestimonialsForVehicle (src\server\queries\public.ts:185:29)
+    at VehicleRatingStrip (src\components\public\vehicle-rating-strip.tsx:30:31)
+  183 |
+  184 | export function listTestimonialsForVehicle(tenantId: string, vehicleId: string, limit = 6) {
+> 185 |   return prisma.testimonial.findMany({
+      |                             ^
+  186 |     where: { tenantId, status: "PUBLISHED", vehicleId },
+  187 |     select: testimonialCardSelect,
+  188 |     orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }], {
+  digest: '3730405135'
+}
+ GET /bandung-ride/kendaraan/cmwq9q66o000mxxwwh0gsn7it 500 in 645ms

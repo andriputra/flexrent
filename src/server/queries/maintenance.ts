@@ -45,12 +45,3 @@ export async function listMaintenancePlans(tenantId: string, filters: Maintenanc
     totalPages: Math.max(1, Math.ceil(total / perPage)),
   }
 }
-
-/** Hanya id kendaraan milik tenant yang boleh dijadikan filter. */
-export function getVehicleOptions(tenantId: string) {
-  return prisma.vehicle.findMany({
-    where: { tenantId },
-    select: { id: true, brand: true, model: true, plate: true },
-    orderBy: [{ type: "asc" }, { brand: "asc" }, { createdAt: "desc" }],
-  })
-}

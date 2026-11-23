@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { VehicleGallery } from "@/components/public/vehicle-gallery"
+import { VehicleRatingStrip } from "@/components/public/vehicle-rating-strip"
 import { PriceCalculator } from "@/components/public/price-calculator"
 import { VehicleStatusBadge, VehicleTypeBadge } from "@/components/shared/status-badge"
 import { PublicPanel, SectionHeading } from "@/components/shared/layout-parts"
@@ -174,6 +175,13 @@ export default async function PublicVehicleDetailPage({
                 ))}
               </dl>
             </PublicPanel>
+
+            <VehicleRatingStrip
+              tenantId={tenant.id}
+              slug={tenant.slug}
+              vehicleId={vehicle.id}
+              vehicleLabel={`${vehicle.brand} ${vehicle.model}`}
+            />
 
             <Suspense fallback={<VehicleAvailabilitySkeleton />}>
               <VehicleAvailabilitySection tenantId={tenant.id} vehicleId={vehicle.id} />

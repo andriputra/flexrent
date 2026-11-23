@@ -10,6 +10,7 @@ export type RateRule = { limit: number; windowMs: number }
  */
 export const RATE_RULES = {
   booking: { limit: 8, windowMs: 10 * MINUTE },
+  testimonial: { limit: 5, windowMs: 60 * MINUTE },
   documentUpload: { limit: 12, windowMs: 60 * MINUTE },
   login: { limit: 10, windowMs: 5 * MINUTE },
   register: { limit: 5, windowMs: 60 * MINUTE },

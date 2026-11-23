@@ -81,8 +81,9 @@ export default async function TenantPublicLayout({
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
           </div>
 
-          <div className="page-container grid gap-8 py-12 sm:grid-cols-2 sm:py-14">
-            <div className="space-y-2.5 text-sm">
+          {/* flex + justify-between (bukan grid 2 kolom) agar blok kanan menempel tepi, sama seperti footer marketing. */}
+          <div className="page-container flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between sm:gap-12 sm:py-14">
+            <div className="w-full max-w-sm space-y-2.5 text-sm sm:w-auto">
               <p className="text-base font-semibold tracking-tight">{tenant.name}</p>
               {tenant.tagline ? <p className="max-w-sm text-muted-foreground">{tenant.tagline}</p> : null}
               {tenant.address ? (
@@ -99,15 +100,15 @@ export default async function TenantPublicLayout({
               </p>
             </div>
 
-            <div className="space-y-2.5 text-sm">
-              <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-muted-foreground/70 uppercase">
+            <div className="w-full max-w-xs space-y-2.5 text-sm sm:shrink-0 sm:text-right">
+              <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-muted-foreground/70 uppercase sm:justify-end">
                 <Clock aria-hidden className="size-3.5" />
                 Jam operasional
               </p>
               {tenant.openingHours.length ? (
-                <ul className="max-w-xs space-y-1 text-muted-foreground">
+                <ul className="space-y-1 text-muted-foreground">
                   {tenant.openingHours.map((row) => (
-                    <li key={row.day} className="flex justify-between gap-4 tabular-nums">
+                    <li key={row.day} className="flex justify-between gap-6 tabular-nums">
                       <span>{dayLabel(row.day)}</span>
                       <span>{row.closed ? "Tutup" : `${row.open}–${row.close}`}</span>
                     </li>

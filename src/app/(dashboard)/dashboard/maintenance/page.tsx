@@ -17,7 +17,8 @@ import { MaintenanceRowActions } from "@/components/maintenance/maintenance-row-
 import { NewMaintenanceDialog } from "@/components/maintenance/new-maintenance-dialog"
 import { requireTenant } from "@/lib/tenant"
 import { formatDateTimeId, diffInCalendarDays } from "@/lib/datetime"
-import { listMaintenancePlans, getVehicleOptions } from "@/server/queries/maintenance"
+import { listMaintenancePlans } from "@/server/queries/maintenance"
+import { getVehicleOptions } from "@/server/queries/vehicles"
 
 export const metadata = { title: "Perawatan" }
 

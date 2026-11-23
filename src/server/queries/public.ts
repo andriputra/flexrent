@@ -83,6 +83,15 @@ export function getCatalogVehicle(tenantId: string, vehicleId: string) {
   })
 }
 
+/** Pilihan kendaraan untuk formulir ulasan publik. */
+export function listPublicVehicleOptions(tenantId: string) {
+  return prisma.vehicle.findMany({
+    where: { tenantId, isPublished: true, status: { not: "INACTIVE" } },
+    select: { id: true, brand: true, model: true },
+    orderBy: [{ type: "asc" }, { brand: "asc" }, { createdAt: "desc" }],
+    take: 60,
+  })
+}
 /**
  * Penanda kalender di halaman publik. Sengaja tanpa label pelanggan: penyewa
  * hanya perlu tahu hari mana yang tidak bisa dipilih.
@@ -150,6 +159,60 @@ export function findPublicBooking(tenantId: string, code: string, phone: string)
       vehicle: { select: { id: true, type: true, brand: true, model: true, year: true, plate: true } },
     },
   })
+}
+
+const testimonialCardSelect = {
+  id: true,
+  author: true,
+  rating: true,
+  message: true,
+  photoUrl: true,
+  occurredAt: true,
+  vehicle: { select: { id: true, brand: true, model: true } },
+} satisfies Prisma.TestimonialSelect
+
+/** Ulasan yang boleh dibaca pengunjung: hanya yang sudah terbit oleh staf. */
+export function listPublishedTestimonials(tenantId: string, limit = 12) {
+  return prisma.testimonial.findMany({
+    where: { tenantId, status: "PUBLISHED" },
+    select: testimonialCardSelect,
+    orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }],
+    take: limit,
+  })
+}
+
+export function listTestimonialsForVehicle(tenantId: string, vehicleId: string, limit = 6) {
+  return prisma.testimonial.findMany({
+    where: { tenantId, status: "PUBLISHED", vehicleId },
+    select: testimonialCardSelect,
+    orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }],
+    take: limit,
+  })
+}
+
+/**
+ * Rata-rata bintang untuk strip rating, lengkap dengan sebaran per nilai. Tanpa
+ * ulasan, `count` nol dan callers menyembunyikan seluruh section, bukan
+ * menampilkan "0,0 dari 5".
+ */
+export async function getTestimonialSummary(tenantId: string, vehicleId?: string) {
+  const where = { tenantId, status: "PUBLISHED" as const, ...(vehicleId ? { vehicleId } : {}) }
+  const [count, average, ratings] = await prisma.$transaction([
+    prisma.testimonial.count({ where }),
+    prisma.testimonial.aggregate({ where, _avg: { rating: true } }),
+    // Sebaran bintang dihitung di sini, dibatasi 500 baris: cukup untuk satu
+    // armada, dan `groupBy` menuntut ordering yang tidak perlu di sini.
+    prisma.testimonial.findMany({ where, select: { rating: true }, take: 500 }),
+  ])
+
+  // Indeks 0..4 = bintang 5..1, supaya bar digambar dari yang terbaik.
+  const breakdown = [0, 0, 0, 0, 0]
+  for (const item of ratings) {
+    const star = Math.max(1, Math.min(5, item.rating))
+    breakdown[5 - star] += 1
+  }
+
+  return { count, average: count ? (average._avg.rating ?? 0) : 0, breakdown }
 }
 
 export function findBlockedCustomer(tenantId: string, phone: string) {

@@ -81,6 +81,18 @@ export function countVehicles(tenantId: string) {
   return prisma.vehicle.count({ where: { tenantId } })
 }
 
+/**
+ * Pilihan kendaraan untuk dropdown antar modul (filter jadwal perawatan, form
+ * testimoni). Hanya kendaraan milik tenant sendiri yang boleh muncul.
+ */
+export function getVehicleOptions(tenantId: string) {
+  return prisma.vehicle.findMany({
+    where: { tenantId },
+    select: { id: true, brand: true, model: true, plate: true },
+    orderBy: [{ type: "asc" }, { brand: "asc" }, { createdAt: "desc" }],
+  })
+}
+
 export function plateAlreadyUsed(tenantId: string, plate: string, excludeId?: string) {
   return prisma.vehicle.findFirst({
     where: { tenantId, plate, ...(excludeId ? { id: { not: excludeId } } : {}) },
