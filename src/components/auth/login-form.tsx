@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
+import { useEffect, useState, useTransition, type ReactNode } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { LogIn, Mail, User } from "lucide-react"
+import { Eye, EyeOff, Lock, LogIn, Mail, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -37,6 +37,18 @@ const GOOGLE_LOGO = (
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/
 
+/** Isian dengan ikon di kiri; tombol mata pada sandi menempel di sisi kanannya. */
+function IconField({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+  return (
+    <div className="relative">
+      <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        {icon}
+      </span>
+      {children}
+    </div>
+  )
+}
+
 export function LoginForm({
   mode,
   googleEnabled,
@@ -58,6 +70,7 @@ export function LoginForm({
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [formError, setFormError] = useState<string | null>(error ?? null)
 
   const isRegister = mode === "register"
@@ -118,7 +131,12 @@ export function LoginForm({
   }
 
   return (
-    <Card className="shadow-pop">
+    <Card className="anim-pop relative shadow-pop [--card-spacing:1.25rem] [--d:150ms]">
+      {/* Garis aksen di bibir kartu: pembeda dari permukaan, bukan hiasan berbunyi. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent"
+      />
       <CardHeader className="space-y-2">
         <CardTitle className="text-xl">{isRegister ? "Buat akun rental Anda" : "Masuk ke Flexrent"}</CardTitle>
         <CardDescription>
@@ -131,7 +149,7 @@ export function LoginForm({
         {formError ? (
           <p
             role="alert"
-            className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger"
+            className="anim-pop rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger"
           >
             {formError}
           </p>
@@ -140,7 +158,7 @@ export function LoginForm({
         {googleEnabled ? (
           <>
             <form action={signInWithGoogleAction.bind(null, isRegister ? "/onboarding" : "/dashboard")}>
-              <Button type="submit" variant="outline" className="w-full" disabled={pending || !hydrated}>
+              <Button type="submit" variant="outline" className="h-10 w-full" disabled={pending || !hydrated}>
                 {GOOGLE_LOGO}
                 Lanjut dengan Google
               </Button>
@@ -154,56 +172,75 @@ export function LoginForm({
           </>
         ) : null}
 
-        <form onSubmit={submitPassword} method="post" className="space-y-3">
+        <form onSubmit={submitPassword} method="post" className="space-y-4">
           {isRegister ? (
             <div className="space-y-1.5">
               <Label htmlFor="name">Nama Anda</Label>
-              <Input
-                id="name"
-                name="name"
-                autoComplete="name"
-                placeholder="Andi"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                disabled={pending}
-                required
-              />
+              <IconField icon={<User aria-hidden className="size-4" />}>
+                <Input
+                  id="name"
+                  name="name"
+                  autoComplete="name"
+                  placeholder="Andi"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  disabled={pending}
+                  className="h-10 pl-9"
+                  required
+                />
+              </IconField>
             </div>
           ) : null}
 
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="rental@kita.id"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              disabled={pending}
-              required
-            />
+            <IconField icon={<Mail aria-hidden className="size-4" />}>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                autoComplete="email"
+                placeholder="rental@kita.id"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={pending}
+                className="h-10 pl-9"
+                required
+              />
+            </IconField>
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="password">Sandi</Label>
-            <Input
-              id="password"
-              type="password"
-              name="password"
-              autoComplete={isRegister ? "new-password" : "current-password"}
-              placeholder={isRegister ? "Minimal 8 karakter" : "Sandi akun Anda"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              disabled={pending}
-              required
-            />
+            <IconField icon={<Lock aria-hidden className="size-4" />}>
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                autoComplete={isRegister ? "new-password" : "current-password"}
+                placeholder={isRegister ? "Minimal 8 karakter" : "Sandi akun Anda"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={pending}
+                className="h-10 pl-9 pr-11"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+                disabled={pending}
+                aria-pressed={showPassword}
+                aria-label={showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60 disabled:pointer-events-none"
+              >
+                {showPassword ? <EyeOff aria-hidden className="size-4" /> : <Eye aria-hidden className="size-4" />}
+              </button>
+            </IconField>
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-accent text-accent-foreground hover:bg-accent-hover"
+            className="h-10 w-full bg-accent text-accent-foreground shadow-[0_16px_34px_-18px_var(--accent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-hover hover:shadow-[0_22px_40px_-18px_var(--accent)]"
             disabled={pending || !hydrated}
           >
             {isRegister ? <User aria-hidden /> : <LogIn aria-hidden />}
@@ -212,12 +249,12 @@ export function LoginForm({
         </form>
 
         {emailConfigured ? (
-          <form onSubmit={submitEmailLink} method="post" className="space-y-2">
+          <form onSubmit={submitEmailLink} method="post" className="space-y-3">
             <Separator />
             <p className="text-xs text-muted-foreground">
               Lupa sandi atau belum membuatnya? Kami kirim tautan masuk sekali pakai ke email ini.
             </p>
-            <Button type="submit" variant="outline" className="w-full" disabled={pending || !hydrated}>
+            <Button type="submit" variant="outline" className="h-10 w-full" disabled={pending || !hydrated}>
               <Mail aria-hidden />
               {pending ? "Mengirim…" : "Kirim tautan masuk"}
             </Button>
