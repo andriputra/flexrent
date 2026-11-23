@@ -34,10 +34,15 @@ export function perFileBudget(count: number): number {
   return Math.min(MAX_IMAGE_BYTES, Math.floor(UPLOAD_BODY_BUDGET_BYTES / count))
 }
 
+/** Ukuran dalam gaya Indonesia: KB untuk berkas kecil, koma desimal untuk MB. */
+export function formatBytes(value: number): string {
+  if (value < MB) return `${Math.max(1, Math.round(value / 1024))} KB`
+  return `${(value / MB).toFixed(1).replace(".", ",")} MB`
+}
+
 /** Penjaga terakhir: batch yang tetap terlalu besar setelah kompresi di klien. */
 export function uploadBudgetError(files: { size: number }[]): string | null {
   const total = files.reduce((sum, file) => sum + file.size, 0)
   if (total <= UPLOAD_BODY_BUDGET_BYTES) return null
-  const mb = (value: number) => `${(value / MB).toFixed(1).replace(".", ",")} MB`
-  return `Total berkas foto ${mb(total)} melebihi jatah ${mb(UPLOAD_BODY_BUDGET_BYTES)} dalam satu kali unggah — unggah lebih sedikit sekaligus.`
+  return `Total berkas foto ${formatBytes(total)} melebihi jatah ${formatBytes(UPLOAD_BODY_BUDGET_BYTES)} dalam satu kali unggah — unggah lebih sedikit sekaligus.`
 }

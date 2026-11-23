@@ -265,6 +265,14 @@
     transform: scale(3.2);
   }
 }
+@keyframes m-track {
+  from {
+    transform: translateX(-250%);
+  }
+  to {
+    transform: translateX(150%);
+  }
+}
 
 @layer utilities {
   .anim-rise,
@@ -296,6 +304,11 @@
   .anim-ping {
     animation: m-ping 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
     animation-delay: var(--d, 0ms);
+  }
+  /* Bar tak-tentu: satu segmen menyapu, dipakai saat durasinya belum bisa diukur. */
+  .anim-track {
+    width: 40%;
+    animation: m-track 1.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   }
 
   /* Pola garis tipis di atas permukaan gelap. */
@@ -412,6 +425,14 @@
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* Bar unggah tanpa gerak: segmen yang membeku di luar alur akan terbaca sebagai kosong. */
+@media (prefers-reduced-motion: reduce) {
+  .anim-track {
+    animation: none;
+    width: 100%;
   }
 }
 

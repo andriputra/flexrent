@@ -140,3 +140,20 @@ prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
  ○ Compiling /login/verify ...
  ✓ Compiled /login/verify in 2.3s
  GET /login/verify?email=rental@kita.id 200 in 2810ms
+   Reload env: .env.local
+ GET /login/verify?email=rental%40kita.id 200 in 1183ms
+   Reload env: .env.local
+ GET /login/verify?email=rental%40kita.id 200 in 1254ms
+ ✓ Compiled in 381ms
+ ✓ Compiled in 8.6s
+ ○ Compiling /login ...
+ ✓ Compiled /login in 1233ms
+ GET /login 200 in 5459ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 1753ms
+ ✓ Compiled in 2.2s
+ ✓ Compiled in 1206ms
+ ✓ Compiled in 1133ms
+ ○ Compiling /dashboard/vehicles/[id] ...
+ ✓ Compiled /dashboard/vehicles/[id] in 51.1s
+(node:7588) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)

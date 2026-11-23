@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Bike } from "lucide-react"
 import { Providers } from "@/components/shared/providers"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="anim-drift absolute bottom-[-26%] right-[-14%] size-[38rem] rounded-full bg-[radial-gradient(circle,rgb(37_99_235/0.20),transparent_62%)] blur-[80px] [--d:-9s] dark:bg-[radial-gradient(circle,rgb(37_99_235/0.26),transparent_62%)]" />
           <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(72%_62%_at_50%_42%,black,transparent_78%)]" />
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+        </div>
+
+        {/* Mengambang di sudut supaya bisa ganti tema sebelum masuk, sama seperti permukaan lain. */}
+        <div className="anim-fade absolute right-4 top-4 rounded-lg bg-card/70 ring-1 ring-foreground/10 backdrop-blur-sm sm:right-6 sm:top-6">
+          <ThemeToggle />
         </div>
 
         <Link href="/" className="anim-rise mb-8 flex items-center gap-2 text-lg font-semibold">
