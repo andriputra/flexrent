@@ -158,9 +158,11 @@ export function VehiclePhotoManager({
   }
 
   return (
-    <div className="space-y-4">
+    // @container: jumlah kolom dihitung dari lebar kartu, bukan lebar jendela.
+    // Di panel kanan (sempit) satu kolom tetap muat; di halaman penuh lebar, tiga.
+    <div className="@container space-y-4">
       {photos.length > 0 ? (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-2.5 @[15rem]:grid-cols-2 @[36rem]:grid-cols-3">
           {photos.map((photo, index) => (
             <li
               key={photo.id}
@@ -169,13 +171,26 @@ export function VehiclePhotoManager({
                 photo.isPrimary && "ring-2 ring-accent"
               )}
             >
-              <div className="aspect-[4/3] bg-muted">
+              <div className="relative aspect-[4/3] bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photo.url} alt={`Foto ${index + 1}`} loading="lazy" className="size-full object-cover" />
+                {!readOnly ? (
+                  <Button
+                    variant="destructive"
+                    size="icon-xs"
+                    onClick={() => remove(photo.id)}
+                    disabled={pending}
+                    aria-label="Hapus foto"
+                    title="Hapus foto"
+                    className="absolute right-1 top-1 shadow-pop"
+                  >
+                    <Trash2 aria-hidden />
+                  </Button>
+                ) : null}
               </div>
               <div className="flex items-center justify-between gap-1 px-2 py-1.5">
                 <span className="text-xs text-muted-foreground">#{index + 1}</span>
-                <div className="flex items-center gap-0.5">
+                <div className="flex flex-wrap items-center justify-end gap-0.5">
                   <Button
                     variant="ghost"
                     size="icon-xs"
@@ -203,15 +218,6 @@ export function VehiclePhotoManager({
                     title={photo.isPrimary ? "Foto utama" : "Jadikan foto utama"}
                   >
                     <Star aria-hidden className={photo.isPrimary ? "fill-current text-accent" : ""} />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon-xs"
-                    onClick={() => remove(photo.id)}
-                    disabled={readOnly || pending}
-                    aria-label="Hapus foto"
-                  >
-                    <Trash2 aria-hidden />
                   </Button>
                 </div>
               </div>
